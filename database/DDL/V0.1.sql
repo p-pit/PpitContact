@@ -1,24 +1,3 @@
--- phpMyAdmin SQL Dump
--- version 4.1.1
--- http://www.phpmyadmin.net
---
--- Client :  localhost
--- Généré le :  Ven 26 Juin 2015 à 10:33
--- Version du serveur :  5.6.15
--- Version de PHP :  5.5.14
-
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET time_zone = "+00:00";
-
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
-
---
--- Base de données :  `cedr`
---
 
 -- --------------------------------------------------------
 
@@ -40,8 +19,7 @@ CREATE TABLE IF NOT EXISTS `contact_event` (
   `update_time` datetime DEFAULT NULL,
   `update_user` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `id` (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -61,7 +39,7 @@ CREATE TABLE IF NOT EXISTS `contact_vcard` (
   `update_time` datetime DEFAULT NULL,
   `update_user` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=10 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -83,8 +61,4 @@ CREATE TABLE IF NOT EXISTS `contact_vcard_property` (
   `update_time` datetime DEFAULT NULL,
   `update_user` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2231 ;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
