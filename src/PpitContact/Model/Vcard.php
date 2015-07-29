@@ -26,6 +26,17 @@ class Vcard implements InputFilterAwareInterface
         return get_object_vars($this);
     }
 
+    public function toArray()
+    {
+    	$data = array();
+    	$data['id'] = (int) $this->id;
+    	$data['n_title'] = (int) $this->n_title;
+    	$data['n_first'] = $this->n_first;
+    	$data['n_last'] = $this->n_last;
+    	$data['n_fn'] = $this->n_fn;
+    
+    	return $data;
+    }
     public function exchangeArray($data)
     {
         $this->id = (isset($data['id'])) ? $data['id'] : null;

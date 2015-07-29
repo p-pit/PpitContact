@@ -9,7 +9,6 @@ use Zend\InputFilter\InputFilterInterface;        // <-- Add this import
 class ContactEvent implements InputFilterAwareInterface
 {
     public $id;
-    public $instance_id;
     public $contact_id;
     public $type;
     public $date;
@@ -23,11 +22,24 @@ class ContactEvent implements InputFilterAwareInterface
     {
         return get_object_vars($this);
     }
-
+    
+    public function toArray()
+    {
+    	$data = array();
+    	$data['id'] = (int) $this->id;
+    	$data['contact_id'] = (int) $this->contact_id;
+    	$data['type'] = $this->type;
+    	$data['date'] = $this->date;
+    	$data['caption'] = $this->caption;
+    	$data['description'] = $this->description;
+    	$data['comment'] = $this->comment;
+    	
+    	return $data;
+    }
+    
     public function exchangeArray($data)
     {
         $this->id = (isset($data['id'])) ? $data['id'] : null;
-        $this->instance_id = (isset($data['instance_id'])) ? $data['instance_id'] : null;
         $this->contact_id = (isset($data['contact_id'])) ? $data['contact_id'] : null;
         $this->type = (isset($data['type'])) ? $data['type'] : null;
         $this->date = (isset($data['date'])) ? $data['date'] : null;
@@ -86,6 +98,44 @@ class ContactEvent implements InputFilterAwareInterface
 	        								'encoding' => 'UTF-8',
 	        								'min'      => 1,
 	        								'max'      => 2047,
+	        						),
+	        				),
+	        		),
+	        )));
+	        
+	        $inputFilter->add($factory->createInput(array(
+	        		'name'     => 'comment',
+	        		'required' => false,
+	        		'filters'  => array(
+	        				array('name' => 'StripTags'),
+	        				array('name' => 'StringTrim'),
+	        		),
+	        		'validators' => array(
+	        				array(
+	        						'name'    => 'StringLength',
+	        						'options' => array(
+	        								'encoding' => 'UTF-8',
+	        								'min'      => 1,
+	        								'max'      => 2047,
+	        						),
+	        				),
+	        		),
+	        )));
+	        
+	        $inputFilter->add($factory->createInput(array(
+	        		'name'     => 'type',
+	        		'required' => false,
+	        		'filters'  => array(
+	        				array('name' => 'StripTags'),
+	        				array('name' => 'StringTrim'),
+	        		),
+	        		'validators' => array(
+	        				array(
+	        						'name'    => 'StringLength',
+	        						'options' => array(
+	        								'encoding' => 'UTF-8',
+	        								'min'      => 1,
+	        								'max'      => 255,
 	        						),
 	        				),
 	        		),

@@ -9,7 +9,6 @@ use Zend\InputFilter\InputFilterInterface;        // <-- Add this import
 class VcardProperty implements InputFilterAwareInterface
 {
     public $id;
-    public $instance_id;
     public $vcard_id;
     public $order;
     public $name;
@@ -22,11 +21,23 @@ class VcardProperty implements InputFilterAwareInterface
     {
         return get_object_vars($this);
     }
-
+    public function toArray()
+    {
+    	$data = array();
+    	$data['id'] = (int) $this->id;
+    	$data['vcard_id'] = (int) $this->vcard_id;
+    	$data['order'] = $this->order;
+    	$data['name'] = $this->name;
+    	$data['type'] = $this->type;
+    	$data['text_value'] = $this->text_value;
+    	$data['blob_value'] = $this->blob_value;
+    
+    	return $data;
+    }
+    
     public function exchangeArray($data)
     {
         $this->id = (isset($data['id'])) ? $data['id'] : null;
-        $this->instance_id = (isset($data['instance_id'])) ? $data['instance_id'] : null;
         $this->vcard_id = (isset($data['vcard_id'])) ? $data['vcard_id'] : null;
         $this->order = (isset($data['order'])) ? $data['order'] : null;
         $this->name = (isset($data['name'])) ? $data['name'] : null;
