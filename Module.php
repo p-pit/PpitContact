@@ -51,20 +51,9 @@ class Module //implements AutoloaderProviderInterface, ConfigProviderInterface
                     $resultSetPrototype->setArrayObjectPrototype(new ContactEvent());
                     return new TableGateway('contact_event', $dbAdapter, null, $resultSetPrototype);
                 },
-            	'PpitContact\Model\TmpVcardTable' =>  function($sm) {
-                    $tableGateway = $sm->get('TmpVcardTableGateway');
-                    $table = new GenericTable($tableGateway);
-                    return $table;
-                },
-                'TmpVcardTableGateway' => function ($sm) {
-                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
-                    $resultSetPrototype = new ResultSet();
-                    $resultSetPrototype->setArrayObjectPrototype(new TmpVcard());
-                    return new TableGateway('tmp_contact_vcard', $dbAdapter, null, $resultSetPrototype);
-                },
             	'PpitContact\Model\VcardTable' =>  function($sm) {
                     $tableGateway = $sm->get('VcardTableGateway');
-                    $table = new VcardTable($tableGateway);
+                    $table = new GenericTable($tableGateway);
                     return $table;
                 },
                 'VcardTableGateway' => function ($sm) {
