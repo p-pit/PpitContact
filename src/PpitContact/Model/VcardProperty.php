@@ -9,6 +9,7 @@ use Zend\InputFilter\InputFilterInterface;        // <-- Add this import
 class VcardProperty implements InputFilterAwareInterface
 {
     public $id;
+    public $instance_id;
     public $vcard_id;
     public $order;
     public $name;
@@ -21,23 +22,11 @@ class VcardProperty implements InputFilterAwareInterface
     {
         return get_object_vars($this);
     }
-    public function toArray()
-    {
-    	$data = array();
-    	$data['id'] = (int) $this->id;
-    	$data['vcard_id'] = (int) $this->vcard_id;
-    	$data['order'] = $this->order;
-    	$data['name'] = $this->name;
-    	$data['type'] = $this->type;
-    	$data['text_value'] = $this->text_value;
-    	$data['blob_value'] = $this->blob_value;
-    
-    	return $data;
-    }
-    
+
     public function exchangeArray($data)
     {
         $this->id = (isset($data['id'])) ? $data['id'] : null;
+        $this->instance_id = (isset($data['instance_id'])) ? $data['instance_id'] : null;
         $this->vcard_id = (isset($data['vcard_id'])) ? $data['vcard_id'] : null;
         $this->order = (isset($data['order'])) ? $data['order'] : null;
         $this->name = (isset($data['name'])) ? $data['name'] : null;
@@ -59,6 +48,83 @@ class VcardProperty implements InputFilterAwareInterface
             $factory     = new InputFactory();
         	$this->inputFilter = $inputFilter;
         }
+        
+        
+        $inputFilter->add($factory->createInput(array(
+        		'name'     => 'name',
+        		'required' => false,
+        		'filters'  => array(
+        				array('name' => 'StripTags'),
+        				array('name' => 'StringTrim'),
+        		),
+        		'validators' => array(
+        				array(
+        						'name'    => 'StringLength',
+        						'options' => array(
+        								'encoding' => 'UTF-8',
+        								'min'      => 1,
+        								'max'      => 255,
+        						),
+        				),
+        		),
+        )));
+        $inputFilter->add($factory->createInput(array(
+        		'name'     => 'type',
+        		'required' => false,
+        		'filters'  => array(
+        				array('name' => 'StripTags'),
+        				array('name' => 'StringTrim'),
+        		),
+        		'validators' => array(
+        				array(
+        						'name'    => 'StringLength',
+        						'options' => array(
+        								'encoding' => 'UTF-8',
+        								'min'      => 1,
+        								'max'      => 255,
+        						),
+        				),
+        		),
+        )));
+        
+        $inputFilter->add($factory->createInput(array(
+        		'name'     => 'text_value',
+        		'required' => false,
+        		'filters'  => array(
+        				array('name' => 'StripTags'),
+        				array('name' => 'StringTrim'),
+        		),
+        		'validators' => array(
+        				array(
+        						'name'    => 'StringLength',
+        						'options' => array(
+        								'encoding' => 'UTF-8',
+        								'min'      => 1,
+        								'max'      => 255,
+        						),
+        				),
+        		),
+        )));
+        
+        
+        
+        
         return $this->inputFilter;
     }
+    
+    
+    public function toArray()
+    {
+    	$data = array();
+    	$data['id'] = (int) $this->id;
+    	$data['vcard_id'] = (int) $this->vcard_id;
+    	$data['order'] = (int) $this->order;
+    	$data['name'] = $this->name;
+    	$data['type'] = $this->type;
+    	$data['text_value'] = $this->text_value;
+    	$data['blob_value'] = $this->blob_value;
+    
+    	return $data;
+    }
+    
 }

@@ -9,7 +9,7 @@ use Zend\InputFilter\InputFilterInterface;        // <-- Add this import
 class Vcard implements InputFilterAwareInterface
 {
     public $id;
-    public $instance_id;
+  
     public $n_title;
     public $n_first;
     public $n_last;
@@ -26,21 +26,9 @@ class Vcard implements InputFilterAwareInterface
         return get_object_vars($this);
     }
 
-    public function toArray()
-    {
-    	$data = array();
-    	$data['id'] = (int) $this->id;
-    	$data['n_title'] = (int) $this->n_title;
-    	$data['n_first'] = $this->n_first;
-    	$data['n_last'] = $this->n_last;
-    	$data['n_fn'] = $this->n_fn;
-    
-    	return $data;
-    }
     public function exchangeArray($data)
     {
         $this->id = (isset($data['id'])) ? $data['id'] : null;
-        $this->instance_id = (isset($data['instance_id'])) ? $data['instance_id'] : null;
         $this->n_title = (isset($data['n_title'])) ? $data['n_title'] : null;
         $this->n_first = (isset($data['n_first'])) ? $data['n_first'] : null;
         $this->n_last = (isset($data['n_last'])) ? $data['n_last'] : null;
@@ -104,8 +92,9 @@ class Vcard implements InputFilterAwareInterface
 	        		),
 	        )));
 	
+	    
 	        $inputFilter->add($factory->createInput(array(
-	        		'name'     => 'ORG',
+	        		'name'     => 'n_fn',
 	        		'required' => TRUE,
 	        		'filters'  => array(
 	        				array('name' => 'StripTags'),
@@ -122,196 +111,13 @@ class Vcard implements InputFilterAwareInterface
 	        				),
 	        		),
 	        )));
-	        
-	        $inputFilter->add($factory->createInput(array(
-	        		'name'     => 'EMAIL',
-	        		'required' => TRUE,
-	        		'filters'  => array(
-	        				array('name' => 'StripTags'),
-	        				array('name' => 'StringTrim'),
-	        		),
-	        		'validators' => array(
-	        				array(
-	        						'name'    => 'StringLength',
-	        						'options' => array(
-	        								'encoding' => 'UTF-8',
-	        								'min'      => 1,
-	        								'max'      => 255,
-	        						),
-	        				),
-	        		),
-	        )));
-	        
-	        $inputFilter->add($factory->createInput(array(
-	        		'name'     => 'TEL_work',
-	        		'required' => TRUE,
-	        		'filters'  => array(
-	        				array('name' => 'StripTags'),
-	        				array('name' => 'StringTrim'),
-	        		),
-	        		'validators' => array(
-	        				array(
-	        						'name'    => 'StringLength',
-	        						'options' => array(
-	        								'encoding' => 'UTF-8',
-	        								'min'      => 1,
-	        								'max'      => 255,
-	        						),
-	        				),
-	        		),
-	        )));
+	     
+	    
 	
-	        $inputFilter->add($factory->createInput(array(
-	        		'name'     => 'TEL_cell',
-	        		'required' => FALSE,
-	        		'filters'  => array(
-	        				array('name' => 'StripTags'),
-	        				array('name' => 'StringTrim'),
-	        		),
-	        		'validators' => array(
-	        				array(
-	        						'name'    => 'StringLength',
-	        						'options' => array(
-	        								'encoding' => 'UTF-8',
-	        								'min'      => 1,
-	        								'max'      => 255,
-	        						),
-	        				),
-	        		),
-	        )));
+	     
 
-	        $inputFilter->add($factory->createInput(array(
-	        		'name'     => 'ORG',
-	        		'required' => FALSE,
-	        		'filters'  => array(
-	        				array('name' => 'StripTags'),
-	        				array('name' => 'StringTrim'),
-	        		),
-	        		'validators' => array(
-	        				array(
-	        						'name'    => 'StringLength',
-	        						'options' => array(
-	        								'encoding' => 'UTF-8',
-	        								'min'      => 1,
-	        								'max'      => 255,
-	        						),
-	        				),
-	        		),
-	        )));
-	         
-	        $inputFilter->add($factory->createInput(array(
-	        		'name'     => 'ADR_street',
-	        		'required' => FALSE,
-	        		'filters'  => array(
-	        				array('name' => 'StripTags'),
-	        				array('name' => 'StringTrim'),
-	        		),
-	        		'validators' => array(
-	        				array(
-	        						'name'    => 'StringLength',
-	        						'options' => array(
-	        								'encoding' => 'UTF-8',
-	        								'min'      => 1,
-	        								'max'      => 255,
-	        						),
-	        				),
-	        		),
-	        )));
-	
-	        $inputFilter->add($factory->createInput(array(
-	        		'name'     => 'ADR_extended',
-	        		'required' => FALSE,
-	        		'filters'  => array(
-	        				array('name' => 'StripTags'),
-	        				array('name' => 'StringTrim'),
-	        		),
-	        		'validators' => array(
-	        				array(
-	        						'name'    => 'StringLength',
-	        						'options' => array(
-	        								'encoding' => 'UTF-8',
-	        								'min'      => 1,
-	        								'max'      => 255,
-	        						),
-	        				),
-	        		),
-	        )));
-	        
-	        $inputFilter->add($factory->createInput(array(
-	        		'name'     => 'ADR_post_office_box',
-	        		'required' => FALSE,
-	        		'filters'  => array(
-	        				array('name' => 'StripTags'),
-	        				array('name' => 'StringTrim'),
-	        		),
-	        		'validators' => array(
-	        				array(
-	        						'name'    => 'StringLength',
-	        						'options' => array(
-	        								'encoding' => 'UTF-8',
-	        								'min'      => 1,
-	        								'max'      => 255,
-	        						),
-	        				),
-	        		),
-	        )));
-	        
-	        $inputFilter->add($factory->createInput(array(
-	        		'name'     => 'ADR_zip',
-	        		'required' => FALSE,
-	        		'filters'  => array(
-	        				array('name' => 'StripTags'),
-	        				array('name' => 'StringTrim'),
-	        		),
-	        		'validators' => array(
-	        				array(
-	        						'name'    => 'StringLength',
-	        						'options' => array(
-	        								'encoding' => 'UTF-8',
-	        								'min'      => 1,
-	        								'max'      => 255,
-	        						),
-	        				),
-	        		),
-	        )));
-	        
-	        $inputFilter->add($factory->createInput(array(
-	        		'name'     => 'ADR_city',
-	        		'required' => FALSE,
-	        		'filters'  => array(
-	        				array('name' => 'StripTags'),
-	        				array('name' => 'StringTrim'),
-	        		),
-	        		'validators' => array(
-	        				array(
-	        						'name'    => 'StringLength',
-	        						'options' => array(
-	        								'encoding' => 'UTF-8',
-	        								'min'      => 1,
-	        								'max'      => 255,
-	        						),
-	        				),
-	        		),
-	        )));
-	
-	        $inputFilter->add($factory->createInput(array(
-	        		'name'     => 'ADR_country',
-	        		'required' => FALSE,
-	        		'filters'  => array(
-	        				array('name' => 'StripTags'),
-	        				array('name' => 'StringTrim'),
-	        		),
-	        		'validators' => array(
-	        				array(
-	        						'name'    => 'StringLength',
-	        						'options' => array(
-	        								'encoding' => 'UTF-8',
-	        								'min'      => 1,
-	        								'max'      => 255,
-	        						),
-	        				),
-	        		),
-	        )));
+	      
+	    
 
         	$this->inputFilter = $inputFilter;
         }
@@ -368,43 +174,8 @@ class Vcard implements InputFilterAwareInterface
 	        		),
 	        )));
 	
-	        $inputFilter->add($factory->createInput(array(
-	        		'name'     => 'ORG',
-	        		'required' => TRUE,
-	        		'filters'  => array(
-	        				array('name' => 'StripTags'),
-	        				array('name' => 'StringTrim'),
-	        		),
-	        		'validators' => array(
-	        				array(
-	        						'name'    => 'StringLength',
-	        						'options' => array(
-	        								'encoding' => 'UTF-8',
-	        								'min'      => 1,
-	        								'max'      => 255,
-	        						),
-	        				),
-	        		),
-	        )));
-	        
-	        $inputFilter->add($factory->createInput(array(
-	        		'name'     => 'EMAIL',
-	        		'required' => TRUE,
-	        		'filters'  => array(
-	        				array('name' => 'StripTags'),
-	        				array('name' => 'StringTrim'),
-	        		),
-	        		'validators' => array(
-	        				array(
-	        						'name'    => 'StringLength',
-	        						'options' => array(
-	        								'encoding' => 'UTF-8',
-	        								'min'      => 1,
-	        								'max'      => 255,
-	        						),
-	        				),
-	        		),
-	        )));
+	      
+	    
 	        
 	        $inputFilter->add($factory->createInput(array(
 	        		'name'     => 'TEL_work',
@@ -468,4 +239,25 @@ class Vcard implements InputFilterAwareInterface
         
         return $this->devisInputFilter;
     }
+    
+    
+    public function toArray()
+    {
+    	$data = array();
+    	$data['id'] = (int) $this->id;
+    	$data['n_title'] = (int) $this->n_title;
+    	$data['n_first'] = $this->n_first;
+    	$data['n_last'] = $this->n_last;
+    	$data['n_fn'] = $this->n_fn;
+
+    	return $data;
+    }
+    
+    
+    
+    
+    
+    
+    
+    
 }
