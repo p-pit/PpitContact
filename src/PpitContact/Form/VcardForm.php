@@ -63,7 +63,97 @@ class VcardForm extends Form
 	    				'size'  => '255',
 	    		),
 	    ));
-	    
+
+	    $this->add(array(
+	    		'name' => 'org',
+	    		'attributes' => array(
+	    				'id' => 'org',
+	    				'type'  => 'text',
+	    				'size'  => '255',
+	    		),
+	    ));
+
+	    $this->add(array(
+	    		'name' => 'tel_work',
+	    		'attributes' => array(
+	    				'id' => 'tel_work',
+	    				'type'  => 'text',
+	    				'size'  => '255',
+	    		),
+	    ));
+
+	    $this->add(array(
+	    		'name' => 'tel_cell',
+	    		'attributes' => array(
+	    				'id' => 'tel_cell',
+	    				'type'  => 'text',
+	    				'size'  => '255',
+	    		),
+	    ));
+
+	    $this->add(array(
+	    		'name' => 'email',
+	    		'attributes' => array(
+	    				'id' => 'email',
+	    				'type'  => 'text',
+	    				'size'  => '255',
+	    		),
+	    ));
+
+	    $this->add(array(
+	    		'name' => 'ADR_street',
+	    		'attributes' => array(
+	    				'id' => 'ADR_street',
+	    				'type'  => 'text',
+	    				'size'  => '255',
+	    		),
+	    ));
+
+	    $this->add(array(
+	    		'name' => 'ADR_extended',
+	    		'attributes' => array(
+	    				'id' => 'ADR_extended',
+	    				'type'  => 'text',
+	    				'size'  => '255',
+	    		),
+	    ));
+
+	    $this->add(array(
+	    		'name' => 'ADR_post_office_box',
+	    		'attributes' => array(
+	    				'id' => 'ADR_post_office_box',
+	    				'type'  => 'text',
+	    				'size'  => '255',
+	    		),
+	    ));
+
+	    $this->add(array(
+	    		'name' => 'ADR_zip',
+	    		'attributes' => array(
+	    				'id' => 'ADR_zip',
+	    				'type'  => 'text',
+	    				'size'  => '255',
+	    		),
+	    ));
+
+	    $this->add(array(
+	    		'name' => 'ADR_city',
+	    		'attributes' => array(
+	    				'id' => 'ADR_city',
+	    				'type'  => 'text',
+	    				'size'  => '255',
+	    		),
+	    ));
+
+	    $this->add(array(
+	    		'name' => 'ADR_country',
+	    		'attributes' => array(
+	    				'id' => 'ADR_country',
+	    				'type'  => 'text',
+	    				'size'  => '255',
+	    		),
+	    ));
+	     
 	    $this->add(array(
 	    		'name' => 'submit',
 	    		'attributes' => array(

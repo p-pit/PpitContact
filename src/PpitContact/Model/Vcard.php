@@ -14,7 +14,11 @@ class Vcard implements InputFilterAwareInterface
     public $n_first;
     public $n_last;
     public $n_fn;
-
+    public $org;
+    public $tel_work;
+    public $tel_cell;
+    public $email;
+    
     // Additional fields (from joined table)
     public $text_value;
     
@@ -33,10 +37,30 @@ class Vcard implements InputFilterAwareInterface
         $this->n_first = (isset($data['n_first'])) ? $data['n_first'] : null;
         $this->n_last = (isset($data['n_last'])) ? $data['n_last'] : null;
         $this->n_fn = (isset($data['n_fn'])) ? $data['n_fn'] : null;
+        $this->org = (isset($data['org'])) ? $data['org'] : null;
+        $this->tel_work = (isset($data['tel_work'])) ? $data['tel_work'] : null;
+        $this->tel_cell = (isset($data['tel_cell'])) ? $data['tel_cell'] : null;
+        $this->email = (isset($data['email'])) ? $data['email'] : null;
         
         $this->text_value = (isset($data['text_value'])) ? $data['text_value'] : null;
     }
 
+    public function toArray()
+    {
+    	$data = array();
+    	$data['id'] = (int) $this->id;
+    	$data['n_title'] = (int) $this->n_title;
+    	$data['n_first'] = $this->n_first;
+    	$data['n_last'] = $this->n_last;
+    	$data['n_fn'] = $this->n_fn;
+    	$data['org'] = $this->org;
+    	$data['tel_work'] = $this->tel_work;
+    	$data['tel_cell'] = $this->tel_cell;
+    	$data['email'] = $this->email;
+    	 
+    	return $data;
+    }
+    
     // Add content to this method:
     public function setInputFilter(InputFilterInterface $inputFilter)
     {
@@ -238,26 +262,5 @@ class Vcard implements InputFilterAwareInterface
         }
         
         return $this->devisInputFilter;
-    }
-    
-    
-    public function toArray()
-    {
-    	$data = array();
-    	$data['id'] = (int) $this->id;
-    	$data['n_title'] = (int) $this->n_title;
-    	$data['n_first'] = $this->n_first;
-    	$data['n_last'] = $this->n_last;
-    	$data['n_fn'] = $this->n_fn;
-
-    	return $data;
-    }
-    
-    
-    
-    
-    
-    
-    
-    
+    }    
 }

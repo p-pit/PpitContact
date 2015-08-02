@@ -335,9 +335,9 @@ class VcardController extends AbstractActionController
     	$current_user->retrieveHabilitations($this);
     	 
     	// Retrieve the vcard and its properties
-    	$vcard = $this->getVcardTable()->get($id);
+    	$vcard = $this->getVcardTable()->get($id, $current_user);
     	$select = $this->getVcardPropertyTable()->getSelect()->where(array('vcard_id' => $id));
-    	$cursor = $this->getVcardPropertyTable()->selectWith($select);
+    	$cursor = $this->getVcardPropertyTable()->selectWith($select, $current_user);
     	$properties = array();
     	foreach($cursor as $property) $properties[$property->name] = $property->text_value;
     	
