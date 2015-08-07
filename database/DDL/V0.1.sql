@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS `contact_vcard` (
   `update_time` datetime DEFAULT NULL,
   `update_user` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=12 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
