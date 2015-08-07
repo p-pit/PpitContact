@@ -34,12 +34,16 @@ CREATE TABLE IF NOT EXISTS `contact_vcard` (
   `n_first` varchar(255) DEFAULT NULL,
   `n_last` varchar(255) DEFAULT NULL,
   `n_fn` varchar(255) DEFAULT NULL,
+  `org` varchar(255) DEFAULT NULL,
+  `tel_work` varchar(255) DEFAULT NULL,
+  `tel_cell` varchar(255) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
   `creation_time` datetime DEFAULT NULL,
   `creation_user` int(11) DEFAULT NULL,
   `update_time` datetime DEFAULT NULL,
   `update_user` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=12 ;
 
 -- --------------------------------------------------------
 
