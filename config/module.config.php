@@ -138,7 +138,7 @@ return array(
             'layout/layout'           => __DIR__ . '/../view/layout/layout.phtml',
         ),
         'template_path_stack' => array(
-            'Ppit-contact' => __DIR__ . '/../view',
+            'ppit-contact' => __DIR__ . '/../view',
         ),
     ),
 	'translator' => array(
