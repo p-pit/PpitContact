@@ -475,7 +475,7 @@ class VcardController extends AbstractActionController
     	$current_user->retrieveHabilitations($this);
     	 
     	// Retrieve the link and its parent folder
-    	$link = $this->getLinkTable()->get($id);
+    	$link = $this->getLinkTable()->get($id, $current_user);
     	$parent_id = $link->parent_id;
 
     	// Retrieve the role list
