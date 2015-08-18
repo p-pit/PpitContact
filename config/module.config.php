@@ -115,11 +115,11 @@ return array(
 			'BjyAuthorize\Guard\Route' => array(
 
 				// Contacts
-				array('route' => 'vcard', 'roles' => array('local_admin')),
-				array('route' => 'vcard/index', 'roles' => array('local_admin')),
-				array('route' => 'vcard/add', 'roles' => array('local_admin')),
-				array('route' => 'vcard/delete', 'roles' => array('local_admin')),
-				array('route' => 'vcard/import', 'roles' => array('local_admin')),
+				array('route' => 'vcard', 'roles' => array('customer_admin')),
+				array('route' => 'vcard/index', 'roles' => array('customer_admin')),
+				array('route' => 'vcard/add', 'roles' => array('customer_admin')),
+				array('route' => 'vcard/delete', 'roles' => array('customer_admin')),
+				array('route' => 'vcard/import', 'roles' => array('customer_admin')),
 				array('route' => 'vcard/devis', 'roles' => array('guest')),
 			)
 		)
