@@ -14,7 +14,7 @@ $this->headTitle($title);
 <h3 align="center"><?php echo $this->translate('Souscrire ou demander un devis');?></h3>
 <p align="center"><?php echo $this->translate('Ou simplement nous poser une question');?></p>
 <?php
-    echo $this->partial('/partials/generic-form', array('route' => 'vcard/devis', 'form' => $this->form, 'returnUrl' => $this->url('zfcuser/login')));
+    echo $this->partial('/partials/generic-form', array('route' => 'vcard/devis', 'id' => $id, 'form' => $this->form, 'returnUrl' => $this->url('zfcuser/login')));
 ?>
 			</div>
 		</div>

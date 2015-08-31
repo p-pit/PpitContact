@@ -23,7 +23,7 @@ class VcardDevisForm extends Form
         		),
         		'options' => array(
         				'label' => '* Title',
-        				'value_options' => array($translator->translate('Mr') => 'Mr', $translator->translate('Ms') => 'Ms'),
+        				'value_options' => array('Mr' => 'Mr', 'Mme' => 'Mme'),
         				'empty_option'  => '--- Please choose ---'
         		),
         ));
@@ -53,7 +53,7 @@ class VcardDevisForm extends Form
 	    ));
 
 	    $this->add(array(
-	    		'name' => 'ORG',
+	    		'name' => 'org',
 	    		'attributes' => array(
 	    				'id' => 'org',
 	    				'type'  => 'text',
@@ -65,9 +65,9 @@ class VcardDevisForm extends Form
 	    ));
 
 	    $this->add(array(
-	    		'name' => 'EMAIL',
+	    		'name' => 'email',
 	    		'attributes' => array(
-	    				'id' => 'tel',
+	    				'id' => 'email',
 	    				'type'  => 'text',
 	    				'size'  => '255',
 	    		),
@@ -77,9 +77,9 @@ class VcardDevisForm extends Form
 	    ));
 	     
 	    $this->add(array(
-	    		'name' => 'TEL_work',
+	    		'name' => 'tel_work',
 	    		'attributes' => array(
-	    				'id' => 'tel',
+	    				'id' => 'tel_work',
 	    				'type'  => 'text',
 	    				'size'  => '255',
 	    		),
@@ -89,9 +89,9 @@ class VcardDevisForm extends Form
 	    ));
 
 	    $this->add(array(
-	    		'name' => 'TEL_cell',
+	    		'name' => 'tel_cell',
 	    		'attributes' => array(
-	    				'id' => 'tel',
+	    				'id' => 'tel_cell',
 	    				'type'  => 'text',
 	    				'size'  => '255',
 	    		),

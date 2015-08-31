@@ -99,7 +99,10 @@ return array(
 	                'devis' => array(
 	                    'type' => 'segment',
 	                    'options' => array(
-	                        'route' => '/devis',
+	                        'route' => '/devis[/:id]',
+		                    'constraints' => array(
+		                    	'id'     => '[0-9]*',
+		                    ),
 	                    	'defaults' => array(
 	                    		'action' => 'devis',
 	                        ),
@@ -115,12 +118,13 @@ return array(
 			'BjyAuthorize\Guard\Route' => array(
 
 				// Contacts
-				array('route' => 'vcard', 'roles' => array('customer_admin')),
-				array('route' => 'vcard/index', 'roles' => array('customer_admin')),
+				array('route' => 'vcard', 'roles' => array('super_admin', 'customer_admin')),
 				array('route' => 'vcard/add', 'roles' => array('customer_admin')),
 				array('route' => 'vcard/delete', 'roles' => array('customer_admin')),
-				array('route' => 'vcard/import', 'roles' => array('customer_admin')),
 				array('route' => 'vcard/devis', 'roles' => array('guest')),
+				array('route' => 'vcard/import', 'roles' => array('customer_admin')),
+				array('route' => 'vcard/index', 'roles' => array('super_admin', 'customer_admin')),
+				array('route' => 'vcard/update', 'roles' => array('user')),
 			)
 		)
 	),
@@ -148,6 +152,7 @@ return array(
 				'type'     => 'phparray',
 				'base_dir' => __DIR__ . '/../language',
 				'pattern'  => '%s.php',
+				'text_domain' => 'ppit-contact'
 			),
 	       	array(
 	            'type' => 'phpArray',

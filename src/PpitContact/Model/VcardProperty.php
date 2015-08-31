@@ -35,6 +35,21 @@ class VcardProperty implements InputFilterAwareInterface
         $this->blob_value = (isset($data['blob_value'])) ? $data['blob_value'] : null;
     }
 
+    public function toArray()
+    {
+    	$data = array();
+    	$data['id'] = (int) $this->id;
+    	$data['instance_id'] = (int) $this->instance_id;
+    	$data['vcard_id'] = (int) $this->vcard_id;
+    	$data['order'] = (int) $this->order;
+    	$data['name'] = $this->name;
+    	$data['type'] = $this->type;
+    	$data['text_value'] = $this->text_value;
+    	$data['blob_value'] = $this->blob_value;
+    
+    	return $data;
+    }
+
     // Add content to this method:
     public function setInputFilter(InputFilterInterface $inputFilter)
     {
@@ -111,20 +126,4 @@ class VcardProperty implements InputFilterAwareInterface
         
         return $this->inputFilter;
     }
-    
-    
-    public function toArray()
-    {
-    	$data = array();
-    	$data['id'] = (int) $this->id;
-    	$data['vcard_id'] = (int) $this->vcard_id;
-    	$data['order'] = (int) $this->order;
-    	$data['name'] = $this->name;
-    	$data['type'] = $this->type;
-    	$data['text_value'] = $this->text_value;
-    	$data['blob_value'] = $this->blob_value;
-    
-    	return $data;
-    }
-    
 }

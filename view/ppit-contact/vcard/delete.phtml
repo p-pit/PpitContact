@@ -1,26 +1,82 @@
 <?php
-    echo $this->partial('/partials/menu');
+	$title = $this->translate('Contacts', 'ppit-contact', $current_user->locale);
+	echo $this->partial('/partials/menu');
 ?>
 <?php
 $this->headTitle($title);
 ?>
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-4 col-md-offset-4">
 		<div class="panel panel-default">
             <div class="panel-heading">
-				<strong><?php echo $this->translate($title);?></strong>
+				<strong><?php echo $this->translate('Delete a contact', 'ppit-contact', $current_user->locale) ?></strong>
             </div>
            	<div class="panel-body">
-<h3 align="center"><?php echo $this->translate('Delete a contact');?></h3>
-<?php
-$url = $this->url('vcard/delete', array('id' => $this->id));
-?>
-<form action="<?php echo $url; ?>" method="post">
-<div>
-    <input type="hidden" name="id" value="<?php echo (int) $this->id; ?>" />
-    <input type="submit" class="btn btn-primary" name="del" value="<?php echo $this->translate('Confirm') ?>" />
-    &nbsp;&nbsp;
-	<a href="<?php echo $this->url('vcard/index');?>"><?php echo $this->translate('Cancel') ?></a>
-</div>
-</form>
 
+				<table class="table-condensed">
+           	
+<!-- Last, first name -->
+				    <tr class="row">
+						<td align="right"><strong><?php echo $this->translate('Name', 'ppit-contact', $current_user->locale) ?></strong></td>
+						<td><?php echo $vcard->n_fn ?></td>
+					</tr>
+           	
+<!-- email -->
+<?php if ($vcard->email) : ?>
+					<tr class="row">
+						<td align="right"><strong><?php echo $this->translate('email', 'ppit-contact', $current_user->locale) ?></strong></td>
+						<td><?php echo $vcard->email ?></td>
+					</tr>
+<?php endif;?>
+           	
+<!-- Cellular -->
+<?php if ($vcard->tel_cell) : ?>
+					<tr class="row">
+						<td align="right"><strong><?php echo $this->translate('Cellular phone', 'ppit-contact', $current_user->locale) ?></strong></td>
+						<td><?php echo $vcard->tel_cell ?></td>
+					</tr>
+<?php endif;?>
+           	
+<!-- Work phone -->
+<?php if ($vcard->tel_work) : ?>
+					<tr class="row">
+						<td align="right"><strong><?php echo $this->translate('Work phone', 'ppit-contact', $current_user->locale) ?></strong></td>
+						<td><?php echo $vcard->tel_work ?></td>
+					</tr>
+<?php endif;?>
+
+				</table>
+           					
+<!-- Form -->
+				<form action="<?php echo $this->url('vcard/delete', array('id' => $id)) ?>" method="post">
+
+<!--  Consistency error -->
+				    <div class="form-group">
+<?php if ($error == 'Consistency') : ?>
+						<div class="col-sm-12"><p class="help-block"><?php echo $this->translate('The contact is used and cannot be deleted', 'ppit-contact', $current_user->locale) ?></p></div>
+<?php endif;?>
+					</div>
+				
+<!--  CSRF -->
+<?php $element = $csrfForm->get('csrf') ?>
+				    <div class="form-group">
+						<?php echo $this->formElement($element) ?>
+<?php if ($this->formElementErrors($element)) : ?>
+						<div class="col-sm-12"><p class="help-block"><?php echo $this->translate('The form has expired, please input again', 'ppit-core', $current_user->locale) ?></p></div>
+<?php endif;?>
+					</div>
+					
+<!-- Submit button -->
+					<div class="form-group">
+						<div class="col-sm-5">&nbsp;</div>
+						<div class="col-sm-7">
+							<input type="submit" class="btn btn-primary" name="del" value="<?php echo $this->translate('Delete', 'ppit-core', $current_user->locale) ?>" />
+							&nbsp;&nbsp;
+							<a href="<?php echo $this->url('vcard') ?>"><?php echo $this->translate('Cancel', 'ppit-core', $current_user->locale) ?></a>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>

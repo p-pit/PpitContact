@@ -1,7 +1,7 @@
 <?php
 namespace PpitContact\Controller;
 
-use Zend\Mvc\Controller\AbstractActionController;
+use PpitCore\Controller\PpitController;
 use Zend\View\Model\ViewModel;
 use Zend\Session\Container;
 use PpitContact\Model\ContactEvent;
@@ -11,24 +11,25 @@ use PpitContact\Model\VcardProperty;
 use PpitContact\Form\VcardForm;
 use PpitContact\Form\VcardDevisForm;
 use PpitCore\Controller\Functions;
-use PpitMasterData\Model\Customer;
+use PpitCore\Form\CsrfForm;
+use PpitCore\Model\Csrf;
+use PpitCustomer\Model\Customer;
 use PpitOrder\Model\Order;
 use PpitUser\Model\User;
 use PpitUser\Model\UserRoleLinker;
 use SplFileObject;
 use Zend\Db\Sql\Expression;
 
-class VcardController extends AbstractActionController
+class VcardController extends PpitController
 {
 	protected $customerTable;
 	protected $contactEventTable;
 	protected $orderTable;
 	protected $tmpVcardTable;
 	protected $emailRegex = "/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}/";
-	protected $telRegexRequired = "/^\+?([0-9\. ]+)$/";
 	protected $telRegex = "/^\+?([0-9\. ]*)$/";
-	
-   public function indexAction()
+
+	public function indexAction()
     {
     	// Retrieve the current user
     	$current_user = Functions::getUser($this);
@@ -42,25 +43,26 @@ class VcardController extends AbstractActionController
     	if (!$dir) $dir = 'ASC';
     	$adapter = $this->getServiceLocator()->get('Zend\Db\Adapter\Adapter');
         $select = $this->getVcardTable()->getSelect()
-        	->where(array('instance_id' => $current_user->instance_id, 'id <> ?' => 1))
+//        	->where(array('instance_id' => $current_user->instance_id, 'id <> ?' => 1))
         	->order(array($major.' '.$dir, 'n_last', 'n_first'));
-       	$paginator = new \Zend\Paginator\Paginator(new \Zend\Paginator\Adapter\DbSelect($select, $adapter));
+        $vcards = $this->getVcardTable()->selectWith($select, $current_user);
+/*       	$paginator = new \Zend\Paginator\Paginator(new \Zend\Paginator\Adapter\DbSelect($select, $adapter));
     	$paginator->setCurrentPageNumber($currentPage);
-    	$paginator->setDefaultItemCountPerPage(30);
+    	$paginator->setDefaultItemCountPerPage(30);*/
     	
     	// Create the email array
     	$select = $this->getVcardTable()->getSelect()->order(array('n_last', 'n_first'))
-    	->join('contact_vcard_property', 'contact_vcard.id = contact_vcard_property.vcard_id', array('text_value'))
-    	->where(array('contact_vcard_property.name' => 'EMAIL', 'contact_vcard_property.type' => 'work'));
-    	$cursor = $this->getVcardTable()->selectWith($select);
+	    	->join('contact_vcard_property', 'contact_vcard.id = contact_vcard_property.vcard_id', array('text_value'))
+	    	->where(array('contact_vcard_property.name' => 'EMAIL', 'contact_vcard_property.type' => 'work'));
+    	$cursor = $this->getVcardTable()->selectWith($select, $current_user);
 		$emails = array();
 		foreach ($cursor as $email) $emails[$email->id] = $email->text_value;
 
 		// Create the phone array
 		$select = $this->getVcardTable()->getSelect()->order(array('n_last', 'n_first'))
-		->join('contact_vcard_property', 'contact_vcard.id = contact_vcard_property.vcard_id', array('text_value'))
-		->where(array('contact_vcard_property.name' => 'TEL_work', 'contact_vcard_property.type' => 'work'));
-		$cursor = $this->getVcardTable()->selectWith($select);
+			->join('contact_vcard_property', 'contact_vcard.id = contact_vcard_property.vcard_id', array('text_value'))
+			->where(array('contact_vcard_property.name' => 'TEL_work', 'contact_vcard_property.type' => 'work'));
+		$cursor = $this->getVcardTable()->selectWith($select, $current_user);
 		$tels = array();
 		foreach ($cursor as $tel) $tels[$tel->id] = $tel->text_value;
 		
@@ -70,7 +72,7 @@ class VcardController extends AbstractActionController
     		'title' => 'Contact',
     		'major' => $major,
     		'dir' => $dir,
-    		'vcards' => $paginator,
+    		'vcards' => $vcards,
     		'emails' => $emails,
     		'tels' => $tels
         ));
@@ -82,135 +84,167 @@ class VcardController extends AbstractActionController
     	$current_user = Functions::getUser($this);
     	$current_user->retrieveHabilitations($this);
     	 
-    	$form = new VcardForm();
-        $form->addElements($this->getServiceLocator()->get('translator'));
-        $form->get('submit')->setValue($this->getServiceLocator()->get('translator')->translate('Add'));
+        // Instanciates the model objects
+        $vcard = new Vcard();
+        
+		// Instanciate the csrf form
+        $csrfForm = new CsrfForm();
+    	$csrfForm->addCsrfElement('csrf');
 
+    	$error = null;
         $request = $this->getRequest();
         if ($request->isPost()) {
-            $vcard = new Vcard();
-            $form->setInputFilter($vcard->getInputFilter());
-            $form->setData($request->getPost());
-            $validator = new \Zend\Validator\Db\NoRecordExists(
-			    array(
-			        'table'   => 'contact_vcard',
-			        'field'   => 'n_fn',
-			        'adapter' => $this->getServiceLocator()->get('Zend\Db\Adapter\Adapter')
-			    )
-			);
-   			$form->getInputFilter()->get('n_last')->getValidatorChain()->addValidator($validator);
+        	$vcard->n_title = $request->getPost('n_title');
+        	$vcard->n_last = $request->getPost('n_last');
+        	$vcard->n_first = $request->getPost('n_first');
+        	$vcard->org = $request->getPost('org');
+        	$vcard->email = $request->getPost('email');
+        	$vcard->tel_work = $request->getPost('tel_work');
+        	$vcard->tel_cell = $request->getPost('tel_cell');
 
-            if ($form->isValid()) {
-            	            	 
-            	// Check the email
-		    	if (!preg_match($this->emailRegex, $form->get('EMAIL')->getValue())) {
-		    		$form->get('EMAIL')->setMessages(array(array('EMAIL' => $this->getServiceLocator()->get('translator')->translate('This is not a valid email address'))));
-		    	}
-            	// Check the work phone
-		    	elseif (!preg_match($this->telRegexRequired, $form->get('TEL_work')->getValue())) {
-		    		$form->get('TEL_work')->setMessages(array(array('TEL_work' => $this->getServiceLocator()->get('translator')->translate('This is not a valid phone number'))));
-		    	}
-                // Check the cell phone
-		    	elseif (!preg_match($this->telRegex, $form->get('TEL_cell')->getValue())) {
-		    		$form->get('TEL_cell')->setMessages(array(array('TEL_cell' => $this->getServiceLocator()->get('translator')->translate('This is not a valid phone number'))));
-		    	}
-		    	else {
-      				$vcard->exchangeArray($form->getData());
-	                $vcard->id = NULL;
-	                $vcard->n_fn = $vcard->n_last.', '.$vcard->n_first;
-	                $id = $this->getVcardTable()->save($vcard, $current_user);
+        	$vcard->ADR_street = $request->getPost('ADR_street');
+        	$vcard->ADR_extended = $request->getPost('ADR_extended');
+        	$vcard->ADR_post_office_box = $request->getPost('ADR_post_office_box');
+        	$vcard->ADR_zip = $request->getPost('ADR_zip');
+        	$vcard->ADR_city = $request->getPost('ADR_city');
+        	$vcard->ADR_state = $request->getPost('ADR_state');
+        	$vcard->ADR_country = $request->getPost('ADR_country');
+        	
+        	$csrfForm->setInputFilter((new Csrf('csrf'))->getInputFilter());
+        	$csrfForm->setData($request->getPost());
+
+            if ($csrfForm->isValid()) {
+    			
+    			// Double the client controls
+    			if (strlen($vcard->n_title) > 255 ||
+    				!$vcard->n_first || strlen($vcard->n_first) > 255 ||
+					!$vcard->n_last || strlen($vcard->n_last) > 255 ||
+					strlen($vcard->org) > 255 ||
+					strlen($vcard->email) > 255 ||
+    				!preg_match($this->emailRegex, $vcard->email) ||
+					strlen($vcard->tel_work) > 255 ||
+    				!preg_match($this->telRegex, $vcard->tel_work) ||
+					strlen($vcard->tel_cell) > 255 ||
+    				!preg_match($this->telRegex, $vcard->tel_cell) ||
+    				(!$vcard->tel_cell && !$vcard->tel_work) ||
+    				(!$vcard->tel_cell && !$vcard->email) ||
+					strlen($vcard->ADR_street) > 255 ||
+					strlen($vcard->ADR_extended) > 255 ||
+					strlen($vcard->ADR_post_office_box) > 255 ||
+					strlen($vcard->ADR_zip) > 255 ||
+					strlen($vcard->ADR_city) > 255 ||
+					strlen($vcard->ADR_state) > 255 ||
+    				strlen($vcard->ADR_country) > 255
+    			) throw new \Exception('javascript error');
+
+    			else { // Check for duplicate contact
+    				
+    				// same first name, last name and email
+    				$select = $this->getVcardTable()->getSelect()
+    					->where(array('n_first' => $vcard->n_first, 'n_last' => $vcard->n_last, 'email' => $vcard->email));
+		            if (count($this->getVcardTable()->selectWith($select, $current_user)) > 0) $error = 'Duplicate';
+		            else {
+    					// same first name, last name and cellular
+		            	$select = $this->getVcardTable()->getSelect()
+		            		->where(array('n_first' => $vcard->n_first, 'n_last' => $vcard->n_last, 'tel_cell' => $vcard->tel_cell));
+		            	if (count($this->getVcardTable()->selectWith($select, $current_user)) > 0) $error = 'Duplicate';
+						else {
+
+							// Atomically save the vcard and its properties
+			            	try {
+			    				/**
+			    				* @var \Zend\Db\Adapter\Driver\Pdo\Connection
+			    				*/
+				    			$connection = $this->getVcardTable()->getAdapter()->getDriver()->getConnection();
+			    				$connection->beginTransaction();
+
+			    				$vcard->id = NULL;
+				                $vcard->n_fn = $vcard->n_last.', '.$vcard->n_first;
+				                $id = $this->getVcardTable()->save($vcard->toArray(), $current_user);
+				
+				                // Add the vcard properties
+				                $property = new VcardProperty();
+				                $property->vcard_id = $id;
+			
+				                // Address - Street
+				                $property->order = 1;
+				                $property->name = 'ADR_street';
+				                $property->type = 'work';
+				                $property->text_value = $vcard->ADR_street;
+				                $this->getVcardPropertyTable()->save($property->toArray(), $current_user);
 	
-	                // Add the vcard properties
-	                $property = new VcardProperty();
-	                $property->vcard_id = $id;
+				                // Address - Extended
+				                $property->order = 2;
+				                $property->name = 'ADR_extended';
+				                $property->type = 'work';
+				                $property->text_value = $vcard->ADR_extended;
+				                $this->getVcardPropertyTable()->save($property->toArray(), $current_user);
+			
+				                // Address - Post office box
+				                $property->order = 3;
+				                $property->name = 'ADR_post_office_box';
+				                $property->type = 'work';
+				                $property->text_value = $vcard->ADR_post_office_box;
+				                $this->getVcardPropertyTable()->save($property->toArray(), $current_user);
+			
+				                // Address - Zip
+				                $property->order = 4;
+				                $property->name = 'ADR_zip';
+				                $property->type = 'work';
+				                $property->text_value = $vcard->ADR_zip;
+				                $this->getVcardPropertyTable()->save($property->toArray(), $current_user);
+			
+				                // Address - City
+				                $property->order = 5;
+				                $property->name = 'ADR_city';
+				                $property->type = 'work';
+				                $property->text_value = $vcard->ADR_city;
+				                $this->getVcardPropertyTable()->save($property->toArray(), $current_user);
+	
+				                // Address - State
+				                $property->order = 6;
+				                $property->name = 'ADR_state';
+				                $property->type = 'work';
+				                $property->text_value = $vcard->ADR_state;
+				                $this->getVcardPropertyTable()->save($property->toArray(), $current_user);
+				                 
+				                // Address - Country
+				                $property->order = 7;
+				                $property->name = 'ADR_country';
+				                $property->type = 'work';
+				                $property->text_value = $vcard->ADR_country;
+				                $this->getVcardPropertyTable()->save($property->toArray(), $current_user);
 
-	                // Organization
-	                $property->order = 1;
-	                $property->name = 'ORG';
-	                $property->type = NULL;
-	                $property->text_value = $form->get('ORG')->getValue();
-	                $this->getVcardPropertyTable()->save($property, $current_user);
-	                 
-	                // Email
-	                $property->order = 2;
-	                $property->name = 'EMAIL';
-	                $property->type = 'work';
-	                $property->text_value = $form->get('EMAIL')->getValue();
-	                $this->getVcardPropertyTable()->save($property, $current_user);
-	                 
-	                // Work phone
-	                $property->order = 3;
-	                $property->name = 'TEL_work';
-	                $property->type = 'work';
-	                $property->text_value = $form->get('TEL_work')->getValue();
-	                $this->getVcardPropertyTable()->save($property, $current_user);
+				                $connection->commit();
 
-	                // Cellular phone
-	                $property->order = 4;
-	                $property->name = 'TEL_cell';
-	                $property->type = 'cell';
-	                $property->text_value = $form->get('TEL_cell')->getValue();
-	                $this->getVcardPropertyTable()->save($property, $current_user);
-
-	                // Address - Street
-	                $property->order = 5;
-	                $property->name = 'ADR_street';
-	                $property->type = 'work';
-	                $property->text_value = $form->get('ADR_street')->getValue();
-	                $this->getVcardPropertyTable()->save($property, $current_user);
-
-	                // Address - Extended
-	                $property->order = 6;
-	                $property->name = 'ADR_extended';
-	                $property->type = 'work';
-	                $property->text_value = $form->get('ADR_extended')->getValue();
-	                $this->getVcardPropertyTable()->save($property, $current_user);
-
-	                // Address - Post office box
-	                $property->order = 7;
-	                $property->name = 'ADR_post_office_box';
-	                $property->type = 'work';
-	                $property->text_value = $form->get('ADR_post_office_box')->getValue();
-	                $this->getVcardPropertyTable()->save($property, $current_user);
-
-	                // Address - Zip
-	                $property->order = 8;
-	                $property->name = 'ADR_zip';
-	                $property->type = 'work';
-	                $property->text_value = $form->get('ADR_zip')->getValue();
-	                $this->getVcardPropertyTable()->save($property, $current_user);
-
-	                // Address - City
-	                $property->order = 9;
-	                $property->name = 'ADR_city';
-	                $property->type = 'work';
-	                $property->text_value = $form->get('ADR_city')->getValue();
-	                $this->getVcardPropertyTable()->save($property, $current_user);
-
-	                // Address - Country
-	                $property->order = 10;
-	                $property->name = 'ADR_country';
-	                $property->type = 'work';
-	                $property->text_value = $form->get('ADR_country')->getValue();
-	                $this->getVcardPropertyTable()->save($property, $current_user);
-
-	                // Redirect to the user list
-	                return $this->redirect()->toRoute('vcard/index');
-      			}
+				                // Redirect
+				                return $this->redirect()->toRoute('vcard');
+			            	}
+							catch (\Exception $e) {
+		    					$connection->rollback();
+		    					throw $e;
+		    				}
+						}
+		            }
+		        }
             }
         }
         return array(
-    			'current_user' => $current_user,
-    			'title' => 'Contact',
-        		'form' => $form,
+    		'current_user' => $current_user,
+        	'csrfForm' => $csrfForm,
+        	'vcard' => $vcard,
+        	'error' => $error
         );
     }
 
     public function devisAction()
     {
-    	// No user connected : Log as guest user
-    	$current_user = new User();
-    	$current_user->username = 'guest';
+        // Check the presence of the id parameter for the entity to update
+    	$id = (int) $this->params()->fromRoute('id', 0);
+    	if (!$id) {
+    		return $this->redirect()->toRoute('vcard/index');
+    	}
+    	$current_user = $this->getUserTable()->get($id);
     	$current_user->retrieveHabilitations($this);
     
     	$form = new VcardDevisForm();
@@ -234,23 +268,24 @@ class VcardController extends AbstractActionController
     		if ($form->isValid()) {
     			 
     			// Check the email
-    			if (!preg_match($this->emailRegex, $form->get('EMAIL')->getValue())) {
-    				$form->get('EMAIL')->setMessages(array(array('EMAIL' => $this->getServiceLocator()->get('translator')->translate('This is not a valid email address'))));
+    			if (!preg_match($this->emailRegex, $form->get('email')->getValue())) {
+    				$form->get('email')->setMessages(array(array('email' => $this->getServiceLocator()->get('translator')->translate('This is not a valid email address'))));
     			}
     			// Check the work phone
-    			elseif (!preg_match($this->telRegexRequired, $form->get('TEL_work')->getValue())) {
-    				$form->get('TEL_work')->setMessages(array(array('TEL_work' => $this->getServiceLocator()->get('translator')->translate('This is not a valid phone number'))));
+    			elseif (!preg_match($this->telRegex, $form->get('tel_work')->getValue())) {
+    				$form->get('tel_work')->setMessages(array(array('tel_work' => $this->getServiceLocator()->get('translator')->translate('This is not a valid phone number'))));
     			}
     			// Check the cell phone
-    			elseif (!preg_match($this->telRegex, $form->get('TEL_cell')->getValue())) {
-    				$form->get('TEL_cell')->setMessages(array(array('TEL_cell' => $this->getServiceLocator()->get('translator')->translate('This is not a valid phone number'))));
+    			elseif (!preg_match($this->telRegex, $form->get('tel_cell')->getValue())) {
+    				$form->get('tel_cell')->setMessages(array(array('tel_cell' => $this->getServiceLocator()->get('translator')->translate('This is not a valid phone number'))));
     			}
     			else {
     				$vcard->exchangeArray($form->getData());
     				$vcard->id = NULL;
+    				$vcard->instance_id = $current_user->instance_id;
     				$vcard->n_fn = $vcard->n_last.', '.$vcard->n_first;
-    				$id = $this->getVcardTable()->save($vcard, $current_user);
-    
+    				$id = $this->getVcardTable()->save($vcard->toArray(), $current_user);
+/*    
     				// Add the vcard properties
     				$property = new VcardProperty();
     				$property->vcard_id = $id;
@@ -260,55 +295,58 @@ class VcardController extends AbstractActionController
     				$property->name = 'ORG';
     				$property->type = NULL;
     				$property->text_value = $form->get('ORG')->getValue();
-    				$this->getVcardPropertyTable()->save($property, $current_user);
+    				$this->getVcardPropertyTable()->save($property->toArray(), $current_user);
     
     				// Email
     				$property->order = 2;
     				$property->name = 'EMAIL';
     				$property->type = 'work';
     				$property->text_value = $form->get('EMAIL')->getValue();
-    				$this->getVcardPropertyTable()->save($property, $current_user);
+    				$this->getVcardPropertyTable()->save($property->toArray(), $current_user);
     
     				// Work phone
     				$property->order = 3;
     				$property->name = 'TEL_work';
     				$property->type = 'work';
     				$property->text_value = $form->get('TEL_work')->getValue();
-    				$this->getVcardPropertyTable()->save($property, $current_user);
+    				$this->getVcardPropertyTable()->save($property->toArray(), $current_user);
     
     				// Cellular phone
     				$property->order = 4;
     				$property->name = 'TEL_cell';
     				$property->type = 'cell';
     				$property->text_value = $form->get('TEL_cell')->getValue();
-    				$this->getVcardPropertyTable()->save($property, $current_user);
+    				$this->getVcardPropertyTable()->save($property->toArray(), $current_user);*/
 
     				if ($form->get('souscrire')->getValue()) {
 
 	    				// Create the customer
 	    				$customer = new Customer();
-	    				$customer->name = $form->get('ORG')->getValue();
+	    				$customer->instance_id = $current_user->instance_id;
+	    				$customer->name = $form->get('org')->getValue();
 	    				$customer->contact_id = $id;
-	    				$customer_id = $this->getCustomerTable()->save($customer, $current_user);
+	    				$customer_id = $this->getCustomerTable()->save($customer->toArray(), $current_user);
 	    				
 	    				// Create the order
 						$order = new Order();
+	    				$order->instance_id = $current_user->instance_id;
 						$order->customer_id = $customer_id;
 						$order->order_date = date('Y-m-d');
 						$order->caption = 'location gratuite 1 an - 50 utilisateurs';    				
-						$this->getOrderTable()->save($order, $current_user);
+						$this->getOrderTable()->save($order->toArray(), $current_user);
     				}
 
     				if ($form->get('quotation')->getValue()) {
     				
-    					// Create the customer
+    					// Create the event
     					$event = new ContactEvent();
+	    				$event->instance_id = $current_user->instance_id;
     					$event->contact_id = $id;
     					$event->type = 'quotation';
 						$event->date = date('Y-m-d');
 						$event->caption = 'Demander un devis location ou achat premium';
 						$event->comment = $form->get('comment')->getValue();
-						$event_id = $this->getContactEventTable()->save($event, $current_user);
+						$event_id = $this->getContactEventTable()->save($event->toArray(), $current_user);
     				}
     				
     				// Redirect to the user list
@@ -320,6 +358,7 @@ class VcardController extends AbstractActionController
     			'current_user' => $current_user,
     			'title' => 'Notes de frais',
     			'form' => $form,
+    			'id' => $id,
     	);
     }
     
@@ -336,129 +375,173 @@ class VcardController extends AbstractActionController
     	 
     	// Retrieve the vcard and its properties
     	$vcard = $this->getVcardTable()->get($id, $current_user);
-    	$select = $this->getVcardPropertyTable()->getSelect()->where(array('vcard_id' => $id));
+    	$select = $this->getVcardPropertyTable()->getSelect()
+    		->where(array('vcard_id' => $id))
+    		->order(array('order'));
     	$cursor = $this->getVcardPropertyTable()->selectWith($select, $current_user);
     	$properties = array();
-    	foreach($cursor as $property) $properties[$property->name] = $property->text_value;
+    	foreach($cursor as $property) {
+    		switch ($property->name) {
+    			case 'ADR_street' :
+	    			$vcard->ADR_street = $property->text_value;
+	    			break;
+    			case 'ADR_extended' :
+	    			$vcard->ADR_extended = $property->text_value;
+	    			break;
+    			case 'ADR_post_office_box' :
+	    			$vcard->ADR_post_office_box = $property->text_value;
+	    			break;
+    			case 'ADR_zip' :
+	    			$vcard->ADR_zip = $property->text_value;
+	    			break;
+    			case 'ADR_city' :
+	    			$vcard->ADR_city = $property->text_value;
+	    			break;
+    			case 'ADR_state' :
+	    			$vcard->ADR_state = $property->text_value;
+	    			break;
+    			case 'ADR_country' :
+	    			$vcard->ADR_country = $property->text_value;
+	    			break;
+    		}
+    	}
+
+    	// Instanciate the csrf form
+    	$csrfForm = new CsrfForm();
+    	$csrfForm->addCsrfElement('csrf');
     	
-		// Create and fill the form
-    	$form = new VcardForm();
-    	$form->addElements($this->getServiceLocator()->get('translator'));
-        $form->bind($vcard);
-		foreach($properties as $name => $value) $form->get($name)->setValue($value);
-
-        $form->get('submit')->setAttribute('value', $this->getServiceLocator()->get('translator')->translate('Update'));
+    	$error = null;
         $request = $this->getRequest();
-        
-        // process the post request (form filled and submitted)
         if ($request->isPost()) {
-            $form->setInputFilter($vcard->getInputFilter());
-            $form->setData($request->getPost());
+        	$vcard->n_title = $request->getPost('n_title');
+        	$vcard->n_last = $request->getPost('n_last');
+        	$vcard->n_first = $request->getPost('n_first');
+        	$vcard->org = $request->getPost('org');
+        	$vcard->email = $request->getPost('email');
+        	$vcard->tel_work = $request->getPost('tel_work');
+        	$vcard->tel_cell = $request->getPost('tel_cell');
+        	
+        	$vcard->ADR_street = $request->getPost('ADR_street');
+        	$vcard->ADR_extended = $request->getPost('ADR_extended');
+        	$vcard->ADR_post_office_box = $request->getPost('ADR_post_office_box');
+        	$vcard->ADR_zip = $request->getPost('ADR_zip');
+        	$vcard->ADR_city = $request->getPost('ADR_city');
+        	$vcard->ADR_state = $request->getPost('ADR_state');
+        	$vcard->ADR_country = $request->getPost('ADR_country');
+        	 
+        	$csrfForm->setInputFilter((new Csrf('csrf'))->getInputFilter());
+        	$csrfForm->setData($request->getPost());
+        	
+        	if ($csrfForm->isValid()) {
+        		 
+        		// Double the client controls
+        		if (strlen($vcard->n_title) > 255 ||
+        				!$vcard->n_first || strlen($vcard->n_first) > 255 ||
+        				!$vcard->n_last || strlen($vcard->n_last) > 255 ||
+        				strlen($vcard->org) > 255 ||
+        				strlen($vcard->email) > 255 ||
+        				!preg_match($this->emailRegex, $vcard->email) ||
+        				strlen($vcard->tel_work) > 255 ||
+        				!preg_match($this->telRegex, $vcard->tel_work) ||
+        				strlen($vcard->tel_cell) > 255 ||
+        				!preg_match($this->telRegex, $vcard->tel_cell) ||
+        				(!$vcard->tel_cell && !$vcard->tel_work) ||
+        				(!$vcard->tel_cell && !$vcard->email) ||
+        				strlen($vcard->ADR_street) > 255 ||
+        				strlen($vcard->ADR_extended) > 255 ||
+        				strlen($vcard->ADR_post_office_box) > 255 ||
+        				strlen($vcard->ADR_zip) > 255 ||
+        				strlen($vcard->ADR_city) > 255 ||
+        				strlen($vcard->ADR_state) > 255 ||
+        				strlen($vcard->ADR_country) > 255
+        		) throw new \Exception('javascript error');
+        		else {
 
-            if ($form->isValid()) {
-            	            	            	
-            	// Check the email
-            	if (!preg_match($this->emailRegex, $form->get('EMAIL')->getValue())) {
-            		$form->get('EMAIL')->setMessages(array(array('EMAIL' => $this->getServiceLocator()->get('translator')->translate('This is not a valid email address'))));
-            	}
-            	// Check the work phone
-            	elseif (!preg_match($this->telRegexRequired, $form->get('TEL_work')->getValue())) {
-            		$form->get('TEL_work')->setMessages(array(array('TEL_work' => $this->getServiceLocator()->get('translator')->translate('This is not a valid phone number'))));
-            	}
-            	// Check the cell phone
-            	elseif (!preg_match($this->telRegex, $form->get('TEL_cell')->getValue())) {
-            		$form->get('TEL_cell')->setMessages(array(array('TEL_cell' => $this->getServiceLocator()->get('translator')->translate('This is not a valid phone number'))));
-            	}
-            	else {
-            		// Update the vcard
-	                $vcard->n_fn = $vcard->n_last.', '.$vcard->n_first;
-            		$this->getVcardTable()->save($vcard, $current_user);
-            	
-            		// Delete then add the vcard properties
-            		$this->getVcardPropertyTable()->multipleDelete(array('vcard_id' => $vcard->id));
-            		
-            		$property = new VcardProperty();
-            		$property->vcard_id = $id;
+        			// Atomically save the vcard and its properties
+        			try {
+        				/**
+        				 * @var \Zend\Db\Adapter\Driver\Pdo\Connection
+        				 */
+        				$connection = $this->getVcardTable()->getAdapter()->getDriver()->getConnection();
+        				$connection->beginTransaction();
+	        				 
+	            		// Update the vcard
+		                $vcard->n_fn = $vcard->n_last.', '.$vcard->n_first;
+	            		$this->getVcardTable()->save($vcard->toArray(), $current_user);
+	            	
+	            		// Delete then add the vcard properties
+	            		$this->getVcardPropertyTable()->multipleDelete(array('vcard_id' => $vcard->id), $current_user);
 
-            		// Organization
-            		$property->order = 1;
-            		$property->name = 'ORG';
-            		$property->type = NULL;
-            		$property->text_value = $form->get('ORG')->getValue();
-            		$this->getVcardPropertyTable()->save($property, $current_user);
+	            		// Add the vcard properties
+	            		$property = new VcardProperty();
+	            		$property->vcard_id = $id;
+	            			
+	            		// Address - Street
+	            		$property->order = 1;
+	            		$property->name = 'ADR_street';
+	            		$property->type = 'work';
+	            		$property->text_value = $vcard->ADR_street;
+	            		$this->getVcardPropertyTable()->save($property->toArray(), $current_user);
+	            		
+	            		// Address - Extended
+	            		$property->order = 2;
+	            		$property->name = 'ADR_extended';
+	            		$property->type = 'work';
+	            		$property->text_value = $vcard->ADR_extended;
+	            		$this->getVcardPropertyTable()->save($property->toArray(), $current_user);
+	            			
+	            		// Address - Post office box
+	            		$property->order = 3;
+	            		$property->name = 'ADR_post_office_box';
+	            		$property->type = 'work';
+	            		$property->text_value = $vcard->ADR_post_office_box;
+	            		$this->getVcardPropertyTable()->save($property->toArray(), $current_user);
+	            			
+	            		// Address - Zip
+	            		$property->order = 4;
+	            		$property->name = 'ADR_zip';
+	            		$property->type = 'work';
+	            		$property->text_value = $vcard->ADR_zip;
+	            		$this->getVcardPropertyTable()->save($property->toArray(), $current_user);
+	            			
+	            		// Address - City
+	            		$property->order = 5;
+	            		$property->name = 'ADR_city';
+	            		$property->type = 'work';
+	            		$property->text_value = $vcard->ADR_city;
+	            		$this->getVcardPropertyTable()->save($property->toArray(), $current_user);
+	            		
+	            		// Address - State
+	            		$property->order = 6;
+	            		$property->name = 'ADR_state';
+	            		$property->type = 'work';
+	            		$property->text_value = $vcard->ADR_state;
+	            		$this->getVcardPropertyTable()->save($property->toArray(), $current_user);
+	            		 
+	            		// Address - Country
+	            		$property->order = 7;
+	            		$property->name = 'ADR_country';
+	            		$property->type = 'work';
+	            		$property->text_value = $vcard->ADR_country;
+	            		$this->getVcardPropertyTable()->save($property->toArray(), $current_user);
 
-            		// Email
-            		$property->order = 2;
-            		$property->name = 'EMAIL';
-            		$property->type = 'work';
-            		$property->text_value = $form->get('EMAIL')->getValue();
-            		$this->getVcardPropertyTable()->save($property, $current_user);
-            		
-            		// Work phone
-            		$property->order = 3;
-            		$property->name = 'TEL_work';
-            		$property->type = 'work';
-            		$property->text_value = $form->get('TEL_work')->getValue();
-            		$this->getVcardPropertyTable()->save($property, $current_user);
-            	
-            		// Cellular phone
-            		$property->order = 4;
-            		$property->name = 'TEL_cell';
-            		$property->type = 'cell';
-            		$property->text_value = $form->get('TEL_cell')->getValue();
-            		$this->getVcardPropertyTable()->save($property, $current_user);
-            	
-            		// Address - Street
-            		$property->order = 5;
-            		$property->name = 'ADR_street';
-            		$property->type = 'work';
-            		$property->text_value = $form->get('ADR_street')->getValue();
-            		$this->getVcardPropertyTable()->save($property, $current_user);
-            	
-            		// Address - Extended
-            		$property->order = 6;
-            		$property->name = 'ADR_extended';
-            		$property->type = 'work';
-            		$property->text_value = $form->get('ADR_extended')->getValue();
-            		$this->getVcardPropertyTable()->save($property, $current_user);
-            	
-            		// Address - Post office box
-            		$property->order = 7;
-            		$property->name = 'ADR_post_office_box';
-            		$property->type = 'work';
-            		$property->text_value = $form->get('ADR_post_office_box')->getValue();
-            		$this->getVcardPropertyTable()->save($property, $current_user);
-            	
-            		// Address - Zip
-            		$property->order = 8;
-            		$property->name = 'ADR_zip';
-            		$property->type = 'work';
-            		$property->text_value = $form->get('ADR_zip')->getValue();
-            		$this->getVcardPropertyTable()->save($property, $current_user);
-            	
-            		// Address - City
-            		$property->order = 9;
-            		$property->name = 'ADR_city';
-            		$property->type = 'work';
-            		$property->text_value = $form->get('ADR_city')->getValue();
-            		$this->getVcardPropertyTable()->save($property, $current_user);
-            	
-            		// Address - Country
-            		$property->order = 10;
-            		$property->name = 'ADR_country';
-            		$property->type = 'work';
-            		$property->text_value = $form->get('ADR_country')->getValue();
-            		$this->getVcardPropertyTable()->save($property, $current_user);
-	
-	                // Redirect to the user list
-	                return $this->redirect()->toRoute('vcard/index');
-            	}
+	            		$connection->commit();
+	            		
+	            		// Redirect
+	            		return $this->redirect()->toRoute('vcard');
+	            	}
+	            	catch (\Exception $e) {
+	            		$connection->rollback();
+	            		throw $e;
+	            	}
+	            }
             }
         }
         return array(
     		'current_user' => $current_user,
-    		'title' => 'Contact',
-        	'form' => $form,
+        	'csrfForm' => $csrfForm,
+        	'vcard' => $vcard,
+        	'error' => $error,
         	'id' => $id
         );
     }
@@ -682,26 +765,44 @@ class VcardController extends AbstractActionController
     	$current_user->retrieveHabilitations($this);
     	 
         // retrieve the vcard
-	    $vcard = $this->getVcardTable()->get($id);
-        
+	    $vcard = $this->getVcardTable()->get($id, $current_user);
+
+	    $csrfForm = new CsrfForm();
+	    $csrfForm->addCsrfElement('csrf');
+
+	    $error = null;
 	    $request = $this->getRequest();
         if ($request->isPost()) {
-            $del = $request->getPost('del', $this->getServiceLocator()->get('translator')->translate('No'));
+    		$csrfForm->setInputFilter((new Csrf('csrf'))->getInputFilter());
+    		$csrfForm->setData($request->getPost());
+    		
+    		if ($csrfForm->isValid()) { // CSRF check
+    			 
+    			// Check if the contact is not bound to a user or an agent
+    			$select = $this->getUserTable()->getSelect()->where(array('contact_id' => $vcard->id));
+    			if (count($this->getUserTable()->selectWith($select)) > 0) $error = 'Consistency';
+    			else {
+    				$select = $this->getAgentTable()->getSelect()->where(array('contact_id' => $vcard->id));
+    				if (count($this->getAgentTable()->selectWith($select, $current_user)) > 0) {
+    					$error = 'Consistency';
+    				}
+	    			else {
+			        	$this->getVcardTable()->delete($id, $current_user);
+						$this->getVcardPropertyTable()->multipleDelete(array('vcard_id' => $id), $current_user);
 
-            if ($del == $this->getServiceLocator()->get('translator')->translate('Confirm')) {
-                $id = (int) $request->getPost('id');
-                $this->getVcardTable()->delete($id);
-				$this->getVcardPropertyTable()->multipleDelete(array('vcard_id' => $id));
-            }
-
-            // Redirect to the index
-            return $this->redirect()->toRoute('vcard/index');
+			            // Redirect
+			            return $this->redirect()->toRoute('vcard');
+	    			}
+    			}
+    		}
         }
 
         return array(
-    			'current_user' => $current_user,
-    			'title' => 'Contact',
-        		'id'    => $id,
+    		'current_user' => $current_user,
+ 	  		'csrfForm' => $csrfForm,
+        	'vcard' => $vcard,
+    		'id' => $id,
+    		'error' => $error
         );
     }
 
@@ -709,7 +810,7 @@ class VcardController extends AbstractActionController
     {
     	if (!$this->customerTable) {
     		$sm = $this->getServiceLocator();
-    		$this->customerTable = $sm->get('PpitMasterData\Model\CustomerTable');
+    		$this->customerTable = $sm->get('PpitCustomer\Model\CustomerTable');
     	}
     	return $this->customerTable;
     }
@@ -739,88 +840,5 @@ class VcardController extends AbstractActionController
     		$this->tmpVcardTable = $sm->get('PpitContact\Model\TmpVcardTable');
     	}
     	return $this->tmpVcardTable;
-    }
-
-    // Don't remove if using UserTable::retrieveHabilitations
-    public $routes;
-    protected $instanceTable;
-	protected $linkTable;
-    protected $userTable;
-    protected $userPerimeterTable;
-    protected $userRoleTable;
-    protected $userRoleLinkerTable;
-    protected $vcardTable;
-    protected $vcardPropertyTable;
-    
-    public function getInstanceTable()
-    {
-    	if (!$this->instanceTable) {
-    		$sm = $this->getServiceLocator();
-    		$this->instanceTable = $sm->get('PpitCore\Model\InstanceTable');
-    	}
-    	return $this->instanceTable;
-    }
-
-    public function getLinkTable()
-    {
-    	if (!$this->linkTable) {
-    		$sm = $this->getServiceLocator();
-    		$this->linkTable = $sm->get('PpitCore\Model\LinkTable');
-    	}
-    	return $this->linkTable;
-    }
-    
-    public function getUserTable()
-    {
-    	if (!$this->userTable) {
-    		$sm = $this->getServiceLocator();
-    		$this->userTable = $sm->get('PpitUser\Model\UserTable');
-    	}
-    	return $this->userTable;
-    }
-    
-    public function getUserPerimeterTable()
-    {
-    	if (!$this->userPerimeterTable) {
-    		$sm = $this->getServiceLocator();
-    		$this->userPerimeterTable = $sm->get('PpitUser\Model\UserPerimeterTable');
-    	}
-    	return $this->userPerimeterTable;
-    }
-    
-    public function getUserRoleTable()
-    {
-    	if (!$this->userRoleTable) {
-    		$sm = $this->getServiceLocator();
-    		$this->userRoleTable = $sm->get('PpitUser\Model\UserRoleTable');
-    	}
-    	return $this->userRoleTable;
-    }
-    
-    public function getUserRoleLinkerTable()
-    {
-    	if (!$this->userRoleLinkerTable) {
-    		$sm = $this->getServiceLocator();
-    		$this->userRoleLinkerTable = $sm->get('PpitUser\Model\UserRoleLinkerTable');
-    	}
-    	return $this->userRoleLinkerTable;
-    }
-    
-    public function getVcardTable()
-    {
-    	if (!$this->vcardTable) {
-    		$sm = $this->getServiceLocator();
-    		$this->vcardTable = $sm->get('PpitContact\Model\VcardTable');
-    	}
-    	return $this->vcardTable;
-    }
-    
-    public function getVcardPropertyTable()
-    {
-    	if (!$this->vcardPropertyTable) {
-    		$sm = $this->getServiceLocator();
-    		$this->vcardPropertyTable = $sm->get('PpitContact\Model\VcardPropertyTable');
-    	}
-    	return $this->vcardPropertyTable;
     }
 }

@@ -1,5 +1,5 @@
 <?php
-namespace Contact\Model;
+namespace PpitContact\Model;
 
 use Zend\InputFilter\Factory as InputFactory;     // <-- Add this import
 use Zend\InputFilter\InputFilter;                 // <-- Add this import
