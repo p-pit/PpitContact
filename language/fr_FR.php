@@ -1,5 +1,6 @@
 <?php
 	return array(
+			'A contact with the same email or cellular phone number already exists' => 'Un contact existe déjà avec le même email ou téléphone mobile',
 			'Add' => 'Ajouter',
 			'Add a contact' => 'Ajouter un contact',
 			'Address - city' => 'Adresse - ville',
@@ -8,6 +9,7 @@
 			'Address - post office box' => 'Adresse - boîte postale',
 			'Address - street' => 'Adresse - rue',
 			'Address - zip' => 'Adresse - code postal',
+			'Backup contact' => 'Contact backup',
 			'Cellular phone' => 'Portable',
 			'Confirm' => 'Confirmer',
 			'Contact us' => 'Nous contacter',
@@ -27,6 +29,7 @@
 			'Please input an email' => 'Veuillez saisir un email',
 			'Please input the last name' => 'Veuillez saisir le nom',
 			'Please input the first name' => 'Veuillez saisir le prénom',
+			'Phone' => 'Téléphone',
 			'The contact is used and cannot be deleted' => 'Le contact est utilisé et ne peut pas être supprimé',
 			'Title' => 'Civilité',
 			'Update' => 'Enregistrer',

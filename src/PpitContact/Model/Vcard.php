@@ -10,7 +10,8 @@ class Vcard implements InputFilterAwareInterface
 {
     public $id;
 	public $instance_id;
-    public $n_title;
+	public $customer_id;
+	public $n_title;
     public $n_first;
     public $n_last;
     public $n_fn;
@@ -31,6 +32,8 @@ class Vcard implements InputFilterAwareInterface
     
     protected $inputFilter;
     protected $devisInputFilter;
+    protected $emailRegex = "/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}/";
+    protected $telRegex = "/^\+?([0-9\. ]*)$/";
     
     public function getArrayCopy()
     {
@@ -41,6 +44,7 @@ class Vcard implements InputFilterAwareInterface
     {
         $this->id = (isset($data['id'])) ? $data['id'] : null;
         $this->instance_id = (isset($data['instance_id'])) ? $data['instance_id'] : null;
+        $this->customer_id = (isset($data['customer_id'])) ? $data['customer_id'] : null;
         $this->n_title = (isset($data['n_title'])) ? $data['n_title'] : null;
         $this->n_first = (isset($data['n_first'])) ? $data['n_first'] : null;
         $this->n_last = (isset($data['n_last'])) ? $data['n_last'] : null;
@@ -66,6 +70,7 @@ class Vcard implements InputFilterAwareInterface
     	$data = array();
     	$data['id'] = (int) $this->id;
     	$data['instance_id'] = (int) $this->instance_id;
+    	$data['customer_id'] = (int) $this->customer_id;
     	$data['n_title'] = $this->n_title;
     	$data['n_first'] = $this->n_first;
     	$data['n_last'] = $this->n_last;
@@ -77,6 +82,58 @@ class Vcard implements InputFilterAwareInterface
     	 
     	return $data;
     }
+
+    public function checkIntegrity() {
+    
+    	$this->n_title = trim(strip_tags($this->n_title));
+    	$this->n_first = trim(strip_tags($this->n_first));
+    	$this->n_last = trim(strip_tags($this->n_last));
+    	$this->email = trim(strip_tags($this->email));
+    	$this->tel_work = trim(strip_tags($this->tel_work));
+    	$this->tel_cell = trim(strip_tags($this->tel_cell));
+    	 
+    	if (strlen($vcard->n_title) > 255 ||
+    		!$vcard->n_first || strlen($vcard->n_first) > 255 ||
+			!$vcard->n_last || strlen($vcard->n_last) > 255 ||
+			!$vcard->email || strlen($vcard->email) > 255 ||
+    		!preg_match($this->emailRegex, $vcard->email) ||
+			strlen($vcard->tel_work) > 255 ||
+    		!preg_match($this->telRegex, $vcard->tel_work) ||
+			strlen($vcard->tel_cell) > 255 ||
+    		!preg_match($this->telRegex, $vcard->tel_cell) ||
+    		(!$vcard->tel_cell && ! $vcard->tel_work)) {
+    		
+    		throw new \Exception('javascript error');
+    	}
+    }
+    
+    public static function visibleContactList($cursor, $customer_id, $current_user) {
+    
+    	// Execute the request
+    	$contacts = array();
+    	// Only the users belonging to one's instance, except superadmin which see everyone
+    	foreach ($cursor as $contact) {
+    
+    		// Super admin
+    		if ($current_user->role_id == 'super_admin') $contacts[$contact->id] = $contact;
+    
+/*    		// Admin
+    		elseif ($current_user->role_id == 'admin' &&
+    				$current_user->instance_id == $contact->instance_id) {
+    				
+    			$contacts[$contact->id] = $contact;
+    		}
+    
+    		// Customer admin*/
+    		elseif (/*$current_user->role_id == 'customer_admin' &&*/
+    				$current_user->instance_id == $contact->instance_id &&
+    				$customer_id == $contact->customer_id) {
+
+    			$contacts[$contact->id] = $contact;
+    		}
+    	}
+    	return $contacts;
+    }
     
     // Add content to this method:
     public function setInputFilter(InputFilterInterface $inputFilter)
@@ -86,84 +143,7 @@ class Vcard implements InputFilterAwareInterface
 
     public function getInputFilter()
     {
-        if (!$this->inputFilter) {
-            $inputFilter = new InputFilter();
-            $factory     = new InputFactory();
-
-            $inputFilter->add($factory->createInput(array(
-            		'name'     => 'csrf',
-            		'required' => false,
-            )));
-
-	        $inputFilter->add($factory->createInput(array(
-	        		'name'     => 'n_last',
-	        		'required' => TRUE,
-	        		'filters'  => array(
-	        				array('name' => 'StripTags'),
-	        				array('name' => 'StringTrim'),
-	        		),
-	        		'validators' => array(
-	        				array(
-	        						'name'    => 'StringLength',
-	        						'options' => array(
-	        								'encoding' => 'UTF-8',
-	        								'min'      => 1,
-	        								'max'      => 255,
-	        						),
-	        				),
-	        		),
-	        )));
-	
-	        $inputFilter->add($factory->createInput(array(
-	        		'name'     => 'n_first',
-	        		'required' => TRUE,
-	        		'filters'  => array(
-	        				array('name' => 'StripTags'),
-	        				array('name' => 'StringTrim'),
-	        		),
-	        		'validators' => array(
-	        				array(
-	        						'name'    => 'StringLength',
-	        						'options' => array(
-	        								'encoding' => 'UTF-8',
-	        								'min'      => 1,
-	        								'max'      => 255,
-	        						),
-	        				),
-	        		),
-	        )));
-	
-/*	    
-	        $inputFilter->add($factory->createInput(array(
-	        		'name'     => 'n_fn',
-	        		'required' => TRUE,
-	        		'filters'  => array(
-	        				array('name' => 'StripTags'),
-	        				array('name' => 'StringTrim'),
-	        		),
-	        		'validators' => array(
-	        				array(
-	        						'name'    => 'StringLength',
-	        						'options' => array(
-	        								'encoding' => 'UTF-8',
-	        								'min'      => 1,
-	        								'max'      => 255,
-	        						),
-	        				),
-	        		),
-	        )));*/
-	     
-	    
-	
-	     
-
-	      
-	    
-
-        	$this->inputFilter = $inputFilter;
-        }
-        
-        return $this->inputFilter;
+        throw new \Exception("Not used");
     }
 
     public function getDevisInputFilter()

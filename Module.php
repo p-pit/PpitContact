@@ -1,7 +1,6 @@
 <?php
 namespace PpitContact;
 
-use PpitContact\Model\TmpVcard;
 use PpitContact\Model\ContactEvent;
 use PpitContact\Model\Vcard;
 use PpitContact\Model\VcardTable;
@@ -53,7 +52,7 @@ class Module //implements AutoloaderProviderInterface, ConfigProviderInterface
                 },
             	'PpitContact\Model\VcardTable' =>  function($sm) {
                     $tableGateway = $sm->get('VcardTableGateway');
-                    $table = new GenericTable($tableGateway);
+                    $table = new VcardTable($tableGateway);
                     return $table;
                 },
                 'VcardTableGateway' => function ($sm) {

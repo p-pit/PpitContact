@@ -9,20 +9,20 @@ $this->headTitle($title);
     <div class="col-md-6 col-md-offset-3">
 		<div class="panel panel-default">
             <div class="panel-heading">
-				<strong><?php echo $this->translate($this->translate('Update a contact', 'ppit-contact', $current_user->locale));?></strong>
+				<strong><?php echo $this->translate($this->translate('Add a contact', 'ppit-contact', $current_user->locale)).(($customer_id) ? ' '.$customer->name : '') ?></strong>
             </div>
            	<div class="panel-body">
 				
 <!-- Form opening tag -->
-				<form action="<?php echo $this->url('vcard/update', array('id' => $id)) ?>" method="post" name="vcard" class="form-horizontal" enctype="form-data" id="vcard" onSubmit="return checkForm()">
+				<form action="<?php echo $this->url('vcard/update', array('customer_id' => $customer_id, 'id' => $id)) ?>" method="post" name="vcard" class="form-horizontal" enctype="form-data" id="vcard" onSubmit="return checkForm()">
 
 <!--  Duplicate error -->
-				    <div class="form-group">
 <?php if ($error == 'Duplicate') : ?>
+					<div class="form-group">
 						<div class="col-sm-12"><p class="help-block"><?php echo $this->translate('A contact with the same email or cellular phone number already exists', 'ppit-contact', $current_user->locale) ?></p></div>
-<?php endif;?>
 					</div>
-				
+<?php endif;?>
+
 <!--  CSRF -->
 <?php $element = $csrfForm->get('csrf') ?>
 				    <div class="form-group">
@@ -34,8 +34,8 @@ $this->headTitle($title);
 
 <!-- Title -->
 				    <div class="form-group" id="n_title_group">
-						<label class="col-sm-4 control-label"><?php echo $this->translate('Title', 'ppit-contact', $current_user->locale) ?></label>
-						<div class="col-sm-8">
+						<label class="col-sm-5 control-label"><?php echo $this->translate('Title', 'ppit-contact', $current_user->locale) ?></label>
+						<div class="col-sm-7">
 							<input name="n_title" id="n_title" class="form-control" value="<?php echo $vcard->n_title ?>">
 						</div>
 						<div class="col-sm-12"><p class="help-block" id="n_title_error"></p></div>
@@ -43,8 +43,8 @@ $this->headTitle($title);
 					
 <!-- First name -->
 				    <div class="form-group" id="n_first_group">
-						<label class="col-sm-4 control-label">* <?php echo $this->translate('First name', 'ppit-contact', $current_user->locale) ?></label>
-						<div class="col-sm-8">
+						<label class="col-sm-5 control-label">* <?php echo $this->translate('First name', 'ppit-contact', $current_user->locale) ?></label>
+						<div class="col-sm-7">
 							<input name="n_first" id="n_first" class="form-control" value="<?php echo $vcard->n_first ?>">
 						</div>
 						<div class="col-sm-12"><p class="help-block" id="n_first_error"></p></div>
@@ -52,8 +52,8 @@ $this->headTitle($title);
 
 <!-- Last name -->
 				    <div class="form-group" id="n_last_group">
-						<label class="col-sm-4 control-label">* <?php echo $this->translate('Last name', 'ppit-contact', $current_user->locale) ?></label>
-						<div class="col-sm-8">
+						<label class="col-sm-5 control-label">* <?php echo $this->translate('Last name', 'ppit-contact', $current_user->locale) ?></label>
+						<div class="col-sm-7">
 							<input name="n_last" id="n_last" class="form-control" value="<?php echo $vcard->n_last ?>">
 						</div>
 						<div class="col-sm-12"><p class="help-block" id="n_last_error"></p></div>
@@ -61,8 +61,8 @@ $this->headTitle($title);
 					
 <!-- Organisation -->
 				    <div class="form-group" id="org_group">
-						<label class="col-sm-4 control-label"><?php echo $this->translate('Organisation', 'ppit-contact', $current_user->locale) ?></label>
-						<div class="col-sm-8">
+						<label class="col-sm-5 control-label"><?php echo $this->translate('Organisation', 'ppit-contact', $current_user->locale) ?></label>
+						<div class="col-sm-7">
 							<input name="org" id="org" class="form-control" value="<?php echo $vcard->org ?>">
 						</div>
 						<div class="col-sm-12"><p class="help-block" id="org_error"></p></div>
@@ -70,8 +70,8 @@ $this->headTitle($title);
 					
 <!-- Email -->
 				    <div class="form-group" id="email_group">
-						<label class="col-sm-4 control-label">* <?php echo $this->translate('Email', 'ppit-contact', $current_user->locale) ?></label>
-						<div class="col-sm-8">
+						<label class="col-sm-5 control-label">* <?php echo $this->translate('Email', 'ppit-contact', $current_user->locale) ?></label>
+						<div class="col-sm-7">
 							<input name="email" id="email" class="form-control" value="<?php echo $vcard->email ?>">
 						</div>
 						<div class="col-sm-12"><p class="help-block" id="email_error"></p></div>
@@ -79,8 +79,8 @@ $this->headTitle($title);
 
 <!-- Work phone -->
 				    <div class="form-group" id="tel_work_group">
-						<label class="col-sm-4 control-label"> <?php echo $this->translate('Work phone', 'ppit-contact', $current_user->locale) ?></label>
-						<div class="col-sm-8">
+						<label class="col-sm-5 control-label"> <?php echo $this->translate('Work phone', 'ppit-contact', $current_user->locale) ?></label>
+						<div class="col-sm-7">
 							<input name="tel_work" id="tel_work" class="form-control" value="<?php echo $vcard->tel_work ?>">
 						</div>
 						<div class="col-sm-12"><p class="help-block" id="tel_work_error"></p></div>
@@ -88,8 +88,8 @@ $this->headTitle($title);
 
 <!-- Cellular phone -->
 				    <div class="form-group" id="tel_cell_group">
-						<label class="col-sm-4 control-label"> <?php echo $this->translate('Cellular phone', 'ppit-contact', $current_user->locale) ?></label>
-						<div class="col-sm-8">
+						<label class="col-sm-5 control-label"> <?php echo $this->translate('Cellular phone', 'ppit-contact', $current_user->locale) ?></label>
+						<div class="col-sm-7">
 							<input name="tel_cell" id="tel_cell" class="form-control" value="<?php echo $vcard->tel_cell ?>">
 						</div>
 						<div class="col-sm-12"><p class="help-block" id="tel_cell_error"></p></div>
@@ -97,8 +97,8 @@ $this->headTitle($title);
 
 <!-- Address - street -->
 				    <div class="form-group" id="ADR_street_group">
-						<label class="col-sm-4 control-label"> <?php echo $this->translate('Address - street', 'ppit-contact', $current_user->locale) ?></label>
-						<div class="col-sm-8">
+						<label class="col-sm-5 control-label"> <?php echo $this->translate('Address - street', 'ppit-contact', $current_user->locale) ?></label>
+						<div class="col-sm-7">
 							<input name="ADR_street" id="ADR_street" class="form-control" value="<?php echo $vcard->ADR_street ?>">
 						</div>
 						<div class="col-sm-12"><p class="help-block" id="ADR_street_error"></p></div>
@@ -106,8 +106,8 @@ $this->headTitle($title);
 
 <!-- Address - extended -->
 				    <div class="form-group" id="ADR_extended_group">
-						<label class="col-sm-4 control-label"> <?php echo $this->translate('Address - extended', 'ppit-contact', $current_user->locale) ?></label>
-						<div class="col-sm-8">
+						<label class="col-sm-5 control-label"> <?php echo $this->translate('Address - extended', 'ppit-contact', $current_user->locale) ?></label>
+						<div class="col-sm-7">
 							<input name="ADR_extended" id="ADR_extended" class="form-control" value="<?php echo $vcard->ADR_extended ?>">
 						</div>
 						<div class="col-sm-12"><p class="help-block" id="ADR_extended_error"></p></div>
@@ -115,8 +115,8 @@ $this->headTitle($title);
 
 <!-- Address - Post office box -->
 				    <div class="form-group" id="ADR_post_office_box_group">
-						<label class="col-sm-4 control-label"> <?php echo $this->translate('Address - post office box', 'ppit-contact', $current_user->locale) ?></label>
-						<div class="col-sm-8">
+						<label class="col-sm-5 control-label"> <?php echo $this->translate('Address - post office box', 'ppit-contact', $current_user->locale) ?></label>
+						<div class="col-sm-7">
 							<input name="ADR_post_office_box" id="ADR_post_office_box" class="form-control" value="<?php echo $vcard->ADR_post_office_box ?>">
 						</div>
 						<div class="col-sm-12"><p class="help-block" id="ADR_post_office_box_error"></p></div>
@@ -124,8 +124,8 @@ $this->headTitle($title);
 
 <!-- Address - zip -->
 				    <div class="form-group" id="ADR_zip_group">
-						<label class="col-sm-4 control-label"> <?php echo $this->translate('Address - zip', 'ppit-contact', $current_user->locale) ?></label>
-						<div class="col-sm-8">
+						<label class="col-sm-5 control-label"> <?php echo $this->translate('Address - zip', 'ppit-contact', $current_user->locale) ?></label>
+						<div class="col-sm-7">
 							<input name="ADR_zip" id="ADR_zip" class="form-control" value="<?php echo $vcard->ADR_zip ?>">
 						</div>
 						<div class="col-sm-12"><p class="help-block" id="ADR_zip_error"></p></div>
@@ -133,8 +133,8 @@ $this->headTitle($title);
 
 <!-- Address - city -->
 				    <div class="form-group" id="ADR_city_group">
-						<label class="col-sm-4 control-label"> <?php echo $this->translate('Address - city', 'ppit-contact', $current_user->locale) ?></label>
-						<div class="col-sm-8">
+						<label class="col-sm-5 control-label"> <?php echo $this->translate('Address - city', 'ppit-contact', $current_user->locale) ?></label>
+						<div class="col-sm-7">
 							<input name="ADR_city" id="ADR_city" class="form-control" value="<?php echo $vcard->ADR_city ?>">
 						</div>
 						<div class="col-sm-12"><p class="help-block" id="ADR_city_error"></p></div>
@@ -142,17 +142,17 @@ $this->headTitle($title);
 
 <!-- Address - state -->
 				    <div class="form-group" id="ADR_state_group">
-						<label class="col-sm-4 control-label"> <?php echo $this->translate('Address - state', 'ppit-contact', $current_user->locale) ?></label>
-						<div class="col-sm-8">
+						<label class="col-sm-5 control-label"> <?php echo $this->translate('Address - state', 'ppit-contact', $current_user->locale) ?></label>
+						<div class="col-sm-7">
 							<input name="ADR_state" id="ADR_state" class="form-control" value="<?php echo $vcard->ADR_state ?>">
 						</div>
 						<div class="col-sm-12"><p class="help-block" id="ADR_state_error"></p></div>
 					</div>
 					
 <!-- Address - country -->
-				    <div class="form-group" id="ADR_country">
-						<label class="col-sm-4 control-label"> <?php echo $this->translate('Address - country', 'ppit-contact', $current_user->locale) ?></label>
-						<div class="col-sm-8">
+				    <div class="form-group" id="ADR_country_group">
+						<label class="col-sm-5 control-label"> <?php echo $this->translate('Address - country', 'ppit-contact', $current_user->locale) ?></label>
+						<div class="col-sm-7">
 							<input name="ADR_country" id="ADR_country" class="form-control" value="<?php echo $vcard->ADR_country ?>">
 						</div>
 						<div class="col-sm-12"><p class="help-block" id="ADR_country_error"></p></div>
@@ -160,11 +160,11 @@ $this->headTitle($title);
 					
 <!-- Submit button -->
 				    <div class="form-group">
-						<div class="col-sm-4">&nbsp;</div>
-						<div class="col-sm-8">
+						<div class="col-sm-5">&nbsp;</div>
+						<div class="col-sm-7">
 							<input name="submit" type="submit" id="submitbutton" class="btn btn-primary" value="<?php echo $this->translate('Submit', 'ppit-core', $current_user->locale) ?>">
 							&nbsp;&nbsp;
-							<a href="<?php echo $this->url('vcard') ?>"><?php echo $this->translate('Cancel', 'ppit-core', $current_user->locale) ?></a>
+							<a href="<?php echo $this->url('vcard/index', array('customer_id' => $customer_id)) ?>"><?php echo $this->translate('Cancel', 'ppit-core', $current_user->locale) ?></a>
 						</div>
 					</div>
 				</form>

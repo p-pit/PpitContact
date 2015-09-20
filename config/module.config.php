@@ -45,26 +45,21 @@ return array(
 	                'index' => array(
 	                    'type' => 'segment',
 	                    'options' => array(
-	                        'route' => '/index',
+	                        'route' => '/index[/:customer_id]',
+		                    'constraints' => array(
+		                    	'customer_id'     => '[0-9]*',
+		                    ),
 	                    	'defaults' => array(
 	                    		'action' => 'index',
-	                        ),
-	                    ),
-	                ),
-	                'add' => array(
-	                    'type' => 'segment',
-	                    'options' => array(
-	                        'route' => '/add',
-	                    	'defaults' => array(
-	                    		'action' => 'add',
 	                        ),
 	                    ),
 	                ),
 	       			'update' => array(
 	                    'type' => 'segment',
 	                    'options' => array(
-	                        'route' => '/update[/:id]',
+	                        'route' => '/update[/:customer_id][/:id]',
 		                    'constraints' => array(
+		                    	'customer_id'     => '[0-9]*',
 		                    	'id'     => '[0-9]*',
 		                    ),
 	                    	'defaults' => array(

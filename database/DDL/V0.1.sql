@@ -30,6 +30,7 @@ CREATE TABLE `contact_event` (
 CREATE TABLE `contact_vcard` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `instance_id` int(11) DEFAULT NULL,
+  `customer_id` int(11) DEFAULT NULL,
   `n_title` varchar(255) DEFAULT NULL,
   `n_first` varchar(255) DEFAULT NULL,
   `n_last` varchar(255) DEFAULT NULL,
