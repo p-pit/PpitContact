@@ -36,12 +36,13 @@ class VcardController extends PpitController
     	$current_user->retrieveHabilitations($this);
 
     	// Control access to other customers (limited to supplyer-side users)
-    	$customer_id = (int) $this->params()->fromRoute('customer_id', 0);
-    	if ($customer_id) {
-    		$customer = $this->getCustomerTable()->get($customer_id, $current_user);
-    		if ($current_user->customer_id) return $this->redirect()->toRoute('index');
-    	}
-    	else $customer = null;
+    	if ($current_user->customer_id) $customer_id = $current_user->customer_id;
+       	else $customer_id = (int) $this->params()->fromRoute('customer_id', 0);
+	    	
+	    if ($customer_id) {
+	    	$customer = $this->getCustomerTable()->get($customer_id, $current_user);
+	    }
+	    else $customer = null;
 
     	// Prepare the SQL request
     	$currentPage = $this->params()->fromQuery('page', 1);
