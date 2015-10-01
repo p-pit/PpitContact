@@ -97,6 +97,7 @@ class VcardTable
 			            foreach ($data as $cell) $content .= ';'.$cell;
 			            $logger->info('update;'.$user->user_id.$content);
 		        	}
+		        	return $id;
 	            }
 	            else {
 	                throw new \Exception('Form id does not exist');

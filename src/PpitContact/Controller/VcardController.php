@@ -26,8 +26,9 @@ class VcardController extends PpitController
 	protected $contactEventTable;
 	protected $orderTable;
 	protected $tmpVcardTable;
-	protected $emailRegex = "/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}/";
-	protected $telRegex = "/^\+?([0-9\. ]*)$/";
+
+	public $emailRegex = "/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}/";
+	public $telRegex = "/^\+?([0-9\. ]*)$/";
 	
 	public function indexAction()
     {
