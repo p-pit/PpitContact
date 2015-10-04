@@ -33,15 +33,15 @@ class VcardController extends PpitController
 	public function indexAction()
     {
     	// Retrieve the current user
-    	$current_user = Functions::getUser($this);
-    	$current_user->retrieveHabilitations($this);
+    	$currentUser = Functions::getUser($this);
+    	$currentUser->retrieveHabilitations($this);
 
     	// Control access to other customers (limited to supplyer-side users)
-    	if ($current_user->customer_id) $customer_id = $current_user->customer_id;
+    	if ($currentUser->customer_id) $customer_id = $currentUser->customer_id;
        	else $customer_id = (int) $this->params()->fromRoute('customer_id', 0);
 	    	
 	    if ($customer_id) {
-	    	$customer = $this->getCustomerTable()->get($customer_id, $current_user);
+	    	$customer = $this->getCustomerTable()->get($customer_id, $currentUser);
 	    }
 	    else $customer = null;
 
@@ -55,15 +55,15 @@ class VcardController extends PpitController
         $select = $this->getVcardTable()->getSelect()
         	->order(array($major.' '.$dir, 'n_last', 'n_first'));
 		if ($customer_id) $select->where(array('customer_id' => $customer_id));
-        $cursor = $this->getVcardTable()->selectWith($select, $current_user);
+        $cursor = $this->getVcardTable()->selectWith($select, $currentUser);
 
-        $vcards = Vcard::visibleContactList($cursor, $customer_id, $current_user);
+        $vcards = Vcard::visibleContactList($cursor, $customer_id, $currentUser);
         
     	// Create the email array
     	$select = $this->getVcardTable()->getSelect()->order(array('n_last', 'n_first'))
 	    	->join('contact_vcard_property', 'contact_vcard.id = contact_vcard_property.vcard_id', array('text_value'))
 	    	->where(array('contact_vcard_property.name' => 'EMAIL', 'contact_vcard_property.type' => 'work'));
-    	$cursor = $this->getVcardTable()->selectWith($select, $current_user);
+    	$cursor = $this->getVcardTable()->selectWith($select, $currentUser);
 		$emails = array();
 		foreach ($cursor as $email) $emails[$email->id] = $email->text_value;
 
@@ -71,13 +71,13 @@ class VcardController extends PpitController
 		$select = $this->getVcardTable()->getSelect()->order(array('n_last', 'n_first'))
 			->join('contact_vcard_property', 'contact_vcard.id = contact_vcard_property.vcard_id', array('text_value'))
 			->where(array('contact_vcard_property.name' => 'TEL_work', 'contact_vcard_property.type' => 'work'));
-		$cursor = $this->getVcardTable()->selectWith($select, $current_user);
+		$cursor = $this->getVcardTable()->selectWith($select, $currentUser);
 		$tels = array();
 		foreach ($cursor as $tel) $tels[$tel->id] = $tel->text_value;
 		
     	// Return the page
     	return new ViewModel(array(
-    		'current_user' => $current_user,
+    		'currentUser' => $currentUser,
     		'customer_id' => $customer_id,
     		'customer' => $customer,
     		'major' => $major,
@@ -91,14 +91,14 @@ class VcardController extends PpitController
     public function updateAction()
     {
     	// Retrieve the current user
-    	$current_user = Functions::getUser($this);
-    	$current_user->retrieveHabilitations($this);
+    	$currentUser = Functions::getUser($this);
+    	$currentUser->retrieveHabilitations($this);
 
     	// Control access to other customers (limited to supplyer-side users)
     	$customer_id = (int) $this->params()->fromRoute('customer_id', 0);
     	if ($customer_id) {
-    		$customer = $this->getCustomerTable()->get($customer_id, $current_user);
-    		if ($current_user->customer_id) return $this->redirect()->toRoute('index');
+    		$customer = $this->getCustomerTable()->get($customer_id, $currentUser);
+    		if ($currentUser->customer_id) return $this->redirect()->toRoute('index');
     	}
     	else $customer = null;
 
@@ -106,11 +106,11 @@ class VcardController extends PpitController
     	$id = (int) $this->params()->fromRoute('id', 0);
     	if ($id) {
     		// Retrieve the vcard and its properties
-    		$vcard = $this->getVcardTable()->get($id, $current_user);
+    		$vcard = $this->getVcardTable()->get($id, $currentUser);
     		$select = $this->getVcardPropertyTable()->getSelect()
  		   		->where(array('vcard_id' => $id))
     			->order(array('order'));
-    		$cursor = $this->getVcardPropertyTable()->selectWith($select, $current_user);
+    		$cursor = $this->getVcardPropertyTable()->selectWith($select, $currentUser);
     		$properties = array();
     		foreach($cursor as $property) {
     			switch ($property->name) {
@@ -196,13 +196,13 @@ class VcardController extends PpitController
     				// same first name, last name and email
     				$select = $this->getVcardTable()->getSelect()
     					->where(array('n_first' => $vcard->n_first, 'n_last' => $vcard->n_last, 'email' => $vcard->email));
-    				$cursor = $this->getVcardTable()->selectWith($select, $current_user);
+    				$cursor = $this->getVcardTable()->selectWith($select, $currentUser);
 		            if (count($cursor) > 0 && $cursor->current()->id != $id) $error = 'Duplicate';
 		            else {
     					// same first name, last name and cellular
 		            	$select = $this->getVcardTable()->getSelect()
 		            		->where(array('n_first' => $vcard->n_first, 'n_last' => $vcard->n_last, 'tel_cell' => $vcard->tel_cell));
-    					$cursor = $this->getVcardTable()->selectWith($select, $current_user);
+    					$cursor = $this->getVcardTable()->selectWith($select, $currentUser);
 		            	if ($vcard->tel_cell && count($cursor) > 0 && $cursor->current()->id != $id) $error = 'Duplicate';
 						else {
 
@@ -211,10 +211,10 @@ class VcardController extends PpitController
 			    			$connection->beginTransaction();
 							try {
 			    				$vcard->n_fn = $vcard->n_last.', '.$vcard->n_first;
-				                $vcard->id = $this->getVcardTable()->save($vcard->toArray(), $current_user);
+				                $vcard->id = $this->getVcardTable()->save($vcard, $currentUser);
 
 				                // Delete then add the vcard properties
-				                $this->getVcardPropertyTable()->multipleDelete(array('vcard_id' => $vcard->id), $current_user);
+				                $this->getVcardPropertyTable()->multipleDelete(array('vcard_id' => $vcard->id), $currentUser);
 
 				                // Add the vcard properties
 				                $property = new VcardProperty();
@@ -225,49 +225,49 @@ class VcardController extends PpitController
 				                $property->name = 'ADR_street';
 				                $property->type = 'work';
 				                $property->text_value = $vcard->ADR_street;
-				                $this->getVcardPropertyTable()->save($property->toArray(), $current_user);
+				                $this->getVcardPropertyTable()->save($property, $currentUser);
 	
 				                // Address - Extended
 				                $property->order = 2;
 				                $property->name = 'ADR_extended';
 				                $property->type = 'work';
 				                $property->text_value = $vcard->ADR_extended;
-				                $this->getVcardPropertyTable()->save($property->toArray(), $current_user);
+				                $this->getVcardPropertyTable()->save($property, $currentUser);
 			
 				                // Address - Post office box
 				                $property->order = 3;
 				                $property->name = 'ADR_post_office_box';
 				                $property->type = 'work';
 				                $property->text_value = $vcard->ADR_post_office_box;
-				                $this->getVcardPropertyTable()->save($property->toArray(), $current_user);
+				                $this->getVcardPropertyTable()->save($property, $currentUser);
 			
 				                // Address - Zip
 				                $property->order = 4;
 				                $property->name = 'ADR_zip';
 				                $property->type = 'work';
 				                $property->text_value = $vcard->ADR_zip;
-				                $this->getVcardPropertyTable()->save($property->toArray(), $current_user);
+				                $this->getVcardPropertyTable()->save($property, $currentUser);
 			
 				                // Address - City
 				                $property->order = 5;
 				                $property->name = 'ADR_city';
 				                $property->type = 'work';
 				                $property->text_value = $vcard->ADR_city;
-				                $this->getVcardPropertyTable()->save($property->toArray(), $current_user);
+				                $this->getVcardPropertyTable()->save($property, $currentUser);
 	
 				                // Address - State
 				                $property->order = 6;
 				                $property->name = 'ADR_state';
 				                $property->type = 'work';
 				                $property->text_value = $vcard->ADR_state;
-				                $this->getVcardPropertyTable()->save($property->toArray(), $current_user);
+				                $this->getVcardPropertyTable()->save($property, $currentUser);
 				                 
 				                // Address - Country
 				                $property->order = 7;
 				                $property->name = 'ADR_country';
 				                $property->type = 'work';
 				                $property->text_value = $vcard->ADR_country;
-				                $this->getVcardPropertyTable()->save($property->toArray(), $current_user);
+				                $this->getVcardPropertyTable()->save($property, $currentUser);
 
 				                $connection->commit();
 
@@ -284,7 +284,7 @@ class VcardController extends PpitController
             }
         }
         return array(
-    		'current_user' => $current_user,
+    		'currentUser' => $currentUser,
         	'customer_id' => $customer_id,
         	'customer' => $customer,
         	'id' => $id,
@@ -301,8 +301,8 @@ class VcardController extends PpitController
     	if (!$id) {
     		return $this->redirect()->toRoute('vcard/index');
     	}
-    	$current_user = $this->getUserTable()->get($id);
-    	$current_user->retrieveHabilitations($this);
+    	$currentUser = $this->getUserTable()->get($id);
+    	$currentUser->retrieveHabilitations($this);
     
     	$form = new VcardDevisForm();
     	$form->addElements($this->getServiceLocator()->get('translator'));
@@ -339,39 +339,39 @@ class VcardController extends PpitController
     			else {
     				$vcard->exchangeArray($form->getData());
     				$vcard->id = NULL;
-    				$vcard->instance_id = $current_user->instance_id;
+    				$vcard->instance_id = $currentUser->instance_id;
     				$vcard->n_fn = $vcard->n_last.', '.$vcard->n_first;
-    				$id = $this->getVcardTable()->save($vcard->toArray(), $current_user);
+    				$id = $this->getVcardTable()->save($vcard, $currentUser);
 
     				if ($form->get('souscrire')->getValue()) {
 
 	    				// Create the customer
 	    				$customer = new Customer();
-	    				$customer->instance_id = $current_user->instance_id;
+	    				$customer->instance_id = $currentUser->instance_id;
 	    				$customer->name = $form->get('org')->getValue();
 	    				$customer->contact_id = $id;
-	    				$customer_id = $this->getCustomerTable()->save($customer->toArray(), $current_user);
+	    				$customer_id = $this->getCustomerTable()->save($customer, $currentUser);
 	    				
 	    				// Create the order
 						$order = new Order();
-	    				$order->instance_id = $current_user->instance_id;
+	    				$order->instance_id = $currentUser->instance_id;
 						$order->customer_id = $customer_id;
 						$order->order_date = date('Y-m-d');
 						$order->caption = 'location gratuite 1 an - 50 utilisateurs';    				
-						$this->getOrderTable()->save($order->toArray(), $current_user);
+						$this->getOrderTable()->save($order, $currentUser);
     				}
 
     				if ($form->get('quotation')->getValue()) {
     				
     					// Create the event
     					$event = new ContactEvent();
-	    				$event->instance_id = $current_user->instance_id;
+	    				$event->instance_id = $currentUser->instance_id;
     					$event->contact_id = $id;
     					$event->type = 'quotation';
 						$event->date = date('Y-m-d');
 						$event->caption = 'Demander un devis location ou achat premium';
 						$event->comment = $form->get('comment')->getValue();
-						$event_id = $this->getContactEventTable()->save($event->toArray(), $current_user);
+						$event_id = $this->getContactEventTable()->save($event, $currentUser);
     				}
     				
     				// Redirect to the user list
@@ -380,7 +380,7 @@ class VcardController extends PpitController
     		}
     	}
     	return array(
-    			'current_user' => $current_user,
+    			'currentUser' => $currentUser,
     			'title' => 'Notes de frais',
     			'form' => $form,
     			'id' => $id,
@@ -394,11 +394,11 @@ class VcardController extends PpitController
             return $this->redirect()->toRoute('vcard/index');
         }
     	// Retrieve the current user
-    	$current_user = Functions::getUser($this);
-    	$current_user->retrieveHabilitations($this);
+    	$currentUser = Functions::getUser($this);
+    	$currentUser->retrieveHabilitations($this);
     	 
         // retrieve the vcard
-	    $vcard = $this->getVcardTable()->get($id, $current_user);
+	    $vcard = $this->getVcardTable()->get($id, $currentUser);
 
 	    $csrfForm = new CsrfForm();
 	    $csrfForm->addCsrfElement('csrf');
@@ -416,12 +416,12 @@ class VcardController extends PpitController
     			if (count($this->getUserTable()->selectWith($select)) > 0) $error = 'Consistency';
     			else {
     				$select = $this->getAgentTable()->getSelect()->where(array('contact_id' => $vcard->id));
-    				if (count($this->getAgentTable()->selectWith($select, $current_user)) > 0) {
+    				if (count($this->getAgentTable()->selectWith($select, $currentUser)) > 0) {
     					$error = 'Consistency';
     				}
 	    			else {
-			        	$this->getVcardTable()->delete($id, $current_user);
-						$this->getVcardPropertyTable()->multipleDelete(array('vcard_id' => $id), $current_user);
+			        	$this->getVcardTable()->delete($id, $currentUser);
+						$this->getVcardPropertyTable()->multipleDelete(array('vcard_id' => $id), $currentUser);
 
 			            // Redirect
 			            return $this->redirect()->toRoute('vcard');
@@ -431,7 +431,7 @@ class VcardController extends PpitController
         }
 
         return array(
-    		'current_user' => $current_user,
+    		'currentUser' => $currentUser,
  	  		'csrfForm' => $csrfForm,
         	'vcard' => $vcard,
     		'id' => $id,

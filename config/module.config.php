@@ -4,6 +4,7 @@ return array(
     'controllers' => array(
         'invokables' => array(
             'PpitContact\Controller\Vcard' => 'PpitContact\Controller\VcardController',
+        	'PpitContact\Controller\VcardRest' => 'PpitContact\Controller\VcardRestController',
         ),
     ),
  
@@ -105,6 +106,18 @@ return array(
 	                ),
 	       		),
 	       	),
+        	'vcardRest' => array(
+                'type'    => 'segment',
+                'options' => array(
+                    'route'    => '/vcard-rest[/:id]',
+                    'constraints' => array(
+                        'id' => '[0-9]+',
+                    ),
+                    'defaults' => array(
+                        'controller' => 'PpitContact\Controller\VcardRest',
+                    ),
+                ),
+            ),
         ),
     ),
 	'bjyauthorize' => array(
@@ -120,6 +133,7 @@ return array(
 				array('route' => 'vcard/import', 'roles' => array('customer_admin')),
 				array('route' => 'vcard/index', 'roles' => array('super_admin', 'customer_admin')),
 				array('route' => 'vcard/update', 'roles' => array('user')),
+				array('route' => 'vcardRest', 'roles' => array('admin')),
 			)
 		)
 	),

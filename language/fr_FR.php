@@ -16,6 +16,7 @@
 			'CSV imports' => 'Imports CSV',
 			'Delete a contact' => 'Supprimer un contact',
 			'Email' => 'Email',
+			'Existing contact name' => 'Nom du contact existant',
 			'First name' => 'Prénom',
 			'Invalid email format' => 'Format d\'email invalide',
 			'Invalid phone format' => 'Format de téléphone invalide',

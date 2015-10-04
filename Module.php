@@ -3,7 +3,6 @@ namespace PpitContact;
 
 use PpitContact\Model\ContactEvent;
 use PpitContact\Model\Vcard;
-use PpitContact\Model\VcardTable;
 use PpitContact\Model\VcardProperty;
 use PpitCore\Model\GenericTable;
 use Zend\Db\ResultSet\ResultSet;
@@ -52,7 +51,7 @@ class Module //implements AutoloaderProviderInterface, ConfigProviderInterface
                 },
             	'PpitContact\Model\VcardTable' =>  function($sm) {
                     $tableGateway = $sm->get('VcardTableGateway');
-                    $table = new VcardTable($tableGateway);
+                    $table = new GenericTable($tableGateway);
                     return $table;
                 },
                 'VcardTableGateway' => function ($sm) {

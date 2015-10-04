@@ -1,5 +1,5 @@
 <?php
-	$title = $this->translate('Contacts', 'ppit-contact', $current_user->locale);
+	$title = $this->translate('Contacts', 'ppit-contact', $currentUser->locale);
 	echo $this->partial('/partials/menu');
 ?>
 <?php
@@ -9,7 +9,7 @@ $this->headTitle($title);
     <div class="col-md-6 col-md-offset-3">
 		<div class="panel panel-default">
             <div class="panel-heading">
-				<strong><?php echo $this->translate($this->translate('Add a contact', 'ppit-contact', $current_user->locale)).(($customer_id) ? ' '.$customer->name : '') ?></strong>
+				<strong><?php echo $this->translate($this->translate('Add a contact', 'ppit-contact', $currentUser->locale)).(($customer_id) ? ' '.$customer->name : '') ?></strong>
             </div>
            	<div class="panel-body">
 				
@@ -19,7 +19,7 @@ $this->headTitle($title);
 <!--  Duplicate error -->
 <?php if ($error == 'Duplicate') : ?>
 					<div class="form-group">
-						<div class="col-sm-12"><p class="help-block"><?php echo $this->translate('A contact with the same email or cellular phone number already exists', 'ppit-contact', $current_user->locale) ?></p></div>
+						<div class="col-sm-12"><p class="help-block"><?php echo $this->translate('A contact with the same email or cellular phone number already exists', 'ppit-contact', $currentUser->locale) ?></p></div>
 					</div>
 <?php endif;?>
 
@@ -28,13 +28,13 @@ $this->headTitle($title);
 				    <div class="form-group">
 						<?php echo $this->formElement($element) ?>
 <?php if ($this->formElementErrors($element)) : ?>
-						<div class="col-sm-12"><p class="help-block"><?php echo $this->translate('The form has expired, please input again', 'ppit-core', $current_user->locale) ?></p></div>
+						<div class="col-sm-12"><p class="help-block"><?php echo $this->translate('The form has expired, please input again', 'ppit-core', $currentUser->locale) ?></p></div>
 <?php endif;?>
 					</div>
 
 <!-- Title -->
 				    <div class="form-group" id="n_title_group">
-						<label class="col-sm-5 control-label"><?php echo $this->translate('Title', 'ppit-contact', $current_user->locale) ?></label>
+						<label class="col-sm-5 control-label"><?php echo $this->translate('Title', 'ppit-contact', $currentUser->locale) ?></label>
 						<div class="col-sm-7">
 							<input name="n_title" id="n_title" class="form-control" value="<?php echo $vcard->n_title ?>">
 						</div>
@@ -43,7 +43,7 @@ $this->headTitle($title);
 					
 <!-- First name -->
 				    <div class="form-group" id="n_first_group">
-						<label class="col-sm-5 control-label">* <?php echo $this->translate('First name', 'ppit-contact', $current_user->locale) ?></label>
+						<label class="col-sm-5 control-label">* <?php echo $this->translate('First name', 'ppit-contact', $currentUser->locale) ?></label>
 						<div class="col-sm-7">
 							<input name="n_first" id="n_first" class="form-control" value="<?php echo $vcard->n_first ?>">
 						</div>
@@ -52,7 +52,7 @@ $this->headTitle($title);
 
 <!-- Last name -->
 				    <div class="form-group" id="n_last_group">
-						<label class="col-sm-5 control-label">* <?php echo $this->translate('Last name', 'ppit-contact', $current_user->locale) ?></label>
+						<label class="col-sm-5 control-label">* <?php echo $this->translate('Last name', 'ppit-contact', $currentUser->locale) ?></label>
 						<div class="col-sm-7">
 							<input name="n_last" id="n_last" class="form-control" value="<?php echo $vcard->n_last ?>">
 						</div>
@@ -61,7 +61,7 @@ $this->headTitle($title);
 					
 <!-- Organisation -->
 				    <div class="form-group" id="org_group">
-						<label class="col-sm-5 control-label"><?php echo $this->translate('Organisation', 'ppit-contact', $current_user->locale) ?></label>
+						<label class="col-sm-5 control-label"><?php echo $this->translate('Organisation', 'ppit-contact', $currentUser->locale) ?></label>
 						<div class="col-sm-7">
 							<input name="org" id="org" class="form-control" value="<?php echo $vcard->org ?>">
 						</div>
@@ -70,7 +70,7 @@ $this->headTitle($title);
 					
 <!-- Email -->
 				    <div class="form-group" id="email_group">
-						<label class="col-sm-5 control-label">* <?php echo $this->translate('Email', 'ppit-contact', $current_user->locale) ?></label>
+						<label class="col-sm-5 control-label">* <?php echo $this->translate('Email', 'ppit-contact', $currentUser->locale) ?></label>
 						<div class="col-sm-7">
 							<input name="email" id="email" class="form-control" value="<?php echo $vcard->email ?>">
 						</div>
@@ -79,7 +79,7 @@ $this->headTitle($title);
 
 <!-- Work phone -->
 				    <div class="form-group" id="tel_work_group">
-						<label class="col-sm-5 control-label"> <?php echo $this->translate('Work phone', 'ppit-contact', $current_user->locale) ?></label>
+						<label class="col-sm-5 control-label"> <?php echo $this->translate('Work phone', 'ppit-contact', $currentUser->locale) ?></label>
 						<div class="col-sm-7">
 							<input name="tel_work" id="tel_work" class="form-control" value="<?php echo $vcard->tel_work ?>">
 						</div>
@@ -88,7 +88,7 @@ $this->headTitle($title);
 
 <!-- Cellular phone -->
 				    <div class="form-group" id="tel_cell_group">
-						<label class="col-sm-5 control-label"> <?php echo $this->translate('Cellular phone', 'ppit-contact', $current_user->locale) ?></label>
+						<label class="col-sm-5 control-label"> <?php echo $this->translate('Cellular phone', 'ppit-contact', $currentUser->locale) ?></label>
 						<div class="col-sm-7">
 							<input name="tel_cell" id="tel_cell" class="form-control" value="<?php echo $vcard->tel_cell ?>">
 						</div>
@@ -97,7 +97,7 @@ $this->headTitle($title);
 
 <!-- Address - street -->
 				    <div class="form-group" id="ADR_street_group">
-						<label class="col-sm-5 control-label"> <?php echo $this->translate('Address - street', 'ppit-contact', $current_user->locale) ?></label>
+						<label class="col-sm-5 control-label"> <?php echo $this->translate('Address - street', 'ppit-contact', $currentUser->locale) ?></label>
 						<div class="col-sm-7">
 							<input name="ADR_street" id="ADR_street" class="form-control" value="<?php echo $vcard->ADR_street ?>">
 						</div>
@@ -106,7 +106,7 @@ $this->headTitle($title);
 
 <!-- Address - extended -->
 				    <div class="form-group" id="ADR_extended_group">
-						<label class="col-sm-5 control-label"> <?php echo $this->translate('Address - extended', 'ppit-contact', $current_user->locale) ?></label>
+						<label class="col-sm-5 control-label"> <?php echo $this->translate('Address - extended', 'ppit-contact', $currentUser->locale) ?></label>
 						<div class="col-sm-7">
 							<input name="ADR_extended" id="ADR_extended" class="form-control" value="<?php echo $vcard->ADR_extended ?>">
 						</div>
@@ -115,7 +115,7 @@ $this->headTitle($title);
 
 <!-- Address - Post office box -->
 				    <div class="form-group" id="ADR_post_office_box_group">
-						<label class="col-sm-5 control-label"> <?php echo $this->translate('Address - post office box', 'ppit-contact', $current_user->locale) ?></label>
+						<label class="col-sm-5 control-label"> <?php echo $this->translate('Address - post office box', 'ppit-contact', $currentUser->locale) ?></label>
 						<div class="col-sm-7">
 							<input name="ADR_post_office_box" id="ADR_post_office_box" class="form-control" value="<?php echo $vcard->ADR_post_office_box ?>">
 						</div>
@@ -124,7 +124,7 @@ $this->headTitle($title);
 
 <!-- Address - zip -->
 				    <div class="form-group" id="ADR_zip_group">
-						<label class="col-sm-5 control-label"> <?php echo $this->translate('Address - zip', 'ppit-contact', $current_user->locale) ?></label>
+						<label class="col-sm-5 control-label"> <?php echo $this->translate('Address - zip', 'ppit-contact', $currentUser->locale) ?></label>
 						<div class="col-sm-7">
 							<input name="ADR_zip" id="ADR_zip" class="form-control" value="<?php echo $vcard->ADR_zip ?>">
 						</div>
@@ -133,7 +133,7 @@ $this->headTitle($title);
 
 <!-- Address - city -->
 				    <div class="form-group" id="ADR_city_group">
-						<label class="col-sm-5 control-label"> <?php echo $this->translate('Address - city', 'ppit-contact', $current_user->locale) ?></label>
+						<label class="col-sm-5 control-label"> <?php echo $this->translate('Address - city', 'ppit-contact', $currentUser->locale) ?></label>
 						<div class="col-sm-7">
 							<input name="ADR_city" id="ADR_city" class="form-control" value="<?php echo $vcard->ADR_city ?>">
 						</div>
@@ -142,7 +142,7 @@ $this->headTitle($title);
 
 <!-- Address - state -->
 				    <div class="form-group" id="ADR_state_group">
-						<label class="col-sm-5 control-label"> <?php echo $this->translate('Address - state', 'ppit-contact', $current_user->locale) ?></label>
+						<label class="col-sm-5 control-label"> <?php echo $this->translate('Address - state', 'ppit-contact', $currentUser->locale) ?></label>
 						<div class="col-sm-7">
 							<input name="ADR_state" id="ADR_state" class="form-control" value="<?php echo $vcard->ADR_state ?>">
 						</div>
@@ -151,7 +151,7 @@ $this->headTitle($title);
 					
 <!-- Address - country -->
 				    <div class="form-group" id="ADR_country_group">
-						<label class="col-sm-5 control-label"> <?php echo $this->translate('Address - country', 'ppit-contact', $current_user->locale) ?></label>
+						<label class="col-sm-5 control-label"> <?php echo $this->translate('Address - country', 'ppit-contact', $currentUser->locale) ?></label>
 						<div class="col-sm-7">
 							<input name="ADR_country" id="ADR_country" class="form-control" value="<?php echo $vcard->ADR_country ?>">
 						</div>
@@ -162,9 +162,9 @@ $this->headTitle($title);
 				    <div class="form-group">
 						<div class="col-sm-5">&nbsp;</div>
 						<div class="col-sm-7">
-							<input name="submit" type="submit" id="submitbutton" class="btn btn-primary" value="<?php echo $this->translate('Submit', 'ppit-core', $current_user->locale) ?>">
+							<input name="submit" type="submit" id="submitbutton" class="btn btn-primary" value="<?php echo $this->translate('Submit', 'ppit-core', $currentUser->locale) ?>">
 							&nbsp;&nbsp;
-							<a href="<?php echo $this->url('vcard/index', array('customer_id' => $customer_id)) ?>"><?php echo $this->translate('Cancel', 'ppit-core', $current_user->locale) ?></a>
+							<a href="<?php echo $this->url('vcard/index', array('customer_id' => $customer_id)) ?>"><?php echo $this->translate('Cancel', 'ppit-core', $currentUser->locale) ?></a>
 						</div>
 					</div>
 				</form>
@@ -185,7 +185,7 @@ function checkForm()
 	
 	// Address - country
 	if (document.getElementById("ADR_country").value.length > 255) {
-		renderElement("ADR_country", "<?php echo $this->translate('The input is too long', 'ppit-core', $current_user->locale) ?>");
+		renderElement("ADR_country", "<?php echo $this->translate('The input is too long', 'ppit-core', $currentUser->locale) ?>");
 		validity = false;
 	}
     else {
@@ -194,7 +194,7 @@ function checkForm()
 	
 	// Address - state
 	if (document.getElementById("ADR_state").value.length > 255) {
-		renderElement("ADR_state", "<?php echo $this->translate('The input is too long', 'ppit-core', $current_user->locale) ?>");
+		renderElement("ADR_state", "<?php echo $this->translate('The input is too long', 'ppit-core', $currentUser->locale) ?>");
 		validity = false;
 	}
     else {
@@ -203,7 +203,7 @@ function checkForm()
 	
 	// Address - city
 	if (document.getElementById("ADR_city").value.length > 255) {
-		renderElement("ADR_city", "<?php echo $this->translate('The input is too long', 'ppit-core', $current_user->locale) ?>");
+		renderElement("ADR_city", "<?php echo $this->translate('The input is too long', 'ppit-core', $currentUser->locale) ?>");
 		validity = false;
 	}
     else {
@@ -212,7 +212,7 @@ function checkForm()
 	
 	// Address - zip
 	if (document.getElementById("ADR_zip").value.length > 255) {
-		renderElement("ADR_zip", "<?php echo $this->translate('The input is too long', 'ppit-core', $current_user->locale) ?>");
+		renderElement("ADR_zip", "<?php echo $this->translate('The input is too long', 'ppit-core', $currentUser->locale) ?>");
 		validity = false;
 	}
     else {
@@ -221,7 +221,7 @@ function checkForm()
 	
 	// Address - post office box
 	if (document.getElementById("ADR_post_office_box").value.length > 255) {
-		renderElement("ADR_post_office_box", "<?php echo $this->translate('The input is too long', 'ppit-core', $current_user->locale) ?>");
+		renderElement("ADR_post_office_box", "<?php echo $this->translate('The input is too long', 'ppit-core', $currentUser->locale) ?>");
 		validity = false;
 	}
     else {
@@ -230,7 +230,7 @@ function checkForm()
 	
 	// Address - extended
 	if (document.getElementById("ADR_extended").value.length > 255) {
-		renderElement("ADR_extended", "<?php echo $this->translate('The input is too long', 'ppit-core', $current_user->locale) ?>");
+		renderElement("ADR_extended", "<?php echo $this->translate('The input is too long', 'ppit-core', $currentUser->locale) ?>");
 		validity = false;
 	}
     else {
@@ -239,7 +239,7 @@ function checkForm()
 	
 	// Address - street
 	if (document.getElementById("ADR_street").value.length > 255) {
-		renderElement("ADR_street", "<?php echo $this->translate('The input is too long', 'ppit-core', $current_user->locale) ?>");
+		renderElement("ADR_street", "<?php echo $this->translate('The input is too long', 'ppit-core', $currentUser->locale) ?>");
 		validity = false;
 	}
     else {
@@ -273,8 +273,8 @@ function checkForm()
 	// 1 mandatory phone
 	if (tel_cell_validity && tel_work_validity) {
 		if (document.getElementById("tel_work").value == "" && document.getElementById("tel_cell").value == "") {
-			renderElement("tel_cell", "<?php echo $this->translate('Please input at least one phone', 'ppit-contact', $current_user->locale) ?>");
-			renderElement("tel_work", "<?php echo $this->translate('Please input at least one phone', 'ppit-contact', $current_user->locale) ?>");
+			renderElement("tel_cell", "<?php echo $this->translate('Please input at least one phone', 'ppit-contact', $currentUser->locale) ?>");
+			renderElement("tel_work", "<?php echo $this->translate('Please input at least one phone', 'ppit-contact', $currentUser->locale) ?>");
 			validity = false;
 		}
 	    else {
@@ -301,8 +301,8 @@ function checkForm()
 	// At least email or cellular
 	if (tel_cell_validity && email_validity) {
 		if (document.getElementById("tel_cell").value == "" && document.getElementById("email").value == "") {
-			renderElement("email", "<?php echo $this->translate('Please input at least the cellular or the email', 'ppit-contact', $current_user->locale) ?>");
-			renderElement("tel_cell", "<?php echo $this->translate('Please input at least the cellular or the email', 'ppit-contact', $current_user->locale) ?>");
+			renderElement("email", "<?php echo $this->translate('Please input at least the cellular or the email', 'ppit-contact', $currentUser->locale) ?>");
+			renderElement("tel_cell", "<?php echo $this->translate('Please input at least the cellular or the email', 'ppit-contact', $currentUser->locale) ?>");
 			validity = false;
 		}
 	    else {
@@ -313,7 +313,7 @@ function checkForm()
 	
 	// Organisation
 	if (document.getElementById("org").value.length > 255) {
-		renderElement("org", "<?php echo $this->translate('The input is too long', 'ppit-core', $current_user->locale) ?>");
+		renderElement("org", "<?php echo $this->translate('The input is too long', 'ppit-core', $currentUser->locale) ?>");
 		validity = false;
 	}
     else {
@@ -322,11 +322,11 @@ function checkForm()
 	
 	// Last name
 	if (document.getElementById("n_last").value == "") {
-		renderElement("n_last", "<?php echo $this->translate('Please input the last name', 'ppit-contact', $current_user->locale) ?>");
+		renderElement("n_last", "<?php echo $this->translate('Please input the last name', 'ppit-contact', $currentUser->locale) ?>");
 		validity = false;
 	}
     else if (document.getElementById("n_last").value.length > 255) {
-		renderElement("n_last", "<?php echo $this->translate('The input is too long', 'ppit-core', $current_user->locale) ?>");
+		renderElement("n_last", "<?php echo $this->translate('The input is too long', 'ppit-core', $currentUser->locale) ?>");
 		validity = false;
 	}
     else {
@@ -335,11 +335,11 @@ function checkForm()
 	
 	// First name
 	if (document.getElementById("n_first").value == "") {
-		renderElement("n_first", "<?php echo $this->translate('Please input the first name', 'ppit-contact', $current_user->locale) ?>");
+		renderElement("n_first", "<?php echo $this->translate('Please input the first name', 'ppit-contact', $currentUser->locale) ?>");
 		validity = false;
 	}
     else if (document.getElementById("n_first").value.length > 255) {
-		renderElement("n_last", "<?php echo $this->translate('The input is too long', 'ppit-core', $current_user->locale) ?>");
+		renderElement("n_last", "<?php echo $this->translate('The input is too long', 'ppit-core', $currentUser->locale) ?>");
 		validity = false;
 	}
     else {
@@ -348,7 +348,7 @@ function checkForm()
 	
 	// Title
 	if (document.getElementById("n_title").value.length > 255) {
-		renderElement("n_title", "<?php echo $this->translate('The input is too long', 'ppit-core', $current_user->locale) ?>");
+		renderElement("n_title", "<?php echo $this->translate('The input is too long', 'ppit-core', $currentUser->locale) ?>");
 		validity = false;
 	}
     else {
