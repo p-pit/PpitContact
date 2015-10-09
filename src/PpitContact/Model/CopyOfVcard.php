@@ -20,17 +20,16 @@ class Vcard implements InputFilterAwareInterface
     public $tel_work;
     public $tel_cell;
     public $email;
-    public $properties;
     
     // Additional fields (from joined table)
-/*    public $address_type;
+    public $address_type;
     public $ADR_street;
     public $ADR_extended;
     public $ADR_post_office_box;
     public $ADR_zip;
     public $ADR_city;
     public $ADR_state;
-    public $ADR_country;*/
+    public $ADR_country;
     
     protected $inputFilter;
     protected $devisInputFilter;
@@ -57,19 +56,8 @@ class Vcard implements InputFilterAwareInterface
         $this->tel_work = (isset($data['tel_work'])) ? $data['tel_work'] : null;
         $this->tel_cell = (isset($data['tel_cell'])) ? $data['tel_cell'] : null;
         $this->email = (isset($data['email'])) ? $data['email'] : null;
-
-        // Retrieve the properties
-        $properties = (isset($data['properties'])) ? ((json_decode($data['properties'])) ? json_decode($data['properties']) : array()) : array();
-        $this->properties = array();
-        foreach ($properties as $property_name => $property_array) {
-        	$property = new VcardProperty;
-        	$property->name = $property_name;
-        	$property->type = $property_array->type;
-        	$property->text_value = $property_array->text_value;
-        	$this->properties[$property_name] = $property;
-	    }
-
-		// Additional fields
+        
+		// Additional fileds
         $this->address_type = (isset($data['address_type'])) ? $data['address_type'] : null;
         $this->ADR_street = (isset($data['ADR_street'])) ? $data['ADR_street'] : null;
         $this->ADR_extended = (isset($data['ADR_extended'])) ? $data['ADR_extended'] : null;
@@ -94,33 +82,10 @@ class Vcard implements InputFilterAwareInterface
     	$data['tel_work'] = $this->tel_work;
     	$data['tel_cell'] = $this->tel_cell;
     	$data['email'] = $this->email;
-    	if ($this->properties) {
-	    	$properties = array();
-	    	foreach ($this->properties as $property) {
-	    		if ($property->text_value) $properties[$property->name] = $property->toArray();
-	    	}
-	    	$data['properties'] = json_encode($properties);
-    	}
+    	 
     	return $data;
     }
 
-    public function retrieveProperties($captions) {
-
-    	$properties = array();
-    	foreach ($captions as $property_name => $property_caption) {
-	    	if ($this->properties && array_key_exists($property_name, $this->properties)) {
-	    		$property = $this->properties[$property_name];
-	    	}
-	    	else {
-	    		$property = new VcardProperty;
-	    	}
-	    	$property->name = $property_name;
-	    	$property->caption = $property_caption;
-	    	$properties[$property_name] = $property;
-    	}
-    	return $properties;
-    }
-    
     public static function retrieveExisting($n_last, $n_first, $email, $tel_cell, $tel_work, $vcardTable, $currentUser)
     {
     	// Search for an existing contact with same last_name, first_name and either email or cellular
@@ -139,7 +104,7 @@ class Vcard implements InputFilterAwareInterface
     	}
     	return null;
     }
-/*    
+    
     public function retrieveProperties($vcardPropertyTable, $currentUser) {
     	$select = $vcardPropertyTable->getSelect()
 	    	->where(array('vcard_id' => $this->id));
@@ -169,7 +134,7 @@ class Vcard implements InputFilterAwareInterface
     				break;
     		}
     	}
-    }*/
+    }
 
     public function loadData($request, $properties) {
     
@@ -180,32 +145,64 @@ class Vcard implements InputFilterAwareInterface
     	$this->email =  trim(strip_tags($request->getPost('email')));
     	$this->tel_work =  trim(strip_tags($request->getPost('tel_work')));
     	$this->tel_cell =  trim(strip_tags($request->getPost('tel_cell')));
+		foreach ($properties as $property => $property_caption) {
+			switch ($property) {
+			case 'ADR_street' :
+		    	$this->ADR_street =  trim(strip_tags($request->getPost($property)));
+		    	break;
+		    	
+			case 'ADR_extended' :
+		    	$this->ADR_extended =  trim(strip_tags($request->getPost($property)));
+		    	break;
+
+	    	case 'ADR_post_office_box' :
+	    		$this->ADR_post_office_box =  trim(strip_tags($request->getPost($property)));
+	    		break;
+
+    		case 'ADR_zip' :
+    			$this->ADR_zip =  trim(strip_tags($request->getPost($property)));
+    			break;
+
+    		case 'ADR_city' :
+    			$this->ADR_city =  trim(strip_tags($request->getPost($property)));
+    			break;
+
+    		case 'ADR_state' :
+    			$this->ADR_state =  trim(strip_tags($request->getPost($property)));
+    			break;
+
+    		case 'ADR_country' :
+    			$this->ADR_country =  trim(strip_tags($request->getPost($property)));
+    			break;
+			}
+		}
     
     	// Check integrity
     
     	if (	strlen($this->n_title) > 255
-    		||	$this->n_first == '' || strlen($this->n_first) > 255
-    		||	$this->n_last == '' || strlen($this->n_last) > 255
-    		||	strlen($this->email) > 255
-    		|| ($this->email && !preg_match(Vcard::$emailRegex, $this->email))
-    		||	strlen($this->tel_work) > 255
-    		|| ($this->tel_work && !preg_match(Vcard::$telRegex, $this->tel_work))
-    		||	strlen($this->tel_cell) > 255
-    		|| ($this->tel_cell && !preg_match(Vcard::$telRegex, $this->tel_cell))
-    		|| (!$this->email && (!$this->tel_work && !$this->tel_cell))) // At least an email or a phone
-    	{
-    		throw new \Exception('View error');
-    	}
-    			
-    	foreach ($properties as $property_name => $property) {
-			$property->text_value = trim(strip_tags($request->getPost($property_name)));
-    		if (strlen($property->text_value) > 255) throw new \Exception('View error');
-    		$this->properties[$property_name] = $property;
-    	}
-    				 
-    	$this->n_fn = $this->n_last.', '.$this->n_first;
+    			||	$this->n_first == '' || strlen($this->n_first) > 255
+    			||	$this->n_last == '' || strlen($this->n_last) > 255
+    			||	strlen($this->email) > 255
+    			|| ($this->email && !preg_match(Vcard::$emailRegex, $this->email))
+    			||	strlen($this->tel_work) > 255
+    			|| ($this->tel_work && !preg_match(Vcard::$telRegex, $this->tel_work))
+    			||	strlen($this->tel_cell) > 255
+    			|| ($this->tel_cell && !preg_match(Vcard::$telRegex, $this->tel_cell))
+    			|| (!$this->email && (!$this->tel_work && !$this->tel_cell)) // At least an email or a phone
+    			||	strlen($this->ADR_street) > 255
+    			||	strlen($this->ADR_extended) > 255
+    			||	strlen($this->ADR_post_office_box) > 255
+    			||	strlen($this->ADR_zip) > 255
+    			||	strlen($this->ADR_city) > 255
+    			||	strlen($this->ADR_state) > 255
+    			||	strlen($this->ADR_country) > 255) {
+    
+    				throw new \Exception('View error');
+    			}
+    			 
+    			$this->n_fn = $this->n_last.', '.$this->n_first;
     }
-/*    
+    
     public function updateProperties($vcardPropertyTable, $currentUser) {
     	$property = new VcardProperty();
     	$property->vcard_id = $this->id;
@@ -266,7 +263,7 @@ class Vcard implements InputFilterAwareInterface
     		$property->text_value = $this->ADR_country;
     		$vcardPropertyTable->save($property, $currentUser);
     	}
-    }*/
+    }
     
     public function checkIntegrity() {
     
@@ -333,6 +330,116 @@ class Vcard implements InputFilterAwareInterface
 
     public function getDevisInputFilter()
     {
-        throw new \Exception("Not used");
+        if (!$this->devisInputFilter) {
+            $inputFilter = new InputFilter();
+            $factory     = new InputFactory();
+
+            $inputFilter->add($factory->createInput(array(
+            		'name'     => 'csrf',
+            		'required' => false,
+            )));
+
+	        $inputFilter->add($factory->createInput(array(
+	        		'name'     => 'n_last',
+	        		'required' => TRUE,
+	        		'filters'  => array(
+	        				array('name' => 'StripTags'),
+	        				array('name' => 'StringTrim'),
+	        		),
+	        		'validators' => array(
+	        				array(
+	        						'name'    => 'StringLength',
+	        						'options' => array(
+	        								'encoding' => 'UTF-8',
+	        								'min'      => 1,
+	        								'max'      => 255,
+	        						),
+	        				),
+	        		),
+	        )));
+	
+	        $inputFilter->add($factory->createInput(array(
+	        		'name'     => 'n_first',
+	        		'required' => TRUE,
+	        		'filters'  => array(
+	        				array('name' => 'StripTags'),
+	        				array('name' => 'StringTrim'),
+	        		),
+	        		'validators' => array(
+	        				array(
+	        						'name'    => 'StringLength',
+	        						'options' => array(
+	        								'encoding' => 'UTF-8',
+	        								'min'      => 1,
+	        								'max'      => 255,
+	        						),
+	        				),
+	        		),
+	        )));
+	
+	      
+	    
+	        
+	        $inputFilter->add($factory->createInput(array(
+	        		'name'     => 'tel_work',
+	        		'required' => TRUE,
+	        		'filters'  => array(
+	        				array('name' => 'StripTags'),
+	        				array('name' => 'StringTrim'),
+	        		),
+	        		'validators' => array(
+	        				array(
+	        						'name'    => 'StringLength',
+	        						'options' => array(
+	        								'encoding' => 'UTF-8',
+	        								'min'      => 1,
+	        								'max'      => 255,
+	        						),
+	        				),
+	        		),
+	        )));
+	
+	        $inputFilter->add($factory->createInput(array(
+	        		'name'     => 'tel_cell',
+	        		'required' => FALSE,
+	        		'filters'  => array(
+	        				array('name' => 'StripTags'),
+	        				array('name' => 'StringTrim'),
+	        		),
+	        		'validators' => array(
+	        				array(
+	        						'name'    => 'StringLength',
+	        						'options' => array(
+	        								'encoding' => 'UTF-8',
+	        								'min'      => 1,
+	        								'max'      => 255,
+	        						),
+	        				),
+	        		),
+	        )));
+
+	        $inputFilter->add($factory->createInput(array(
+	        		'name'     => 'org',
+	        		'required' => FALSE,
+	        		'filters'  => array(
+	        				array('name' => 'StripTags'),
+	        				array('name' => 'StringTrim'),
+	        		),
+	        		'validators' => array(
+	        				array(
+	        						'name'    => 'StringLength',
+	        						'options' => array(
+	        								'encoding' => 'UTF-8',
+	        								'min'      => 1,
+	        								'max'      => 255,
+	        						),
+	        				),
+	        		),
+	        )));
+
+        	$this->devisInputFilter = $inputFilter;
+        }
+        
+        return $this->devisInputFilter;
     }    
 }
