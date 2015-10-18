@@ -23,7 +23,7 @@ class VcardRestController extends PpitRestController
     	$cursor = $this->getVcardTable()->selectWith($select, $currentUser);
 	    $data = array();
 	    foreach($cursor as $contact) {
-	        $data[] = $contact;
+	        $data[] = array($contact->id => $contact_n_fn);
 	    }
 	    return new JsonModel(array('data' => $data));
     }

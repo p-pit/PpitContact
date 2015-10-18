@@ -120,25 +120,23 @@ class Vcard implements InputFilterAwareInterface
     	}
     	return $properties;
     }
-    
+/*    
     public static function retrieveExisting($n_last, $n_first, $email, $tel_cell, $tel_work, $vcardTable, $currentUser)
     {
-    	// Search for an existing contact with same last_name, first_name and either email or cellular
-    	$select = $vcardTable->getSelect()->where(array('n_last' => $n_last, 'n_first' => $n_first, 'email' => $email));
-    	$cursor = $vcardTable->selectWith($select, $currentUser);
-    	if (count($cursor) > 0) return $cursor->current();
-    	else {
-	    	$select = $vcardTable->getSelect()->where(array('n_last' => $n_last, 'n_first' => $n_first, 'tel_cell' => $tel_cell));
-	    	$cursor = $vcardTable->selectWith($select, $currentUser);
-	    	if (count($cursor) > 0) return $cursor->current();
-    		else {
-    			$select = $vcardTable->getSelect()->where(array('n_last' => $n_last, 'n_first' => $n_first, 'tel_work' => $tel_work));
-    			$cursor = $vcardTable->selectWith($select, $currentUser);
-    			if (count($cursor) > 0) return $cursor->current();
-    		}
+    	// Check for an existing contact : same first name and last name and (email or cellular)
+    	if ($this->email) {
+	    	$select = $this->getVcardTable()->getSelect()
+	    		->where(array('n_first' => $this->n_first, 'n_last' => $this->n_last, 'email' => $this->email));
+	    	$cursor = $this->getVcardTable()->selectWith($select, $currentUser);
+			if (count($cursor) > 0) return $cursor->current();
     	}
-    	return null;
-    }
+		elseif ($this->tel_cell) {
+			$select = $this->getVcardTable()->getSelect()
+		     	->where(array('n_first' => $vcard->n_first, 'n_last' => $vcard->n_last, 'tel_cell' => $vcard->tel_cell));
+    		$cursor = $this->getVcardTable()->selectWith($select, $currentUser);
+		    if (count($cursor) > 0) return $cursor->current();
+		}
+    }*/
 /*    
     public function retrieveProperties($vcardPropertyTable, $currentUser) {
     	$select = $vcardPropertyTable->getSelect()
@@ -171,8 +169,14 @@ class Vcard implements InputFilterAwareInterface
     	}
     }*/
 
-    public function loadData($request, $properties) {
-    
+    public function loadData($request, $properties, $vcardTable, $currentUser) {
+
+    	// Save the identifying previous data
+    	$previous_n_last = $this->n_last;
+    	$previous_n_first = $this->n_first;
+    	$previous_email = $this->email;
+    	$previous_tel_cell = $this->tel_cell;
+    	
     	// Retrieve the data from the request
     	$this->n_title =  trim(strip_tags($request->getPost('n_title')));
     	$this->n_last =  trim(strip_tags($request->getPost('n_last')));
@@ -204,6 +208,30 @@ class Vcard implements InputFilterAwareInterface
     	}
     				 
     	$this->n_fn = $this->n_last.', '.$this->n_first;
+
+		// Determine if the contact change (change in the identifying data
+		if ($this->n_last != $previous_n_last
+		||	$this->n_first != $previous_n_first
+		|| 	($this->email && $this->email != $previous_email)
+		||	($this->tel_cell && $this->tel_cell != $previous_tel_cell)) {
+	    	
+			$this->id = null;
+			
+	    	// Check for an existing contact : same first name and last name and (email or cellular)
+	    	if ($this->email || $this->tel_cell) {
+			    $select = $vcardTable->getSelect()
+			    	->where(array('n_first' => $this->n_first, 'n_last' => $this->n_last));
+			    if ($this->email) {
+				   	$select->where->equalTo('email', $this->email);
+			    }
+			    else {
+					$select->where->equalTo('tel_cell', $this->tel_cell);
+			    }
+			    $cursor = $vcardTable->selectWith($select, $currentUser);
+				if (count($cursor) > 0) $this->id = $cursor->current()->id;
+	    	}
+		}
+		return $this->id;
     }
 /*    
     public function updateProperties($vcardPropertyTable, $currentUser) {
@@ -267,7 +295,7 @@ class Vcard implements InputFilterAwareInterface
     		$vcardPropertyTable->save($property, $currentUser);
     	}
     }*/
-    
+/*    
     public function checkIntegrity() {
     
     	$this->n_title = trim(strip_tags($this->n_title));
@@ -290,7 +318,7 @@ class Vcard implements InputFilterAwareInterface
     		
     		throw new \Exception('javascript error');
     	}
-    }
+    }*/
     
     public static function visibleContactList($cursor, $customer_id, $currentUser) {
     

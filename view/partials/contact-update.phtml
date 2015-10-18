@@ -12,7 +12,7 @@
 				    <div class="form-group" id="<?php echo $prefix ?>n_last_group">
 						<label class="col-sm-5 control-label">* <?php echo $this->translate('Last name', 'ppit-contact', $currentUser->locale) ?></label>
 						<div class="col-sm-7">
-							<input name="<?php echo $prefix ?>n_last" id="<?php echo $prefix ?>n_last" list="<?php echo $prefix ?>contacts" class="form-control" value="<?php echo $contact->n_last ?>" onselect="<?php echo $prefix ?>autocompletion()">
+							<input name="<?php echo $prefix ?>n_last" id="<?php echo $prefix ?>n_last" list="<?php echo $prefix ?>contacts" class="form-control" value="<?php echo $contact->n_last ?>" autocomplete="off" onselect="<?php echo $prefix ?>autocompletion()">
 							<datalist id="<?php echo $prefix ?>contacts">
 <?php foreach ($vcards as $vcard) : ?>
 							  <option value="<?php echo $vcard->id ?>" label="<?php echo $vcard->n_fn ?> - <?php echo ($contact->email) ? $contact->email : ($contact->tel_cell) ? $vcard->tel_cell : $vcard->tel_work ?>">
