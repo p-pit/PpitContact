@@ -169,7 +169,7 @@ class Vcard implements InputFilterAwareInterface
     	}
     }*/
 
-    public function loadData($request, $properties, $vcardTable, $currentUser) {
+    public function loadData($request, $properties, $vcardTable, $currentUser, $prefix='') {
 
     	// Save the identifying previous data
     	$previous_n_last = $this->n_last;
@@ -178,13 +178,13 @@ class Vcard implements InputFilterAwareInterface
     	$previous_tel_cell = $this->tel_cell;
     	
     	// Retrieve the data from the request
-    	$this->n_title =  trim(strip_tags($request->getPost('n_title')));
-    	$this->n_last =  trim(strip_tags($request->getPost('n_last')));
-    	$this->n_first =  trim(strip_tags($request->getPost('n_first')));
-    	$this->email =  trim(strip_tags($request->getPost('email')));
-    	$this->tel_work =  trim(strip_tags($request->getPost('tel_work')));
-    	$this->tel_cell =  trim(strip_tags($request->getPost('tel_cell')));
-    
+    	$this->n_title =  trim(strip_tags($request->getPost($prefix.'n_title')));
+    	$this->n_last =  trim(strip_tags($request->getPost($prefix.'n_last')));
+    	$this->n_first =  trim(strip_tags($request->getPost($prefix.'n_first')));
+    	$this->email =  trim(strip_tags($request->getPost($prefix.'email')));
+    	$this->tel_work =  trim(strip_tags($request->getPost($prefix.'tel_work')));
+    	$this->tel_cell =  trim(strip_tags($request->getPost($prefix.'tel_cell')));
+
     	// Check integrity
     
     	if (	strlen($this->n_title) > 255

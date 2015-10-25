@@ -3,7 +3,7 @@
 				    <div class="form-group" id="<?php echo $prefix ?>n_title_group">
 						<label class="col-sm-5 control-label"><?php echo $this->translate('Title', 'ppit-contact', $currentUser->locale) ?></label>
 						<div class="col-sm-7">
-							<input name="<?php echo $prefix ?>n_title" id="<?php echo $prefix ?>n_title" class="form-control" value="<?php echo $contact->n_title ?>">
+							<input name="<?php echo $prefix ?>n_title" id="<?php echo $prefix ?>n_title" class="form-control" value="<?php echo $contact->n_title ?>"<?php if ($message == 'OK') echo 'disabled="disabled"' ?>>
 						</div>
 						<div class="col-sm-12"><p class="help-block" id="<?php echo $prefix ?>n_title_error"></p></div>
 					</div>
@@ -12,7 +12,7 @@
 				    <div class="form-group" id="<?php echo $prefix ?>n_last_group">
 						<label class="col-sm-5 control-label">* <?php echo $this->translate('Last name', 'ppit-contact', $currentUser->locale) ?></label>
 						<div class="col-sm-7">
-							<input name="<?php echo $prefix ?>n_last" id="<?php echo $prefix ?>n_last" list="<?php echo $prefix ?>contacts" class="form-control" value="<?php echo $contact->n_last ?>" autocomplete="off" onselect="<?php echo $prefix ?>autocompletion()">
+							<input name="<?php echo $prefix ?>n_last" id="<?php echo $prefix ?>n_last" list="<?php echo $prefix ?>contacts" class="form-control" value="<?php echo $contact->n_last ?>" autocomplete="off" onselect="<?php echo $prefix ?>autocompletion()"<?php if ($message == 'OK') echo 'disabled="disabled"' ?>>
 							<datalist id="<?php echo $prefix ?>contacts">
 <?php foreach ($vcards as $vcard) : ?>
 							  <option value="<?php echo $vcard->id ?>" label="<?php echo $vcard->n_fn ?> - <?php echo ($contact->email) ? $contact->email : ($contact->tel_cell) ? $vcard->tel_cell : $vcard->tel_work ?>">
@@ -26,7 +26,7 @@
 				    <div class="form-group" id="<?php echo $prefix ?>n_first_group">
 						<label class="col-sm-5 control-label">* <?php echo $this->translate('First name', 'ppit-contact', $currentUser->locale) ?></label>
 						<div class="col-sm-7">
-							<input name="<?php echo $prefix ?>n_first" id="<?php echo $prefix ?>n_first" class="form-control" value="<?php echo $contact->n_first ?>">
+							<input name="<?php echo $prefix ?>n_first" id="<?php echo $prefix ?>n_first" class="form-control" value="<?php echo $contact->n_first ?>"<?php if ($message == 'OK') echo 'disabled="disabled"' ?>>
 						</div>
 						<div class="col-sm-12"><p class="help-block" id="<?php echo $prefix ?>n_first_error"></p></div>
 					</div>
@@ -35,7 +35,7 @@
 				    <div class="form-group" id="<?php echo $prefix ?>email_group">
 						<label class="col-sm-5 control-label">* <?php echo $this->translate('Email', 'ppit-contact', $currentUser->locale) ?></label>
 						<div class="col-sm-7">
-							<input name="<?php echo $prefix ?>email" id="<?php echo $prefix ?>email" class="form-control" value="<?php echo $contact->email ?>">
+							<input name="<?php echo $prefix ?>email" id="<?php echo $prefix ?>email" class="form-control" value="<?php echo $contact->email ?>"<?php if ($message == 'OK') echo 'disabled="disabled"' ?>>
 						</div>
 						<div class="col-sm-12"><p class="help-block" id="<?php echo $prefix ?>email_error"></p></div>
 					</div>
@@ -44,7 +44,7 @@
 				    <div class="form-group" id="<?php echo $prefix ?>tel_work_group">
 						<label class="col-sm-5 control-label"> <?php echo $this->translate('Work phone', 'ppit-contact', $currentUser->locale) ?></label>
 						<div class="col-sm-7">
-							<input name="<?php echo $prefix ?>tel_work" id="<?php echo $prefix ?>tel_work" class="form-control" value="<?php echo $contact->tel_work ?>">
+							<input name="<?php echo $prefix ?>tel_work" id="<?php echo $prefix ?>tel_work" class="form-control" value="<?php echo $contact->tel_work ?>"<?php if ($message == 'OK') echo 'disabled="disabled"' ?>>
 						</div>
 						<div class="col-sm-12"><p class="help-block" id="<?php echo $prefix ?>tel_work_error"></p></div>
 					</div>
@@ -53,7 +53,7 @@
 				    <div class="form-group" id="<?php echo $prefix ?>tel_cell_group">
 						<label class="col-sm-5 control-label"> <?php echo $this->translate('Cellular phone', 'ppit-contact', $currentUser->locale) ?></label>
 						<div class="col-sm-7">
-							<input name="<?php echo $prefix ?>tel_cell" id="<?php echo $prefix ?>tel_cell" class="form-control" value="<?php echo $contact->tel_cell ?>">
+							<input name="<?php echo $prefix ?>tel_cell" id="<?php echo $prefix ?>tel_cell" class="form-control" value="<?php echo $contact->tel_cell ?>"<?php if ($message == 'OK') echo 'disabled="disabled"' ?>>
 						</div>
 						<div class="col-sm-12"><p class="help-block" id="<?php echo $prefix ?>tel_cell_error"></p></div>
 					</div>
@@ -63,7 +63,7 @@
 					<div class="form-group" id="<?php echo $prefix ?><?php echo $property_name ?>_group">
 						<label class="col-sm-5 control-label"> <?php echo $this->translate($property->caption, 'ppit-contact', $currentUser->locale) ?></label>
 						<div class="col-sm-7">
-							<input name="<?php echo $prefix ?><?php echo $property_name ?>" id="<?php echo $prefix ?><?php echo $property_name ?>" class="form-control" value="<?php echo $property->text_value ?>">
+							<input name="<?php echo $prefix ?><?php echo $property_name ?>" id="<?php echo $prefix ?><?php echo $property_name ?>" class="form-control" value="<?php echo $property->text_value ?>"<?php if ($message == 'OK') echo 'disabled="disabled"' ?>>
 						</div>
 						<div class="col-sm-12"><p class="help-block" id="<?php echo $prefix ?><?php echo $property_name ?>_error"></p></div>
 					</div>
@@ -136,7 +136,7 @@ function <?php echo $prefix ?>autocompletion() {
 // The elements are checked last to first so the focus is positionned on the first element on error
 function <?php echo $prefix ?>checkContact() 
 {
-	var validity = true, error;
+//	var validity = true, error;
 	
 // Properties
 <?php foreach ($properties as $property => $property_caption) : ?>

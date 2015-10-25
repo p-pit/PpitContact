@@ -133,7 +133,7 @@ return array(
 				array('route' => 'vcard/import', 'roles' => array('customer_admin')),
 				array('route' => 'vcard/index', 'roles' => array('super_admin', 'customer_admin')),
 				array('route' => 'vcard/update', 'roles' => array('user')),
-				array('route' => 'vcardRest', 'roles' => array('admin')),
+				array('route' => 'vcardRest', 'roles' => array('user')),
 			)
 		)
 	),
