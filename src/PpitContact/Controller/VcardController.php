@@ -301,7 +301,7 @@ class VcardController extends PpitController
     	if (!$id) {
     		return $this->redirect()->toRoute('vcard/index');
     	}
-    	$currentUser = $this->getUserTable()->get($id);
+    	$currentUser = $this->getUserTable()->get($id, null);
     	$currentUser->retrieveHabilitations($this);
     
     	$form = new VcardDevisForm();

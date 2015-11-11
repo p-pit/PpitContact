@@ -133,6 +133,16 @@ function <?php echo $prefix ?>autocompletion() {
 	xhttp.send();
 }
 
+function <?php echo $prefix ?>disable()
+{
+	document.getElementById("<?php echo $prefix ?>n_title").disabled = "disabled";
+	document.getElementById("<?php echo $prefix ?>n_first").disabled = "disabled";
+	document.getElementById("<?php echo $prefix ?>n_last").disabled = "disabled";
+	document.getElementById("<?php echo $prefix ?>email").disabled = "disabled";
+	document.getElementById("<?php echo $prefix ?>tel_work").disabled = "disabled";
+	document.getElementById("<?php echo $prefix ?>tel_cell").disabled = "disabled";
+}	
+
 // The elements are checked last to first so the focus is positionned on the first element on error
 function <?php echo $prefix ?>checkContact() 
 {
