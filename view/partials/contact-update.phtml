@@ -12,7 +12,7 @@
 				    <div class="form-group" id="<?php echo $prefix ?>n_last_group">
 						<label class="col-sm-5 control-label">* <?php echo $this->translate('Last name', 'ppit-contact', $currentUser->locale) ?></label>
 						<div class="col-sm-7">
-							<input name="<?php echo $prefix ?>n_last" id="<?php echo $prefix ?>n_last" list="<?php echo $prefix ?>contacts" class="form-control" value="<?php echo $contact->n_last ?>" autocomplete="off" onselect="<?php echo $prefix ?>autocompletion()"<?php if ($message == 'OK') echo 'disabled="disabled"' ?>>
+							<input name="<?php echo $prefix ?>n_last" id="<?php echo $prefix ?>n_last" list="<?php echo $prefix ?>contacts" class="form-control" value="<?php echo $contact->n_last ?>" autocomplete="off"<?php if ($message == 'OK') echo 'disabled="disabled"' ?>>
 							<datalist id="<?php echo $prefix ?>contacts">
 <?php foreach ($vcards as $vcard) : ?>
 							  <option value="<?php echo $vcard->id ?>" label="<?php echo $vcard->n_fn ?> - <?php echo ($contact->email) ? $contact->email : ($contact->tel_cell) ? $vcard->tel_cell : $vcard->tel_work ?>">
@@ -69,7 +69,7 @@
 					</div>
 <?php endforeach;?>
 
-<script>
+<script id="<?php echo $prefix ?>contact_update_script">
 
 //contactCheckEmail returns null if the given email is valid, else a localized error message
 function contactCheckEmail(value) {
@@ -133,7 +133,7 @@ function <?php echo $prefix ?>autocompletion() {
 	xhttp.send();
 }
 
-function <?php echo $prefix ?>disable()
+function <?php echo $prefix ?>disableContact()
 {
 	document.getElementById("<?php echo $prefix ?>n_title").disabled = "disabled";
 	document.getElementById("<?php echo $prefix ?>n_first").disabled = "disabled";
@@ -142,6 +142,18 @@ function <?php echo $prefix ?>disable()
 	document.getElementById("<?php echo $prefix ?>tel_work").disabled = "disabled";
 	document.getElementById("<?php echo $prefix ?>tel_cell").disabled = "disabled";
 }	
+
+function <?php echo $prefix ?>getContactParams()
+{
+	return 	'&<?php echo $prefix ?>n_title=' + document.getElementById("<?php echo $prefix ?>n_title").value +
+			'&<?php echo $prefix ?>n_first=' + document.getElementById("<?php echo $prefix ?>n_first").value +
+			'&<?php echo $prefix ?>n_last=' + document.getElementById("<?php echo $prefix ?>n_last").value +
+			'&<?php echo $prefix ?>email=' + document.getElementById("<?php echo $prefix ?>email").value +
+			'&<?php echo $prefix ?>tel_work=' + document.getElementById("<?php echo $prefix ?>tel_work").value +
+			'&<?php echo $prefix ?>tel_cell=' + document.getElementById("<?php echo $prefix ?>tel_cell").value;
+}	
+
+$("#<?php echo $prefix ?>n_last").select(function () { <?php echo $prefix ?>autocompletion(); } );
 
 // The elements are checked last to first so the focus is positionned on the first element on error
 function <?php echo $prefix ?>checkContact() 
