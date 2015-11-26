@@ -169,8 +169,30 @@ class Vcard implements InputFilterAwareInterface
     	}
     }*/
 
-    public function loadData($request, $properties, $vcardTable, $currentUser, $prefix='') {
+    public function checkIsolation($request, $properties, $prefix='') {
 
+    	if ($this->n_title != $request->getPost('db_'.$prefix.'n_title')
+    	||	$this->n_last != $request->getPost('db_'.$prefix.'n_last')
+    	||	$this->n_first != $request->getPost('db_'.$prefix.'n_first')
+    	||	$this->email != $request->getPost('db_'.$prefix.'email')
+    	||	$this->tel_work != $request->getPost('db_'.$prefix.'tel_work')
+    	||	$this->tel_cell != $request->getPost('db_'.$prefix.'tel_cell'))
+    	{
+    		return false;
+    	}
+
+    	foreach ($properties as $property_name => $property) {
+    		if ($this->properties[$property_name] != $request->getPost('db_'.$prefix.$property_name))
+    	    {
+    			return false;
+	    	}
+    	}
+
+    	return true;
+    }
+    
+    public function loadData($request, $properties, $vcardTable, $currentUser, $prefix='') {
+    	 
     	// Save the identifying previous data
     	$previous_n_last = $this->n_last;
     	$previous_n_first = $this->n_first;
@@ -202,7 +224,7 @@ class Vcard implements InputFilterAwareInterface
     	}
     			
     	foreach ($properties as $property_name => $property) {
-			$property->text_value = trim(strip_tags($request->getPost($property_name)));
+			$property->text_value = trim(strip_tags($request->getPost($prefix.$property_name)));
     		if (strlen($property->text_value) > 255) throw new \Exception('View error');
     		$this->properties[$property_name] = $property;
     	}

@@ -1,3 +1,12 @@
+					<input type="hidden" name="db_<?php echo $prefix ?>n_title" value="<?php echo $contact->n_title ?>"/>
+					<input type="hidden" name="db_<?php echo $prefix ?>n_last" value="<?php echo $contact->n_last ?>"/>
+					<input type="hidden" name="db_<?php echo $prefix ?>n_first" value="<?php echo $contact->n_first ?>"/>
+					<input type="hidden" name="db_<?php echo $prefix ?>email" value="<?php echo $contact->email ?>"/>
+					<input type="hidden" name="db_<?php echo $prefix ?>tel_work" value="<?php echo $contact->tel_work ?>"/>
+					<input type="hidden" name="db_<?php echo $prefix ?>tel_cell" value="<?php echo $contact->tel_cell ?>"/>
+<?php foreach ($properties as $property_name => $property) : ?>
+					<input type="hidden" name="db_<?php echo $prefix ?><?php echo $property_name ?>" value="<?php echo $property->text_value ?>"/>
+<?php endforeach;?>
 
 <!-- Title -->
 				    <div class="form-group" id="<?php echo $prefix ?>n_title_group">
