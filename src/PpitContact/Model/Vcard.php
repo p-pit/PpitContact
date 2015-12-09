@@ -2,6 +2,7 @@
 namespace PpitContact\Model;
 
 use PpitContact\Model\VcardProperty;
+use PpitCore\Model\Link;
 use Zend\InputFilter\Factory as InputFactory;
 use Zend\InputFilter\InputFilter;
 use Zend\InputFilter\InputFilterAwareInterface;
@@ -21,6 +22,7 @@ class Vcard implements InputFilterAwareInterface
     public $tel_cell;
     public $email;
     public $properties;
+    public $photo_link_id;
     
     // Additional fields (from joined table)
 /*    public $address_type;
@@ -57,7 +59,7 @@ class Vcard implements InputFilterAwareInterface
         $this->tel_work = (isset($data['tel_work'])) ? $data['tel_work'] : null;
         $this->tel_cell = (isset($data['tel_cell'])) ? $data['tel_cell'] : null;
         $this->email = (isset($data['email'])) ? $data['email'] : null;
-
+        
         // Retrieve the properties
         $properties = (isset($data['properties'])) ? ((json_decode($data['properties'])) ? json_decode($data['properties']) : array()) : array();
         $this->properties = array();
@@ -69,6 +71,8 @@ class Vcard implements InputFilterAwareInterface
         	$this->properties[$property_name] = $property;
 	    }
 
+	    $this->photo_link_id = (isset($data['photo_link_id'])) ? $data['photo_link_id'] : null;
+	     
 		// Additional fields
         $this->address_type = (isset($data['address_type'])) ? $data['address_type'] : null;
         $this->ADR_street = (isset($data['ADR_street'])) ? $data['ADR_street'] : null;
@@ -101,6 +105,8 @@ class Vcard implements InputFilterAwareInterface
 	    	}
 	    	$data['properties'] = json_encode($properties);
     	}
+    	$data['photo_link_id'] = $this->photo_link_id;
+    	 
     	return $data;
     }
 
@@ -120,54 +126,6 @@ class Vcard implements InputFilterAwareInterface
     	}
     	return $properties;
     }
-/*    
-    public static function retrieveExisting($n_last, $n_first, $email, $tel_cell, $tel_work, $vcardTable, $currentUser)
-    {
-    	// Check for an existing contact : same first name and last name and (email or cellular)
-    	if ($this->email) {
-	    	$select = $this->getVcardTable()->getSelect()
-	    		->where(array('n_first' => $this->n_first, 'n_last' => $this->n_last, 'email' => $this->email));
-	    	$cursor = $this->getVcardTable()->selectWith($select, $currentUser);
-			if (count($cursor) > 0) return $cursor->current();
-    	}
-		elseif ($this->tel_cell) {
-			$select = $this->getVcardTable()->getSelect()
-		     	->where(array('n_first' => $vcard->n_first, 'n_last' => $vcard->n_last, 'tel_cell' => $vcard->tel_cell));
-    		$cursor = $this->getVcardTable()->selectWith($select, $currentUser);
-		    if (count($cursor) > 0) return $cursor->current();
-		}
-    }*/
-/*    
-    public function retrieveProperties($vcardPropertyTable, $currentUser) {
-    	$select = $vcardPropertyTable->getSelect()
-	    	->where(array('vcard_id' => $this->id));
-    	$cursor = $vcardPropertyTable->selectWith($select, $currentUser);
-    	foreach ($cursor as $property) {
-    		switch ($property->name) {
-    			case 'ADR_street':
-    				$this->ADR_street = $property->text_value;
-    				break;
-    			case 'ADR_extended':
-    				$this->ADR_extended = $property->text_value;
-    				break;
-    			case 'ADR_post_office_box':
-    				$this->ADR_post_office_box = $property->text_value;
-    				break;
-    			case 'ADR_zip':
-    				$this->ADR_zip = $property->text_value;
-    				break;
-    			case 'ADR_city':
-    				$this->ADR_city = $property->text_value;
-    				break;
-    			case 'ADR_state':
-    				$this->ADR_state = $property->text_value;
-    				break;
-    			case 'ADR_country':
-    				$this->ADR_country = $property->text_value;
-    				break;
-    		}
-    	}
-    }*/
 
     public function checkIsolation($request, $properties, $prefix='') {
 
@@ -255,93 +213,20 @@ class Vcard implements InputFilterAwareInterface
 		}
 		return $this->id;
     }
-/*    
-    public function updateProperties($vcardPropertyTable, $currentUser) {
-    	$property = new VcardProperty();
-    	$property->vcard_id = $this->id;
-    	$property->type = $this->address_type;
-    	if (array_key_exists('ADR_street', $properties)) {
-    		$vcardPropertyTable->multipleDelete(array('vcard_id' => $this->id, 'name' => 'ADR_street'), $currentUser);
-    		$property->id = 0;
-    		$property->order = 1;
-    		$property->name = 'ADR_street';
-    		$property->text_value = $this->ADR_street;
-    		$vcardPropertyTable->save($property, $currentUser);
-    	}
-        if (array_key_exists('ADR_extended', $properties)) {
-    		$vcardPropertyTable->multipleDelete(array('vcard_id' => $this->id, 'name' => 'ADR_extended'), $currentUser);
-        	$property->id = 0;
-        	$property->order = 2;
-    		$property->name = 'ADR_extended';
-    		$property->text_value = $this->ADR_extended;
-    		$vcardPropertyTable->save($property, $currentUser);
-    	}
-        if (array_key_exists('ADR_post_office_box', $properties)) {
-    		$vcardPropertyTable->multipleDelete(array('vcard_id' => $this->id, 'name' => 'ADR_post_office_box'), $currentUser);
-        	$property->id = 0;
-        	$property->order = 3;
-    		$property->name = 'ADR_post_office_box';
-    		$property->text_value = $this->ADR_post_office_box;
-    		$vcardPropertyTable->save($property, $currentUser);
-    	}
-        if (array_key_exists('ADR_zip', $properties)) {
-    		$vcardPropertyTable->multipleDelete(array('vcard_id' => $this->id, 'name' => 'ADR_zip'), $currentUser);
-        	$property->id = 0;
-        	$property->order = 4;
-    		$property->name = 'ADR_zip';
-    		$property->text_value = $this->ADR_zip;
-    		$vcardPropertyTable->save($property, $currentUser);
-    	}
-        if (array_key_exists('ADR_city', $properties)) {
-    		$vcardPropertyTable->multipleDelete(array('vcard_id' => $this->id, 'name' => 'ADR_city'), $currentUser);
-        	$property->id = 0;
-        	$property->order = 5;
-    		$property->name = 'ADR_city';
-    		$property->text_value = $this->ADR_city;
-    		$vcardPropertyTable->save($property, $currentUser);
-    	}
-        if (array_key_exists('ADR_state', $properties)) {
-    		$vcardPropertyTable->multipleDelete(array('vcard_id' => $this->id, 'name' => 'ADR_state'), $currentUser);
-        	$property->id = 0;
-        	$property->order = 6;
-    		$property->name = 'ADR_state';
-    		$property->text_value = $this->ADR_state;
-    		$vcardPropertyTable->save($property, $currentUser);
-    	}
-    	if (array_key_exists('ADR_country', $properties)) {
-    		$vcardPropertyTable->multipleDelete(array('vcard_id' => $this->id, 'name' => 'ADR_country'), $currentUser);
-    		$property->id = 0;
-        	$property->order = 7;
-    		$property->name = 'ADR_country';
-    		$property->text_value = $this->ADR_country;
-    		$vcardPropertyTable->save($property, $currentUser);
-    	}
-    }*/
-/*    
-    public function checkIntegrity() {
+
+    public function loadPhoto ($file, $controller, $currentUser, $settings) {
+    	$link = new Link;
+	    $link->loadFile($file, $settings['ppitContactSettings']['photoRootLink'], $controller, $currentUser, $settings);
+	    $this->photo_link_id = $link->id;
+	    $controller->getVcardTable()->save($this, $currentUser);
+    }
     
-    	$this->n_title = trim(strip_tags($this->n_title));
-    	$this->n_first = trim(strip_tags($this->n_first));
-    	$this->n_last = trim(strip_tags($this->n_last));
-    	$this->email = trim(strip_tags($this->email));
-    	$this->tel_work = trim(strip_tags($this->tel_work));
-    	$this->tel_cell = trim(strip_tags($this->tel_cell));
-    	 
-    	if (strlen($vcard->n_title) > 255 ||
-    		!$vcard->n_first || strlen($vcard->n_first) > 255 ||
-			!$vcard->n_last || strlen($vcard->n_last) > 255 ||
-			!$vcard->email || strlen($vcard->email) > 255 ||
-    		!preg_match(Vcard::$emailRegex, $vcard->email) ||
-			strlen($vcard->tel_work) > 255 ||
-    		!preg_match(Vcard::$telRegex, $vcard->tel_work) ||
-			strlen($vcard->tel_cell) > 255 ||
-    		!preg_match(Vcard::$telRegex, $vcard->tel_cell) ||
-    		(!$vcard->tel_cell && ! $vcard->tel_work)) {
-    		
-    		throw new \Exception('javascript error');
-    	}
-    }*/
-    
+    public function loadPhotoFromRequest($request, $name, $controller, $currentUser, $settings) {
+    	$nonFiles = $request->getPost()->toArray();
+    	$files = $request->getFiles()->toArray();
+    	$this->loadPhoto($files[$name], $controller, $currentUser, $settings);
+    }
+
     public static function visibleContactList($cursor, $customer_id, $currentUser) {
     
     	// Execute the request

@@ -3,7 +3,8 @@
 return array(
     'controllers' => array(
         'invokables' => array(
-            'PpitContact\Controller\Vcard' => 'PpitContact\Controller\VcardController',
+            'PpitContact\Controller\Message' => 'PpitContact\Controller\MessageController',
+        	'PpitContact\Controller\Vcard' => 'PpitContact\Controller\VcardController',
         	'PpitContact\Controller\VcardRest' => 'PpitContact\Controller\VcardRestController',
         ),
     ),
@@ -32,7 +33,65 @@ return array(
 	                ),
 	       		),
             ),
-   	       	'vcard' => array(
+        	'message' => array(
+                'type'    => 'segment',
+                'options' => array(
+                    'route'    => '/message',
+                    'defaults' => array(
+                        'controller' => 'PpitContact\Controller\Message',
+                        'action'     => 'index',
+                    ),
+                ),
+           		'may_terminate' => true,
+	       		'child_routes' => array(
+	       			'delete' => array(
+	                    'type' => 'segment',
+	                    'options' => array(
+	                        'route' => '/delete[/:id]',
+		                    'constraints' => array(
+		                    	'id' => '[0-9]*',
+		                    ),
+	                    	'defaults' => array(
+	                            'action' => 'delete',
+	                        ),
+	                    ),
+	                ),
+	       			'index' => array(
+	                    'type' => 'segment',
+	                    'options' => array(
+	                        'route' => '/index',
+	                    	'defaults' => array(
+	                    		'action' => 'index',
+	                        ),
+	                    ),
+	                ),
+	       			'simulate' => array(
+	                    'type' => 'segment',
+	                    'options' => array(
+	                        'route' => '/simulate[/:id]',
+		                    'constraints' => array(
+		                    	'id' => '[0-9]*',
+		                    ),
+	                    	'defaults' => array(
+	                            'action' => 'simulate',
+	                        ),
+	                    ),
+	                ),
+	       			'update' => array(
+	                    'type' => 'segment',
+	                    'options' => array(
+	                        'route' => '/update[/:id]',
+		                    'constraints' => array(
+		                    	'id' => '[0-9]*',
+		                    ),
+	                    	'defaults' => array(
+	                            'action' => 'update',
+	                        ),
+	                    ),
+	                ),
+	       		),
+        	),
+        	'vcard' => array(
                 'type'    => 'literal',
                 'options' => array(
                     'route'    => '/vcard',
@@ -125,7 +184,11 @@ return array(
 		'guards' => array(
 			'BjyAuthorize\Guard\Route' => array(
 
-				// Contacts
+				array('route' => 'message', 'roles' => array('admin')),
+				array('route' => 'message/delete', 'roles' => array('admin')),
+				array('route' => 'message/index', 'roles' => array('admin')),
+				array('route' => 'message/simulate', 'roles' => array('admin')),
+				array('route' => 'message/update', 'roles' => array('admin')),
 				array('route' => 'vcard', 'roles' => array('super_admin', 'customer_admin')),
 				array('route' => 'vcard/add', 'roles' => array('customer_admin')),
 				array('route' => 'vcard/delete', 'roles' => array('customer_admin')),

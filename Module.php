@@ -2,6 +2,8 @@
 namespace PpitContact;
 
 use PpitContact\Model\ContactEvent;
+use PpitContact\Model\Credits;
+use PpitContact\Model\ContactMessage;
 use PpitContact\Model\Vcard;
 use PpitContact\Model\VcardProperty;
 use PpitCore\Model\GenericTable;
@@ -49,7 +51,18 @@ class Module //implements AutoloaderProviderInterface, ConfigProviderInterface
                     $resultSetPrototype->setArrayObjectPrototype(new ContactEvent());
                     return new TableGateway('contact_event', $dbAdapter, null, $resultSetPrototype);
                 },
-            	'PpitContact\Model\VcardTable' =>  function($sm) {
+ 	          	'PpitContact\Model\ContactMessageTable' =>  function($sm) {
+                    $tableGateway = $sm->get('ContactMessageTableGateway');
+                    $table = new GenericTable($tableGateway);
+                    return $table;
+                },
+                'ContactMessageTableGateway' => function ($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $resultSetPrototype = new ResultSet();
+                    $resultSetPrototype->setArrayObjectPrototype(new ContactMessage());
+                    return new TableGateway('contact_message', $dbAdapter, null, $resultSetPrototype);
+                },
+                'PpitContact\Model\VcardTable' =>  function($sm) {
                     $tableGateway = $sm->get('VcardTableGateway');
                     $table = new GenericTable($tableGateway);
                     return $table;
