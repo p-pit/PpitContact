@@ -44,7 +44,7 @@ class UnitaryTarget implements iTarget {
 		if ((substr($tel_cell, 0, 4) == '+336' || substr($tel_cell, 0, 4) == '+337') && strlen($tel_cell) != 12) return false;
 		
     	// Normalize cellular phone number (+336000000 or +337xxxxxx)
-		if (substr($tel_cell, 0, 2) == '06' || substr($tel_cell, 0, 2) == '07') $tel_cell = '+33'.substr($tel_cell, 1, 7);
+		if (substr($tel_cell, 0, 2) == '06' || substr($tel_cell, 0, 2) == '07') $tel_cell = '+33'.substr($tel_cell, 1);
 
     	$this->to[] = $tel_cell;
 		return true;

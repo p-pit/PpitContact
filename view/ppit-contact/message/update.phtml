@@ -43,7 +43,7 @@ else $returnHref = "#";
 <?php if ($modelMessage->type == 'SMS') : ?>
 					<tr>
 						<td class="ppit-header-caption"><?php echo $this->translate('Credit', 'ppit-contact', $currentUser->locale)?></td>
-						<td><?php echo $modelMessage->credits['sms']['LOWCOST']; ?></td>
+						<td><?php echo $modelMessage->credits; ?></td>
 					</tr>
 <?php endif;?>
 

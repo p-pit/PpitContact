@@ -98,9 +98,9 @@ class MessageController extends PpitController
 		// Retrieve credits
 		if ($modelMessage->type == 'SMS') {
 			$sms = new smsenvoi();
-			$modelMessage->credits = $sms->checkCredits();
+			$modelMessage->credits = $sms->checkCredits()['sms']['PREMIUM'];
+//			$modelMessage->credits = 5;
 		}
-		
 		$csrfForm = new CsrfForm();
 		$csrfForm->addCsrfElement('csrf');
 		$message = null;
@@ -130,16 +130,16 @@ class MessageController extends PpitController
 							$message = 'OK';
 						}						
 						// Transmit the message
-						else {								
+						else {
 							// Check the credit
-							if ($modelMessage->credits['sms']['LOWCOST'] < count($modelMessage->to)) $error = 'Insufficient';
+							if ($modelMessage->credits < count($modelMessage->to)) $error = 'Insufficient';
 							else {
 								$tos = $target->compute();
 								$sms = new smsenvoi();
 								$modelMessage->rejected = array();
 								$modelMessage->volume = 0;
 								foreach ($tos as $to) {
-									$return=1; //$return = $sms->sendSMS($to, $modelMessage->subject, 'LOWCOST');
+									$return = ($settings['ppitContactSettings']['isSmsActive']) ? $sms->sendSMS($to, $modelMessage->subject, 'PREMIUM', $settings['ppitCoreSettings']['nameAdmin']) : 1;
 									if (!$return) $modelMessage->rejected[] = $to;
 									else {
 										$modelMessage->accepted[] = $to;
@@ -149,7 +149,10 @@ class MessageController extends PpitController
 											$writer = new Writer\Stream('data/log/mailing.txt');
 											$logger = new Logger();
 											$logger->addWriter($writer);
-											if ($return) $result = 'OK'; else $result = 'KO';
+											if ($settings['ppitContactSettings']['isSmsActive']) {
+												if ($return) $result = 'OK'; else $result = 'KO';
+											}
+											else $result = 'SMS function not enabled => NOT SENT';
 											$logger->info($result.' - '.$modelMessage->type.' to: '.$to.' - subject: '.$modelMessage->subject.' - body: '.$modelMessage->body);
 										}
 									}
