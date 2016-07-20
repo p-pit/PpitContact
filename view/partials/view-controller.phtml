@@ -1,0 +1,151 @@
+
+<!-- Load the common form javascript functions -->
+<?php echo $this->partial('/partials/common-form-js.phtml'); ?>
+
+<script>
+
+reload = function(route, scriptName, target)
+{
+	$(location).attr('hash', '#' + target);
+	var xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function() {
+		if (xhttp.readyState == 4 && xhttp.status == 200) {
+			document.getElementById(target).innerHTML = xhttp.responseText;
+<?php if ($config['ppitCoreSettings']['isTraceActive']) : ?>
+			console.log('reload, route = ' + route + ', scriptName = ' + scriptName + ', target = ' + target);
+			console.log(xhttp.responseText);
+<?php endif;?>
+			eval(document.getElementById(scriptName).innerHTML);
+		}
+	}
+	xhttp.open("GET", route, true);
+	xhttp.send();
+}
+
+
+// PpitPanelClass
+function PpitPanelClass(name) {
+	this.name = name;
+	this.linkedPanels = [];
+}
+
+PpitPanelClass.prototype.linkPanel = function (name) {
+	this.linkedPanels[this.linkedPanels.length] = name;
+}
+
+PpitPanelClass.prototype.unlinkPanel = function(name) {
+	this.linkedPanels.splice(this.linkedPanels.indexOf(name), 1);
+}
+
+PpitPanelClass.prototype.reload = function(route, script, hideLinkedPanels)
+{
+	// Hide the linked panels
+	if (hideLinkedPanels) {
+		for (i = 0; i < this.linkedPanels.length; i++) document.getElementById(this.linkedPanels[i]).style.display='none';
+	}
+	var xhttp = new XMLHttpRequest();
+	xhttp.open("GET", route, false);
+	xhttp.send();
+	if (xhttp.readyState == 4 && xhttp.status == 200) {
+		document.getElementById(this.name).innerHTML = xhttp.responseText;
+		eval(document.getElementById(script).innerHTML);
+	}
+}
+
+// PpitIndexPanelClass
+function PpitIndexPanelClass(name, mainMenu, mainMenuScript) {
+	this.name = name;
+	this.mainMenu = mainMenu;
+	this.mainMenuScript = mainMenuScript;
+	this.linkedForms = [];
+}
+
+PpitIndexPanelClass.prototype.addOpenForm = function (name) {
+	this.linkedForms[this.linkedForms.length] = name;
+}
+
+PpitIndexPanelClass.prototype.removeOpenForm = function(name) {
+	this.linkedForms.splice(this.linkedForms.indexOf(name), 1);
+}
+
+PpitIndexPanelClass.prototype.reload = function(route, scriptName, hideOpenForms)
+{
+	var name = this.name;
+	var mainMenu = this.mainMenu;
+	var mainMenuScript = this.mainMenuScript;
+	// Hide the open forms
+	if (hideOpenForms) {
+		for (i = 0; i < this.linkedForms.length; i++) {
+			document.getElementById(this.linkedForms[i]).style.display='none';
+		}
+		document.getElementById('form_action').style.display='none'; // Depreciated
+	}
+	// Anchor to the main panel
+	$(location).attr('hash', '#');
+	var xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function() {
+		if (xhttp.readyState == 4 && xhttp.status == 200) {
+			document.getElementById(name).innerHTML = xhttp.responseText;
+<?php if ($config['ppitCoreSettings']['isTraceActive']) : ?>
+			console.log('reload, route = ' + route + ', scriptName = ' + scriptName + ', hideOpenForms = ' + hideOpenForms);
+			console.log(xhttp.responseText);
+<?php endif;?>
+			eval(document.getElementById(scriptName).innerHTML);
+			$('#image').hide();
+		}
+	}
+	xhttp.open("GET", route, true);
+	xhttp.send();
+}
+
+var currentIndexPanel = new PpitIndexPanelClass('index_action', 'main_menu', 'main_menu_script');
+
+function showForm(route, scriptName) {
+	document.getElementById("form_action").style.display='block';
+
+	// Anchor to the form panel
+	$(location).attr('hash', 'form_action');
+
+	xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function() {
+		if (xhttp.readyState == 4 && xhttp.status == 200) {
+			document.getElementById("form_action").innerHTML = xhttp.responseText;
+<?php if ($config['ppitCoreSettings']['isTraceActive']) : ?>
+			console.log('showForm, route = ' + route + ', scriptName = ' + scriptName);
+			console.log(xhttp.responseText);
+<?php endif;?>
+			eval(document.getElementById(scriptName).innerHTML);
+		}
+	}
+	xhttp.open("GET", route, true);
+	xhttp.send();
+}
+
+function postForm(route, scriptName, target, params) {
+	var xhttp = new XMLHttpRequest();
+	xhttp.open('POST', route, false);
+	xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+	xhttp.send(params);
+<?php if ($config['ppitCoreSettings']['isTraceActive']) : ?>
+	console.log('postForm, route = ' + route + ', scriptName = ' + scriptName + ', target = ' + target + ', params = ' + params);
+	console.log(xhttp.responseText);
+<?php endif;?>
+	document.getElementById(target).innerHTML = xhttp.responseText;
+	eval(document.getElementById(scriptName).innerHTML);
+}
+
+function hideForm() {
+	document.getElementById("form_action").style.display='none';
+
+	// Anchor to the form panel
+	$(location).attr('hash', currentIndexPanel.name);
+}
+
+function postIndex(route, scriptName, params) {
+	var xhttp = new XMLHttpRequest();
+	xhttp.open('POST', route, false);
+	xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+	xhttp.send(params);
+}
+
+</script>

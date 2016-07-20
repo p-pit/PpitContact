@@ -6,7 +6,7 @@
 </style>
 
 <?php
-$title = $this->translate((($id) ? 'Update' : 'Add').' a message', 'ppit-contact', $currentUser->locale);
+$title = $this->translate((($id) ? 'Update' : 'Add').' a message', 'ppit-contact', $context->getLocale());
 echo $this->partial('/partials/menu');
 $this->headTitle($title);
 ?>
@@ -14,7 +14,7 @@ $this->headTitle($title);
     <div class="col-md-6 col-md-offset-3">
 
 <?php
-if ($settings['ppitCoreSettings']['viewMode'] != 'SPA') $returnHref = $this->url('message/index');
+if (!$context->isSpaMode()) $returnHref = $this->url('message/index');
 else $returnHref = "#";
 ?>
     <div class="panel panel-default">
@@ -28,21 +28,21 @@ else $returnHref = "#";
            			<tr id="return">
 						<td colspan="2">
 							<a id="message_update_anchor_return" class="glyphicon glyphicon-circle-arrow-left" href="<?php echo $returnHref ?>"></a>
-							<a id="message_update_anchor_return_2" href="<?php echo $returnHref ?>"><?php echo $this->translate('Return', 'ppit-core', $currentUser->locale) ?></a>
+							<a id="message_update_anchor_return_2" href="<?php echo $returnHref ?>"><?php echo $this->translate('Return', 'ppit-core', $context->getLocale()) ?></a>
 						</td>
 					</tr>
 <?php endif;?>
 
 <!-- Type -->
 					<tr>
-						<td class="ppit-header-caption"><?php echo $this->translate('Media', 'ppit-contact', $currentUser->locale)?></td>
+						<td class="ppit-header-caption"><?php echo $this->translate('Media', 'ppit-contact', $context->getLocale())?></td>
 						<td><?php echo $modelMessage->type; ?></td>
 					</tr>
 
 <!-- Credits -->
 <?php if ($modelMessage->type == 'SMS') : ?>
 					<tr>
-						<td class="ppit-header-caption"><?php echo $this->translate('Credit', 'ppit-contact', $currentUser->locale)?></td>
+						<td class="ppit-header-caption"><?php echo $this->translate('Credit', 'ppit-contact', $context->getLocale())?></td>
 						<td><?php echo $modelMessage->credits; ?></td>
 					</tr>
 <?php endif;?>
@@ -50,27 +50,27 @@ else $returnHref = "#";
 				</table>
 
 <!-- Form provided for MPA view mode -->
-<?php if ($settings['ppitCoreSettings']['viewMode'] != 'SPA') : ?>
+<?php if (!$context->isSpaMode()) : ?>
 				<form action="<?php echo $this->url('message/update', array('id' => $id)) ?>" method="post" class="form-horizontal">
 <?php endif;?>
 
 <?php if ($message == 'OK') : ?>
 <!-- Global message -->
 			<div class="form-group" id="message">
-				<div class="col-sm-12"><h3><?php echo $this->translate('Your request have been registered', 'ppit-core', $currentUser->locale) ?></h3></div>
+				<div class="col-sm-12"><h3><?php echo $this->translate('Your request have been registered', 'ppit-core', $context->getLocale()) ?></h3></div>
 			</div>
 <?php endif;?>
 
 <!--  Error -->
 <?php if ($error == 'Invalid') : ?>
 					<div class="form-group">
-						<div class="col-sm-12"><p class="help-block"><?php echo $this->translate('Invalid request', 'ppit-core', $currentUser->locale) ?></p></div>
+						<div class="col-sm-12"><p class="help-block"><?php echo $this->translate('Invalid request', 'ppit-core', $context->getLocale()) ?></p></div>
 					</div>
 <?php endif;?>
 
 <?php if ($error == 'Insufficient') : ?>
 					<div class="form-group">
-						<div class="col-sm-12"><p class="help-block"><?php echo $this->translate('You do not have enough credit to transmit this message', 'ppit-core', $currentUser->locale) ?></p></div>
+						<div class="col-sm-12"><p class="help-block"><?php echo $this->translate('You do not have enough credit to transmit this message', 'ppit-core', $context->getLocale()) ?></p></div>
 					</div>
 <?php endif;?>
 				
@@ -78,7 +78,7 @@ else $returnHref = "#";
 					<input type="hidden" name="db_update_time" id="db_update_time" value="<?php echo $modelMessage->update_time ?>"? />
 <?php if ($error == 'Isolation') : ?>
 					<div class="form-group">
-						<div class="col-sm-12"><h4 class="help-block"><?php echo $this->translate('The database has evolved in the meantime, please input again', 'ppit-core', $currentUser->locale) ?></h4></div>
+						<div class="col-sm-12"><h4 class="help-block"><?php echo $this->translate('The database has evolved in the meantime, please input again', 'ppit-core', $context->getLocale()) ?></h4></div>
 					</div>
 <?php endif;?>
 
@@ -87,26 +87,29 @@ else $returnHref = "#";
 				    <div class="form-group">
 						<?php echo $this->formElement($element) ?>
 <?php if ($this->formElementErrors($element)) : ?>
-						<div class="col-sm-12"><p class="help-block"><?php echo $this->translate('The form has expired, please input again', 'ppit-core', $currentUser->locale) ?></p></div>
+						<div class="col-sm-12"><p class="help-block"><?php echo $this->translate('The form has expired, please input again', 'ppit-core', $context->getLocale()) ?></p></div>
 <?php endif;?>
-					</div>
-
-<!-- To -->
-				    <div class="form-group" id="to_group">
-						<label class="col-sm-4 control-label"><?php echo $this->translate('To', 'ppit-contact', $currentUser->locale) ?></label>
-				    	<div class="col-sm-8">
-							<input name="to" id="to" class="form-control" value="<?php echo implode(',', $modelMessage->to) ?>"<?php if ($message == 'OK') echo 'disabled="disabled"' ?>/>
-						</div>
-						<div class="col-sm-12"><p class="help-block" id="to_error"></p></div>
 					</div>
 
 <!-- Subject -->
 				    <div class="form-group" id="subject_group">
-						<label class="col-sm-4 control-label"><?php echo $this->translate('Subject', 'ppit-contact', $currentUser->locale) ?></label>
+						<label class="col-sm-4 control-label"><?php echo $this->translate('Subject', 'ppit-contact', $context->getLocale()) ?></label>
 				    	<div class="col-sm-8">
 							<textarea name="subject" id="subject" rows="5" class="form-control"<?php if ($message == 'OK') echo 'disabled="disabled"' ?>><?php echo $modelMessage->subject ?></textarea>
 						</div>
 						<div class="col-sm-12"><p class="help-block" id="subject_error"></p></div>
+					</div>
+
+<!-- Filter -->
+					<div class="form-group" id="center_id_group">
+						<label class="col-sm-4 control-label"><?php echo $this->translate('Filter', 'ppit-contact', $context->getLocale()) ?></label>
+						<div class="col-sm-8">
+							<select name="filter" id="filter" class="form-control" onchange="simulate()"<?php if ($message == 'OK') echo 'disabled="disabled"' ?>>
+								<option value=""><?php echo $this->translate('Any contact', 'ppit-contact', $context->getLocale()) ?></option>
+								<option value="customer" <?php if ($target->filter == 'customer') echo 'selected="selected"'; ?>><?php echo $this->translate('Customers', 'ppit-customer', $context->getLocale()) ?></option>
+							</select>
+						</div>
+						<div class="col-sm-12"><p class="help-block" id="center_id_error"></p></div>
 					</div>
 					
 <?php if ($message == 'OK') : ?>
@@ -115,7 +118,7 @@ else $returnHref = "#";
 					<div class="form-group">
 						<div class="col-sm-4">&nbsp;</div>
 						<div class="col-sm-8">
-							<a id='message_update_anchor_foot_return' href="<?php echo $returnHref ?>"><?php echo $this->translate('Return', 'ppit-core', $currentUser->locale) ?></a>
+							<a id='message_update_anchor_foot_return' href="<?php echo $returnHref ?>"><?php echo $this->translate('Return', 'ppit-core', $context->getLocale()) ?></a>
 						</div>
 					</div>
 
@@ -126,24 +129,28 @@ else $returnHref = "#";
 						<div class="col-sm-4">&nbsp;</div>
 						<div class="col-sm-8">
 							<input type="hidden" id="action" name="action"/>
-							<input name="save" type="submit" id="message_save_button" class="btn btn-primary" value="<?php echo $this->translate('Save', 'ppit-contact', $currentUser->locale) ?>" />
+							<input name="save" type="submit" id="message_save_button" class="btn btn-primary" value="<?php echo $this->translate('Save', 'ppit-contact', $context->getLocale()) ?>" />
 							&nbsp;&nbsp;
-							<input name="emit" type="submit" id="message_transmit_button" class="btn btn-primary" value="<?php echo $this->translate('Transmit', 'ppit-contact', $currentUser->locale) ?>" />
+							<input name="emit" type="submit" id="message_transmit_button" class="btn btn-primary" value="<?php echo $this->translate('Transmit', 'ppit-contact', $context->getLocale()) ?>" />
 							&nbsp;&nbsp;
-							<a id="message_update_cancel" href="<?php echo $returnHref ?>"><?php echo $this->translate('Cancel', 'ppit-core', $currentUser->locale) ?></a>
+							<a id="message_update_cancel" href="<?php echo $returnHref ?>"><?php echo $this->translate('Cancel', 'ppit-core', $context->getLocale()) ?></a>
 						</div>
 					</div>
 <?php endif;?>
 
-<?php if ($settings['ppitCoreSettings']['viewMode'] != 'SPA') : ?>
+<?php if (!$context->isSpaMode()) : ?>
 				</form>
 <?php endif;?>
-   			</div>
+
+<!-- Result -->
+				<hr>
+				<div id="sms_update_target"></div>
+			</div>
 		</div>
 	</div>
 </div>
 
-<?php if ($settings['ppitCoreSettings']['viewMode'] != 'SPA') echo $this->partial('partials/view-controller') ?>
+<?php if (!$context->isSpaMode()) echo $this->partial('partials/view-controller') ?>
 
 <script id='message_update_script'>
 //Menu
@@ -164,6 +171,28 @@ $("#message_update_anchor_return_2").click(function () { hideForm(); } );
 
 <?php endif;?>
 
+//Simulate the "to" list according to the target criteria
+function simulate() {
+	var xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function() {
+		if (xhttp.readyState == 4/* && xhttp.status == 200*/) {
+			document.getElementById("sms_update_target").innerHTML = xhttp.responseText;
+		}
+	}
+	var params = '';
+	params += 'filter=' + document.getElementById("filter").value;
+	
+	xhttp.open("POST", "<?php echo $this->url('message/simulate') ?>", true);
+	xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	xhttp.setRequestHeader("Content-length", params.length);
+	xhttp.setRequestHeader("Connection", "close");
+	xhttp.send(params);
+}
+
+<?php if ($id) : ?>
+simulate();
+<?php endif;?>
+	
 //The elements are checked last to first so the focus is positionned on the first element on error
 function messageForm() 
 {
@@ -172,11 +201,11 @@ function messageForm()
 	// To
 	addressee = document.getElementById("to").value;
 	if (addressee == '') {
-	 	renderElement("to", "<?php echo $this->translate('Please input a value', 'ppit-core', $currentUser->locale) ?>");
+	 	renderElement("to", "<?php echo $this->translate('Please input a value', 'ppit-core', $context->getLocale()) ?>");
  		validity = false;
 	}
 	else if (addressee.length > 255) {
-	 	renderElement("to", "<?php echo $this->translate('The input is too long', 'ppit-core', $currentUser->locale) ?>");
+	 	renderElement("to", "<?php echo $this->translate('The input is too long', 'ppit-core', $context->getLocale()) ?>");
  		validity = false;
  	}
  	else {
@@ -186,26 +215,26 @@ function messageForm()
 	// Subject
 	subject = document.getElementById("subject").value;
 	if (subject == '') {
-	 	renderElement("subject", "<?php echo $this->translate('Please input a value', 'ppit-core', $currentUser->locale) ?>");
+	 	renderElement("subject", "<?php echo $this->translate('Please input a value', 'ppit-core', $context->getLocale()) ?>");
  		validity = false;
 	}
 	else if (subject.length > 160) {
-	 	renderElement("subject", "<?php echo $this->translate('The input is too long', 'ppit-core', $currentUser->locale) ?>");
+	 	renderElement("subject", "<?php echo $this->translate('The input is too long', 'ppit-core', $context->getLocale()) ?>");
  		validity = false;
  	}
  	else {
  		renderElement("subject", null);
 	}
 	
-<?php if ($settings['ppitCoreSettings']['viewMode'] != 'SPA') : ?>
+<?php if (!$context->isSpaMode()) : ?>
 	return validity;
 <?php else : ?>
 	if (validity) {
 		var data = new FormData();
 		data.append('to', document.getElementById("to").value);
 		data.append('subject', document.getElementById("subject").value);
-		postForm("<?php echo $this->url('message/update', array('id' => $id)) ?>", 'message_update_script', data);
-		reload("<?php echo $this->url('message') ?>", 'message_index_script');
+		postForm("<?php echo $this->url('message/update', array('id' => $id)) ?>", 'message_update_script', 'form_action', data);
+		currentIndexPanel.reload("<?php echo $this->url('message') ?>", 'message_index_script', false);
 	}
 <?php endif;?>
 }

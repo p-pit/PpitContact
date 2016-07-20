@@ -1,0 +1,40 @@
+<?php
+if (!isset($prefix)) $prefix = '';
+if (!isset($indexClass)) $indexClass = '';
+if (!isset($params)) $params = array();
+?>
+<?php if ($message == 'OK') : ?>
+<!-- Foot return link -->
+					<div class="form-group" id="foot_return_link">
+						<div class="col-sm-5">&nbsp;</div>
+						<div class="col-sm-7">
+							<?php echo $this->partial('/partials/action-widget.phtml', array(
+									'context' => $context,
+									'target' => 'form_action',
+									'id' => $prefix.'foot-return-anchor',
+									'class' => $indexClass,
+									'text' => $this->translate('Close', 'ppit-core', $context->getLocale()),
+							)) ?>
+						</div>
+					</div>
+<?php else : ?>
+
+<!-- Submit button -->
+				    <div class="form-group">
+						<div class="col-sm-5">&nbsp;</div>
+						<div class="col-sm-7">
+<?php if (!isset($class)) $class = 'btn-warning'; ?>
+							<input name="submit" type="submit" id="<?php echo $prefix ?>submit-button" class="btn <?php echo $class ?>" value="<?php echo $this->translate('Confirm', 'ppit-core', $context->getLocale()) ?>">
+							&nbsp;&nbsp;
+							<?php echo $this->partial('/partials/action-widget.phtml', array(
+									'context' => $context,
+									'target' => 'form_action',
+									'id' => $prefix.'cancel-anchor',
+									'class' => $indexClass,
+									'text' => $this->translate('Cancel', 'ppit-core', $context->getLocale()),
+							)) ?>
+						</div>
+					</div>
+<?php endif;?>
+
+				</form>

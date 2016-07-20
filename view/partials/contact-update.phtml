@@ -1,284 +1,413 @@
-					<input type="hidden" name="db_<?php echo $prefix ?>n_title" value="<?php echo $contact->n_title ?>"/>
-					<input type="hidden" name="db_<?php echo $prefix ?>n_last" value="<?php echo $contact->n_last ?>"/>
-					<input type="hidden" name="db_<?php echo $prefix ?>n_first" value="<?php echo $contact->n_first ?>"/>
-					<input type="hidden" name="db_<?php echo $prefix ?>email" value="<?php echo $contact->email ?>"/>
-					<input type="hidden" name="db_<?php echo $prefix ?>tel_work" value="<?php echo $contact->tel_work ?>"/>
-					<input type="hidden" name="db_<?php echo $prefix ?>tel_cell" value="<?php echo $contact->tel_cell ?>"/>
-<?php foreach ($properties as $property_name => $property) : ?>
-					<input type="hidden" name="db_<?php echo $prefix ?><?php echo $property_name ?>" value="<?php echo $property->text_value ?>"/>
-<?php endforeach;?>
+
+<?php if (!$community_id) : ?>
+<!-- Multi-communities for the instance manager (null community id) -->
+	
+	<?php
+		$modalities = array();
+		foreach ($communities as $community) $modalities[$community->id] = $community->name;
+		echo $this->partial('/partials/select-widget.phtml', array(
+			'property' => 'community_id',
+			'label' => $this->translate('Community', 'ppit-contact', $context->getLocale()),
+			'modalities' => $modalities,
+			'value' => $contact->community_id,
+			'isMandatory' => false,
+			'context' => $context,
+			'isDisabled' => $isDisabled,
+	));
+	?>
+<?php endif;?>
+
+<!-- Autocompletion -->
+<?php
+	echo $this->partial('/partials/input-widget.phtml', array(
+		'property' => 'autocompletion',
+		'label' => $this->translate('Search by name', 'ppit-contact', $context->getLocale()),
+		'value' => '',
+		'isMandatory' => false,
+		'context' => $context,
+		'isDisabled' => $isDisabled,
+));
+?>
 
 <!-- Title -->
-				    <div class="form-group" id="<?php echo $prefix ?>n_title_group">
-						<label class="col-sm-5 control-label"><?php echo $this->translate('Title', 'ppit-contact', $currentUser->locale) ?></label>
-						<div class="col-sm-7">
-							<input name="<?php echo $prefix ?>n_title" id="<?php echo $prefix ?>n_title" class="form-control" value="<?php echo $contact->n_title ?>"<?php if ($message == 'OK') echo 'disabled="disabled"' ?>>
-						</div>
-						<div class="col-sm-12"><p class="help-block" id="<?php echo $prefix ?>n_title_error"></p></div>
-					</div>
-					
-<!-- Last name -->
-				    <div class="form-group" id="<?php echo $prefix ?>n_last_group">
-						<label class="col-sm-5 control-label">* <?php echo $this->translate('Last name', 'ppit-contact', $currentUser->locale) ?></label>
-						<div class="col-sm-7">
-							<input name="<?php echo $prefix ?>n_last" id="<?php echo $prefix ?>n_last" list="<?php echo $prefix ?>contacts" class="form-control" value="<?php echo $contact->n_last ?>" autocomplete="off"<?php if ($message == 'OK') echo 'disabled="disabled"' ?>>
-							<datalist id="<?php echo $prefix ?>contacts">
-<?php foreach ($vcards as $vcard) : ?>
-							  <option value="<?php echo $vcard->id ?>" label="<?php echo $vcard->n_fn ?> - <?php echo ($contact->email) ? $contact->email : ($contact->tel_cell) ? $vcard->tel_cell : $vcard->tel_work ?>">
-<?php endforeach;?>
-							</datalist>
-						</div>
-						<div class="col-sm-12"><p class="help-block" id="<?php echo $prefix ?>n_last_error"></p></div>
-					</div>
+<?php
+	echo $this->partial('/partials/input-widget.phtml', array(
+		'property' => 'n_title',
+		'label' => $this->translate('Title', 'ppit-contact', $context->getLocale()),
+		'value' => $contact->n_title,
+		'isMandatory' => false,
+		'context' => $context,
+		'isDisabled' => $isDisabled,
+));
+?>
+<input type="hidden" id="autocompletion_n_title" />
 
+<!-- Last name -->	
+<?php
+	echo $this->partial('/partials/input-widget.phtml', array(
+		'property' => 'n_last',
+		'label' => '* '.$this->translate('Last name', 'ppit-contact', $context->getLocale()),
+		'value' => $contact->n_last,
+		'isMandatory' => true,
+		'context' => $context,
+		'isDisabled' => $isDisabled,
+));
+?>
+<input type="hidden" id="autocompletion_n_last" />
+	
 <!-- First name -->
-				    <div class="form-group" id="<?php echo $prefix ?>n_first_group">
-						<label class="col-sm-5 control-label">* <?php echo $this->translate('First name', 'ppit-contact', $currentUser->locale) ?></label>
-						<div class="col-sm-7">
-							<input name="<?php echo $prefix ?>n_first" id="<?php echo $prefix ?>n_first" class="form-control" value="<?php echo $contact->n_first ?>"<?php if ($message == 'OK') echo 'disabled="disabled"' ?>>
-						</div>
-						<div class="col-sm-12"><p class="help-block" id="<?php echo $prefix ?>n_first_error"></p></div>
-					</div>
-					
+<?php
+	echo $this->partial('/partials/input-widget.phtml', array(
+		'property' => 'n_first',
+		'label' => '* '.$this->translate('First name', 'ppit-contact', $context->getLocale()),
+		'value' => $contact->n_first,
+		'isMandatory' => true,
+		'context' => $context,
+		'isDisabled' => $isDisabled,
+));
+?>
+<input type="hidden" id="autocompletion_n_first" />
+	
 <!-- Email -->
-				    <div class="form-group" id="<?php echo $prefix ?>email_group">
-						<label class="col-sm-5 control-label">* <?php echo $this->translate('Email', 'ppit-contact', $currentUser->locale) ?></label>
-						<div class="col-sm-7">
-							<input name="<?php echo $prefix ?>email" id="<?php echo $prefix ?>email" class="form-control" value="<?php echo $contact->email ?>"<?php if ($message == 'OK') echo 'disabled="disabled"' ?>>
-						</div>
-						<div class="col-sm-12"><p class="help-block" id="<?php echo $prefix ?>email_error"></p></div>
-					</div>
+<?php
+	echo $this->partial('/partials/email-widget.phtml', array(
+		'property' => 'email',
+		'label' => $this->translate('Email', 'ppit-contact', $context->getLocale()),
+		'value' => $contact->email,
+		'isMandatory' => false,
+		'context' => $context,
+		'isDisabled' => $isDisabled,
+));
+?>
+<input type="hidden" id="autocompletion_email" />
 
 <!-- Work phone -->
-				    <div class="form-group" id="<?php echo $prefix ?>tel_work_group">
-						<label class="col-sm-5 control-label">* <?php echo $this->translate('Work phone', 'ppit-contact', $currentUser->locale) ?></label>
-						<div class="col-sm-7">
-							<input name="<?php echo $prefix ?>tel_work" id="<?php echo $prefix ?>tel_work" class="form-control" value="<?php echo $contact->tel_work ?>"<?php if ($message == 'OK') echo 'disabled="disabled"' ?>>
-						</div>
-						<div class="col-sm-12"><p class="help-block" id="<?php echo $prefix ?>tel_work_error"></p></div>
-					</div>
-
+<?php
+	echo $this->partial('/partials/phone-widget.phtml', array(
+		'property' => 'tel_work',
+		'label' => $this->translate('Work phone', 'ppit-contact', $context->getLocale()),
+		'value' => $contact->tel_work,
+		'isMandatory' => false,
+		'context' => $context,
+		'isDisabled' => $isDisabled,
+));
+?>
+<input type="hidden" id="autocompletion_tel_work" />
+	
 <!-- Cellular phone -->
-				    <div class="form-group" id="<?php echo $prefix ?>tel_cell_group">
-						<label class="col-sm-5 control-label"> <?php echo $this->translate('Cellular phone', 'ppit-contact', $currentUser->locale) ?></label>
-						<div class="col-sm-7">
-							<input name="<?php echo $prefix ?>tel_cell" id="<?php echo $prefix ?>tel_cell" class="form-control" value="<?php echo $contact->tel_cell ?>"<?php if ($message == 'OK') echo 'disabled="disabled"' ?>>
-						</div>
-						<div class="col-sm-12"><p class="help-block" id="<?php echo $prefix ?>tel_cell_error"></p></div>
-					</div>
+<?php
+	echo $this->partial('/partials/phone-widget.phtml', array(
+		'property' => 'tel_cell',
+		'label' => $this->translate('Cellular phone', 'ppit-contact', $context->getLocale()),
+		'value' => $contact->tel_cell,
+		'isMandatory' => false,
+		'context' => $context,
+		'isDisabled' => $isDisabled,
+));
+?>
+<input type="hidden" id="autocompletion_tel_cell" />
+	
+<!-- Street -->
+<?php if (!$contact->properties || array_key_exists('adr_street', $contact->properties)) : ?>
+	<?php
+		echo $this->partial('/partials/input-widget.phtml', array(
+			'property' => 'adr_street',
+			'label' => $this->translate('Address - street', 'ppit-contact', $context->getLocale()),
+			'value' => $contact->adr_street,
+			'isMandatory' => false,
+			'context' => $context,
+			'isDisabled' => $isDisabled,
+	));
+	?>
+	<input type="hidden" id="autocompletion_adr_street" />
+<?php endif;?>
+	
+<!-- Address extended -->
+<?php if (!$contact->properties || array_key_exists('adr_extended', $contact->properties)) : ?>
+	<?php
+		echo $this->partial('/partials/input-widget.phtml', array(
+			'property' => 'adr_extended',
+			'label' => $this->translate('Address - extended', 'ppit-contact', $context->getLocale()),
+			'value' => $contact->adr_extended,
+			'isMandatory' => false,
+			'context' => $context,
+			'isDisabled' => $isDisabled,
+	));
+	?>
+	<input type="hidden" id="autocompletion_adr_extended" />
+<?php endif;?>
+	
+<!-- Post office box -->
+<?php if (!$contact->properties || array_key_exists('adr_post_office_box', $contact->properties)) : ?>
+	<?php
+		echo $this->partial('/partials/input-widget.phtml', array(
+			'property' => 'adr_post_office_box',
+			'label' => $this->translate('Address - post office box', 'ppit-contact', $context->getLocale()),
+			'value' => $contact->adr_post_office_box,
+			'isMandatory' => false,
+			'context' => $context,
+			'isDisabled' => $isDisabled,
+	));
+	?>
+	<input type="hidden" id="autocompletion_adr_post_office_box" />
+<?php endif;?>
+	
+<!-- Zip -->
+<?php if (!$contact->properties || array_key_exists('adr_zip', $contact->properties)) : ?>
+	<?php
+		echo $this->partial('/partials/input-widget.phtml', array(
+			'property' => 'adr_zip',
+			'label' => $this->translate('Address - zip', 'ppit-contact', $context->getLocale()),
+			'value' => $contact->adr_zip,
+			'isMandatory' => false,
+			'context' => $context,
+			'isDisabled' => $isDisabled,
+	));
+	?>
+	<input type="hidden" id="autocompletion_adr_zip" />
+<?php endif;?>
+	
+<!-- City -->
+<?php if (!$contact->properties || array_key_exists('adr_city', $contact->properties)) : ?>
+	<?php
+		echo $this->partial('/partials/input-widget.phtml', array(
+			'property' => 'adr_city',
+			'label' => $this->translate('Address - city', 'ppit-contact', $context->getLocale()),
+			'value' => $contact->adr_city,
+			'isMandatory' => false,
+			'context' => $context,
+			'isDisabled' => $isDisabled,
+	));
+	?>
+	<input type="hidden" id="autocompletion_adr_city" />
+<?php endif;?>
+	
+<!-- State -->
+<?php if (!$contact->properties || array_key_exists('adr_state', $contact->properties)) : ?>
+	<?php
+		echo $this->partial('/partials/input-widget.phtml', array(
+			'property' => 'adr_state',
+			'label' => $this->translate('Address - state', 'ppit-contact', $context->getLocale()),
+			'value' => $contact->adr_state,
+			'isMandatory' => false,
+			'context' => $context,
+			'isDisabled' => $isDisabled,
+	));
+	?>
+	<input type="hidden" id="autocompletion_adr_state" />
+<?php endif;?>
+	
+<!-- Country -->
+<?php if (!$contact->properties || array_key_exists('adr_country', $contact->properties)) : ?>
+	<?php
+		echo $this->partial('/partials/input-widget.phtml', array(
+			'property' => 'adr_country',
+			'label' => $this->translate('Address - country', 'ppit-contact', $context->getLocale()),
+			'value' => $contact->adr_country,
+			'isMandatory' => false,
+			'context' => $context,
+			'isDisabled' => $isDisabled,
+	));
+	?>
+	<input type="hidden" id="autocompletion_adr_country" />
+<?php endif;?>
+	
+<!-- Sex -->
+<?php if (!$contact->properties || array_key_exists('sex', $contact->properties)) : ?>
+	<?php
+		echo $this->partial('/partials/select-widget.phtml', array(
+			'property' => 'sex',
+			'label' => $this->translate('Sex', 'ppit-contact', $context->getLocale()),
+			'modalities' => array('F' => $this->translate('Female', 'ppit-contact', $context->getLocale()), 'M' => $this->translate('Male', 'ppit-contact', $context->getLocale()), '?' => '?'),
+			'value' => $contact->sex,
+			'isMandatory' => false,
+			'context' => $context,
+			'isDisabled' => $isDisabled,
+	));
+	?>
+	<input type="hidden" id="autocompletion_sex" />
+<?php endif;?>
+	
+<!-- Birth date -->
+<?php if (!$contact->properties || array_key_exists('birth_date', $contact->properties)) : ?>
+	<?php
+		echo $this->partial('/partials/date-widget.phtml', array(
+			'property' => 'birth_date',
+			'label' => $this->translate('Birth date', 'ppit-contact', $context->getLocale()),
+			'value' => $contact->birth_date,
+			'isMandatory' => false,
+			'context' => $context,
+			'isDisabled' => $isDisabled,
+	));
+	?>
+	<input type="hidden" id="autocompletion_birth_date" />
+<?php endif;?>
+	
+<!-- Place of birth -->
+<?php if (!$contact->properties || array_key_exists('place_of_birth', $contact->properties)) : ?>
+	<?php
+		echo $this->partial('/partials/input-widget.phtml', array(
+			'property' => 'place_of_birth',
+			'label' => $this->translate('Place of birth', 'ppit-contact', $context->getLocale()),
+			'value' => $contact->place_of_birth,
+			'isMandatory' => false,
+			'context' => $context,
+			'isDisabled' => $isDisabled,
+	));
+	?>
+	<input type="hidden" id="autocompletion_place_of_birth" />
+<?php endif;?>
+	
+<!-- Nationality -->
+<?php if (!$contact->properties || array_key_exists('nationality', $contact->properties)) : ?>
+	<?php
+		echo $this->partial('/partials/input-widget.phtml', array(
+			'property' => 'nationality',
+			'label' => $this->translate('Nationality', 'ppit-contact', $context->getLocale()),
+			'value' => $contact->nationality,
+			'isMandatory' => false,
+			'context' => $context,
+			'isDisabled' => $isDisabled,
+	));
+	?>
+	<input type="hidden" id="autocompletion_nationality" />
+<?php endif;?>
 
-<!-- Properties -->
-<?php foreach ($properties as $property_name => $property) : ?>
-					<div class="form-group" id="<?php echo $prefix ?><?php echo $property_name ?>_group">
-						<label class="col-sm-5 control-label"> <?php echo $this->translate($property->caption, 'ppit-contact', $currentUser->locale) ?></label>
-						<div class="col-sm-7">
-							<input name="<?php echo $prefix ?><?php echo $property_name ?>" id="<?php echo $prefix ?><?php echo $property_name ?>" class="form-control" value="<?php echo $property->text_value ?>"<?php if ($message == 'OK') echo 'disabled="disabled"' ?>>
-						</div>
-						<div class="col-sm-12"><p class="help-block" id="<?php echo $prefix ?><?php echo $property_name ?>_error"></p></div>
-					</div>
+<!-- Roles -->
+<div class="col-sm-12"><h3><?php echo $this->translate('Roles', 'ppit-contact', $context->getLocale()) ?>:</h3></div>
+
+<?php foreach ($contact->authorized_roles as $roleId => $role) : ?>
+	<?php
+	echo $this->partial('/partials/checkbox-widget.phtml', array(
+		'property' => 'role_'.$roleId,
+		'label' => $this->translate($role['labels']['fr_FR'], $context->getLocale()),
+		'value' => $role['isChecked'],
+		'context' => $context,
+		'isDisabled' => $isDisabled,
+	));
+	?>
+	<input type="hidden" id="autocompletion_<?php echo $roleId ?>" />
 <?php endforeach;?>
 
-<script id="<?php echo $prefix ?>contact_update_script">
+<script id="contact_update_script">
 
-//contactCheckEmail returns null if the given email is valid, else a localized error message
-function contactCheckEmail(value) {
+$("#birth_date").datepicker();
 
-	// Regex for email format
-	var emailFormat = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
-	
-	if(!emailFormat.test(value)) {
-		return "<?php echo $this->translate('Invalid email format', 'ppit-contact', $currentUser->locale); ?>";
-	}
- return null;
-}
-
-//contactCheckPhone returns null if the given phone number is valid, else a localized error message
-function contactCheckPhone(value) {
-
-	// Regex for phone format
-	var phoneFormat = /^\+?([0-9\. ]*)$/;
-	
-	if(!phoneFormat.test(value)) {
-		return "<?php echo $this->translate('Invalid phone format', 'ppit-contact', $currentUser->locale); ?>";
-	}
-return null;
-}
-
-function contactRenderElement(elementId, error) {
-
-	if (error) {
-		document.getElementById(elementId + "_group").className = "form-group has-error";
-		document.getElementById(elementId + "_error").innerHTML = error;
-		document.getElementById(elementId + "_error").style.display = "block";
-		document.getElementById(elementId).focus();
-	}
-	else {
-		document.getElementById(elementId + "_group").className = "form-group";
-		document.getElementById(elementId + "_error").innerHTML = "";
- 	document.getElementById(elementId + "_error").style.display = "none";
-	}
-}
-
-function <?php echo $prefix ?>autocompletion() {
-	var id = document.getElementById("<?php echo $prefix ?>n_last").value;
-	
-	var xhttp = new XMLHttpRequest(), obj;
-	xhttp.onreadystatechange = function() {
-		if (xhttp.readyState == 4 && xhttp.status == 200) {
-			var id = document.getElementById("<?php echo $prefix ?>n_last").value;
-			obj = JSON.parse(xhttp.responseText).data;
-			document.getElementById("<?php echo $prefix ?>n_title").value = obj.n_title;
-			document.getElementById("<?php echo $prefix ?>n_first").value = obj.n_first;
-			document.getElementById("<?php echo $prefix ?>n_last").value = obj.n_last;
-			document.getElementById("<?php echo $prefix ?>email").value = obj.email;
-			document.getElementById("<?php echo $prefix ?>tel_work").value = obj.tel_work;
-			document.getElementById("<?php echo $prefix ?>tel_cell").value = obj.tel_cell;
-<?php foreach ($properties as $property_name => $property) : ?>
-			document.getElementById("<?php echo $prefix ?><?php echo $property_name ?>").value = obj.<?php echo $property_name ?>;
-<?php endforeach; ?>
-		}
-	}
-	xhttp.open("GET", "<?php echo $this->url('vcardRest') ?>/" + id, true);
-	xhttp.send();
-}
-
-function <?php echo $prefix ?>disableContact()
-{
-	document.getElementById("<?php echo $prefix ?>n_title").disabled = "disabled";
-	document.getElementById("<?php echo $prefix ?>n_first").disabled = "disabled";
-	document.getElementById("<?php echo $prefix ?>n_last").disabled = "disabled";
-	document.getElementById("<?php echo $prefix ?>email").disabled = "disabled";
-	document.getElementById("<?php echo $prefix ?>tel_work").disabled = "disabled";
-	document.getElementById("<?php echo $prefix ?>tel_cell").disabled = "disabled";
-}	
-
-function <?php echo $prefix ?>getContactParams()
-{
-	return 	'&<?php echo $prefix ?>n_title=' + document.getElementById("<?php echo $prefix ?>n_title").value +
-			'&<?php echo $prefix ?>n_first=' + document.getElementById("<?php echo $prefix ?>n_first").value +
-			'&<?php echo $prefix ?>n_last=' + document.getElementById("<?php echo $prefix ?>n_last").value +
-			'&<?php echo $prefix ?>email=' + document.getElementById("<?php echo $prefix ?>email").value +
-			'&<?php echo $prefix ?>tel_work=' + document.getElementById("<?php echo $prefix ?>tel_work").value +
-			'&<?php echo $prefix ?>tel_cell=' + document.getElementById("<?php echo $prefix ?>tel_cell").value;
-}	
-
-$("#<?php echo $prefix ?>n_last").select(function () { <?php echo $prefix ?>autocompletion(); } );
+$('#autocompletion').autocomplete({
+	source : function(request, response){
+	$.ajax({
+            url : '<?php echo $this->url('vcard/listRest') ?>', // Server request returning json data
+            dataType : 'json', // The data type is json
+            data : {
+                filter : $('#autocompletion').val(), // Giving the prefix (at least 3 chars input)
+                maxRows : 15
+            },
+            
+            success : function(donnee){
+            		response($.map(donnee.data, function(object) {
+        			document.getElementById("autocompletion_n_title").value = object.n_title;
+        			document.getElementById("autocompletion_n_first").value = object.n_first;
+        			document.getElementById("autocompletion_n_last").value = object.n_last;
+        			document.getElementById("autocompletion_email").value = object.email;
+        			document.getElementById("autocompletion_tel_work").value = object.tel_work;
+        			document.getElementById("autocompletion_tel_cell").value = object.tel_cell;
+<?php if (!$contact->properties || array_key_exists('adr_street', $contact->properties)) : ?>
+        			document.getElementById("autocompletion_adr_street").value = object.adr_street;
+<?php endif ?>
+<?php if (!$contact->properties || array_key_exists('adr_extended', $contact->properties)) : ?>
+					document.getElementById("autocompletion_adr_extended").value = object.adr_extended;
+<?php endif ?>
+<?php if (!$contact->properties || array_key_exists('adr_post_office_box', $contact->properties)) : ?>
+					document.getElementById("autocompletion_adr_post_office_box").value = object.adr_post_office_box;
+<?php endif ?>
+<?php if (!$contact->properties || array_key_exists('adr_zip', $contact->properties)) : ?>
+					document.getElementById("autocompletion_adr_zip").value = object.adr_zip;
+<?php endif ?>
+<?php if (!$contact->properties || array_key_exists('adr_city', $contact->properties)) : ?>
+					document.getElementById("autocompletion_adr_city").value = object.adr_city;
+<?php endif ?>
+<?php if (!$contact->properties || array_key_exists('adr_state', $contact->properties)) : ?>
+					document.getElementById("autocompletion_adr_state").value = object.adr_state;
+<?php endif ?>
+<?php if (!$contact->properties || array_key_exists('adr_country', $contact->properties)) : ?>
+					document.getElementById("autocompletion_adr_country").value = object.adr_country;
+<?php endif ?>
+<?php if (!$contact->properties || array_key_exists('sex', $contact->properties)) : ?>
+					document.getElementById("autocompletion_sex").value = object.sex;
+<?php endif ?>
+<?php if (!$contact->properties || array_key_exists('birth_date', $contact->properties)) : ?>
+					document.getElementById("autocompletion_birth_date").value = object.birth_date;
+<?php endif ?>
+<?php if (!$contact->properties || array_key_exists('place_of_birth', $contact->properties)) : ?>
+					document.getElementById("autocompletion_place_of_birth").value = object.place_of_birth;
+<?php endif ?>
+<?php if (!$contact->properties || array_key_exists('nationality', $contact->properties)) : ?>
+					document.getElementById("autocompletion_nationality").value = object.nationality;
+<?php endif ?>
+					return object.label;
+                }));
+            }
+        });
+	},
+	select: function( event, ui ) {
+		document.getElementById("n_title").value = document.getElementById("autocompletion_n_title").value;
+		document.getElementById("n_first").value = document.getElementById("autocompletion_n_first").value;
+		document.getElementById("n_last").value = document.getElementById("autocompletion_n_last").value;
+		document.getElementById("email").value = document.getElementById("autocompletion_email").value;
+		document.getElementById("tel_work").value = document.getElementById("autocompletion_tel_work").value;
+		document.getElementById("tel_cell").value = document.getElementById("autocompletion_tel_cell").value;
+<?php if (!$contact->properties || array_key_exists('adr_street', $contact->properties)) : ?>
+		document.getElementById("adr_street").value = document.getElementById("autocompletion_adr_street").value;
+<?php endif ?>
+<?php if (!$contact->properties || array_key_exists('adr_extended', $contact->properties)) : ?>
+		document.getElementById("adr_extended").value = document.getElementById("autocompletion_adr_extended").value;
+<?php endif ?>
+<?php if (!$contact->properties || array_key_exists('adr_post_office_box', $contact->properties)) : ?>
+		document.getElementById("adr_post_office_box").value = document.getElementById("autocompletion_adr_post_office_box").value;
+<?php endif ?>
+<?php if (!$contact->properties || array_key_exists('adr_zip', $contact->properties)) : ?>
+		document.getElementById("adr_zip").value = document.getElementById("autocompletion_adr_zip").value;
+<?php endif ?>
+<?php if (!$contact->properties || array_key_exists('adr_city', $contact->properties)) : ?>
+		document.getElementById("adr_city").value = document.getElementById("autocompletion_adr_city").value;
+<?php endif ?>
+<?php if (!$contact->properties || array_key_exists('adr_state', $contact->properties)) : ?>
+		document.getElementById("adr_state").value = document.getElementById("autocompletion_adr_state").value;
+<?php endif ?>
+<?php if (!$contact->properties || array_key_exists('adr_country', $contact->properties)) : ?>
+		document.getElementById("adr_country").value = document.getElementById("autocompletion_adr_country").value;
+<?php endif ?>
+<?php if (!$contact->properties || array_key_exists('sex', $contact->properties)) : ?>
+		document.getElementById("sex").value = document.getElementById("autocompletion_sex").value;
+<?php endif ?>
+<?php if (!$contact->properties || array_key_exists('birth_date', $contact->properties)) : ?>
+		document.getElementById("birth_date").value = document.getElementById("autocompletion_birth_date").value;
+<?php endif ?>
+<?php if (!$contact->properties || array_key_exists('place_of_birth', $contact->properties)) : ?>
+		document.getElementById("place_of_birth").value = document.getElementById("autocompletion_place_of_birth").value;
+<?php endif ?>
+<?php if (!$contact->properties || array_key_exists('nationality', $contact->properties)) : ?>
+		document.getElementById("nationality").value = document.getElementById("autocompletion_nationality").value;
+<?php endif ?>
+},
+	minLength: 3
+});
 
 // The elements are checked last to first so the focus is positionned on the first element on error
-function <?php echo $prefix ?>checkContact() 
+function checkContact() 
 {
-//	var validity = true, error;
-	
-// Properties
-<?php foreach ($properties as $property => $property_caption) : ?>
-	if (document.getElementById("<?php echo $prefix ?><?php echo $property ?>").value.length > 255) {
-		contactRenderElement("<?php echo $prefix ?><?php echo $property ?>", "<?php echo $this->translate('The input is too long', 'ppit-core', $currentUser->locale) ?>");
-		validity = false;
-	}
-    else {
-		contactRenderElement("<?php echo $prefix ?><?php echo $property ?>", null);
-	}
-<?php endforeach;?>
-
-	// Cellular phone
-	var tel_cell_validity = true;
-	error = contactCheckPhone(document.getElementById('<?php echo $prefix ?>tel_cell').value);
-	if (error) {
-		contactRenderElement("<?php echo $prefix ?>tel_cell", error);
-		validity = tel_cell_validity = false;
-	}
-	    else {
-		contactRenderElement("<?php echo $prefix ?>tel_cell", null);
-	}
-	
-	// Work phone
-	var tel_work_validity = true;
-	error = contactCheckPhone(document.getElementById('<?php echo $prefix ?>tel_work').value);
-	if (error) {
-		contactRenderElement("<?php echo $prefix ?>tel_work", error);
-		validity = tel_work_validity = false;
-	}
-	else {
-		contactRenderElement("<?php echo $prefix ?>tel_work", null);
-	}
-
-	// 1 mandatory phone
-	if (tel_cell_validity && tel_work_validity) {
-		if (document.getElementById("<?php echo $prefix ?>tel_work").value == "" && document.getElementById("<?php echo $prefix ?>tel_cell").value == "") {
-			contactRenderElement("<?php echo $prefix ?>tel_cell", "<?php echo $this->translate('Please input at least one phone', 'ppit-contact', $currentUser->locale) ?>");
-			contactRenderElement("<?php echo $prefix ?>tel_work", "<?php echo $this->translate('Please input at least one phone', 'ppit-contact', $currentUser->locale) ?>");
-			validity = false;
-		}
-	    else {
-			contactRenderElement("<?php echo $prefix ?>tel_cell", null);
-	    	contactRenderElement("<?php echo $prefix ?>tel_work", null);
-		}
-	}
-	
-	// Email
-	var email_validity = true;
-	var email = document.getElementById('<?php echo $prefix ?>email').value;
-	if (email == "") contactRenderElement("<?php echo $prefix ?>email", null);
-	else {
-		error = contactCheckEmail(email);
-		if (error) {
-			contactRenderElement("<?php echo $prefix ?>email", error);
-			validity = email_validity = false;
-		}
-	    else {
-			contactRenderElement("<?php echo $prefix ?>email", null);
-		}
-	}
+	var validity = true, error;
 	
 	// At least email or cellular
-	if (tel_cell_validity && email_validity) {
-		if (document.getElementById("<?php echo $prefix ?>tel_cell").value == "" && document.getElementById("<?php echo $prefix ?>email").value == "") {
-			contactRenderElement("<?php echo $prefix ?>email", "<?php echo $this->translate('Please input at least the cellular or the email', 'ppit-contact', $currentUser->locale) ?>");
-			contactRenderElement("<?php echo $prefix ?>tel_cell", "<?php echo $this->translate('Please input at least the cellular or the email', 'ppit-contact', $currentUser->locale) ?>");
-			validity = false;
-		}
-	    else {
-			contactRenderElement("<?php echo $prefix ?>email", null);
-	    	contactRenderElement("<?php echo $prefix ?>tel_cell", null);
-		}
-	}
-	
-	// First name
-	if (document.getElementById("<?php echo $prefix ?>n_first").value == "") {
-		contactRenderElement("<?php echo $prefix ?>n_first", "<?php echo $this->translate('Please input the first name', 'ppit-contact', $currentUser->locale) ?>");
-		validity = false;
-	}
-    else if (document.getElementById("<?php echo $prefix ?>n_first").value.length > 255) {
-		contactRenderElement("<?php echo $prefix ?>n_last", "<?php echo $this->translate('The input is too long', 'ppit-core', $currentUser->locale) ?>");
+	if (document.getElementById("tel_cell").value == "" && document.getElementById("email").value == "") {
+		renderElement("email", "<?php echo $this->translate('Please input at least the cellular or the email', 'ppit-contact', $context->getLocale()) ?>");
+		renderElement("tel_cell", "<?php echo $this->translate('Please input at least the cellular or the email', 'ppit-contact', $context->getLocale()) ?>");
 		validity = false;
 	}
     else {
-		contactRenderElement("<?php echo $prefix ?>n_first", null);
+		renderElement("email", null);
+    	renderElement("tel_cell", null);
 	}
-	
-	// Last name
-	if (document.getElementById("<?php echo $prefix ?>n_last").value == "") {
-		contactRenderElement("<?php echo $prefix ?>n_last", "<?php echo $this->translate('Please input the last name', 'ppit-contact', $currentUser->locale) ?>");
-		validity = false;
-	}
-    else if (document.getElementById("<?php echo $prefix ?>n_last").value.length > 255) {
-		contactRenderElement("<?php echo $prefix ?>n_last", "<?php echo $this->translate('The input is too long', 'ppit-core', $currentUser->locale) ?>");
-		validity = false;
-	}
-    else {
-		contactRenderElement("<?php echo $prefix ?>n_last", null);
-	}
-	
-	// Title
-	if (document.getElementById("<?php echo $prefix ?>n_title").value.length > 255) {
-		contactRenderElement("<?php echo $prefix ?>n_title", "<?php echo $this->translate('The input is too long', 'ppit-core', $currentUser->locale) ?>");
-		validity = false;
-	}
-    else {
-		contactRenderElement("<?php echo $prefix ?>n_title", null);
-	}
-	
-	return validity;
 }
 
 </script>

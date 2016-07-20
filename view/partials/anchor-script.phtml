@@ -1,0 +1,7 @@
+<?php if ($spa) : ?>
+$('#<?php echo $id ?>').click(function () {
+	document.location.href = '<?php echo $href ?>';
+})
+<?php else : ?>
+$('#<?php echo $id ?>').attr('href', '<?php echo $href ?>');
+<?php endif; ?>

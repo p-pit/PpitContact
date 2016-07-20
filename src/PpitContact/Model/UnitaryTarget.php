@@ -2,39 +2,59 @@
 namespace PpitContact\Model;
 
 use PpitContact\Model\iTarget;
+use Zend\db\sql\Where;
 
 define ('TEL_REGEX', "/^\+?([0-9\. ]+)$/");
 
 class UnitaryTarget implements iTarget {
 
 	public $to = array();
-	public $contactTable;
-	public $currentUser;
+	public $filter;
+	public $result = array();
 	
-	public function __construct($message, $contactTable, $currentUser, $ontroller) {
+	public function __construct($message) {
 		$this->to = $message->to;
-		$this->contactTable = $contactTable; 
-		$this->currentUser = $currentUser;
+		if (isset($to->filter)) $this->filter = $to->filter;
 	}
 
-	public function loadData($data) {
-		$this->to = trim(strip_tags($data['to']));
-		if (!$this->to || strlen($this->to) > 255) return 400;
-		$this->to = explode(',', $this->to);
+	public function loadData($data)
+	{
+		$this->filter = trim(strip_tags($data['filter']));
+
+		$this->to = array();
+		if ($this->filter) $this->to['filter'] = $this->filter;
 		return 200;
 	}
 
-	public function loadDataFromRequest($request) {
+	public function loadDataFromRequest($request)
+	{
 		$data = array();
-	    $data['to'] = $request->getPost('to');
+		$data['filter'] = $request->getPost('filter');
 	    return $this->loadData($data);
 	}
 
-	public function compute() { return $this->to; }
+	public function compute()
+	{
+		$select = Vcard::getTable()->getSelect()->order(array('n_fn'))
+			->join('customer', 'contact_vcard.id = customer.contact_id', array('customer' => 'id'), 'left')
+			->join(array('backup_customer' => 'customer'), 'contact_vcard.id = customer.backup_contact_id', array('backup_customer' => 'id'), 'left');
+		$where = new Where();
+		if ($this->filter == 'customer') {
+			$where->nest->notEqualTo('customer.id', '')->or->notEqualTo('backup_customer.id', '')->unnest;
+		}
+		$select->where($where);
+		$cursor = $this->contactTable->selectWith($select, $this->currentUser);
+		$this->to = array();
+		foreach ($cursor as $contact) {
+			$contact->ok = $this->addTo($contact->tel_cell);
+			$this->result[] = $contact;
+		}
+		return $this->to;
+	}
 	
-	public function addTo($tel_cell) {
-
-		// Suppres spaces
+	public function addTo($tel_cell)
+	{
+		// Suppress spaces
 		$tel_cell = preg_replace('/\s/', '', $tel_cell);
 		
 		// Check french cellular phone format (06xxxxxx or 07xxxxxx or +336000000 or +337xxxxxx)

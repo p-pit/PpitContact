@@ -1,0 +1,20 @@
+<?php $i=0; foreach ($contacts as $contact) if ($contact->ok) $i++; ?>
+
+<h5>
+	<?php echo $this->translate('Result', 'ppit-contact', $context->getLocale()) ?>:
+	<?php echo $i ?> <?php echo $this->translate('reachable numbers', 'ppit-contact', $context->getLocale()) ?> -
+	<?php echo $this->translate('Cost', 'ppit-contact', $context->getLocale()) ?>
+	<?php if ($i) echo '= '.$context->formatFloat($i * $config['ppitContactSettings']['smsCost'], 2) ?> €
+</h5>
+<table class="table table-striped">
+
+<?php foreach ($contacts as $contact) : ?>
+<?php if ($contact->ok) { $icon = 'thumbs-up'; $color = 'green'; } else { $icon = 'thumbs-down'; $color = 'red'; } ?>
+	<tr>
+		<td><?php echo $contact->n_fn ?></td>
+		<td style="color: <?php echo $color ?>"><?php echo $contact->tel_cell ?></td>
+		<td><span class="glyphicon glyphicon-<?php echo $icon ?>" style="color: <?php echo $color ?>"></span></td>
+	</tr>
+<?php endforeach; ?>
+
+</table>

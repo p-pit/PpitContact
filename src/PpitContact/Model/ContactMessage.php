@@ -1,10 +1,18 @@
 <?php
 namespace PpitContact\Model;
 
+use PpitContact\Model\Vcard;
+use PpitCore\Model\Context;
 use Zend\InputFilter\Factory as InputFactory;
 use Zend\InputFilter\InputFilter;
 use Zend\InputFilter\InputFilterAwareInterface;
 use Zend\InputFilter\InputFilterInterface;
+use Zend\Log\Logger;
+use Zend\Log\Writer;
+use Zend\Mail;
+use Zend\Mail\Message;
+use Zend\Mime\Message as MimeMessage;
+use Zend\Mime\Part as MimePart;
 
 class ContactMessage implements InputFilterAwareInterface
 {
@@ -30,6 +38,9 @@ class ContactMessage implements InputFilterAwareInterface
 
     protected $inputFilter;
     protected $devisInputFilter;
+
+    // Static fields
+    private static $table;
     
     public function getArrayCopy()
     {
@@ -130,7 +141,7 @@ class ContactMessage implements InputFilterAwareInterface
 
     	return 200;
     }
-    
+
     public function loadDataFromRequest($request, $type, $target) {
     	$data = array();
 		$return = $target->loadDataFromRequest($request);
@@ -145,6 +156,81 @@ class ContactMessage implements InputFilterAwareInterface
     	return $this->loadData($data, $type, $target);
     }
 
+    public static function getToList($community_id, $role_id)
+    {
+    	$select = Vcard::getTable()->getSelect()
+	    	->where(array('community_id' => $community_id));
+    	$cursor = Vcard::getTable()->selectWith($select);
+    	$result = array();
+    	foreach($cursor as $vcard) {
+    		if (array_search($role, $vcard->roles)) $result[$vcard->email] = $vcard;
+    	}
+    	return $result;
+    }
+
+    public static function sendMail($email, $textContent, $subject, $cc = null)
+    {
+    	$context = Context::getCurrent();
+		$settings = $context->getInstance()->specifications;
+    	if ($context->getInstanceId() != 0) { // instance 0 is for demo
+    		$text = new MimePart($textContent);
+    		$text->type = "text/plain; charset = UTF-8";
+    		$body = new MimeMessage();
+    		$body->setParts(array($text));
+    			
+    		$mail = new Mail\Message();
+    		$mail->setEncoding("UTF-8");
+    		$mail->setBody($body);
+    		$mail->setFrom($settings['mailAdmin'], $settings['nameAdmin']);
+    		$mail->setSubject($subject);
+    
+    		// Send the mail to a test mailbox if a 'mailTo' setting is set (test environment) otherwise in the given mail (production)
+    		if ($settings['mailTo']) $mail->addTo($settings['mailTo'], $settings['mailTo']);
+    		else $mail->addTo($email, $email);
+    		if ($cc) foreach ($cc as $ccEmail => $ccName) $mail->addCc($ccEmail, ($ccName) ? $ccName : $ccEmail);
+    		if ($settings['mailProtocol'] == 'Smtp') {
+    			$transport = new Mail\Transport\Smtp();
+    		}
+    		elseif ($settings['mailProtocol'] == 'Sendmail') {
+    			$transport = new Mail\Transport\SendMail();
+    		}
+
+    		if ($settings['mailProtocol']) $transport->send($mail);
+    
+    		if ($settings['isTraceActive']) {
+    
+    			// Write to the log
+    			$writer = new Writer\Stream('data/log/mailing.txt');
+    			$logger = new Logger();
+    			$logger->addWriter($writer);
+    			$logger->info('to: '.$email.' - subject: '.$subject.' - body: '.$textContent);
+    		}
+    	}
+    }
+
+    function sendMultipartMail($htmlBody, $textBody, $subject, $from, $to)
+    {
+    	$htmlPart = new MimePart($htmlBody);
+    	$htmlPart->type = "text/html";
+    
+    	$textPart = new MimePart($textBody);
+    	$textPart->type = "text/plain";
+    
+    	$body = new MimeMessage();
+    	$body->setParts(array($textPart, $htmlPart));
+    
+    	$message = new MailMessage();
+    	$message->setFrom($from);
+    	$message->addTo($to);
+    	$message->setSubject($subject);
+    
+    	$message->setEncoding("UTF-8");
+    	$message->setBody($body);
+    	$message->getHeaders()->get('content-type')->setType('multipart/alternative');
+    
+    	$transport = new Mail\Transport\Sendmail();
+    	$transport->send($message);
+    }    
     // Add content to this method:
     public function setInputFilter(InputFilterInterface $inputFilter)
     {
@@ -154,5 +240,14 @@ class ContactMessage implements InputFilterAwareInterface
     public function getInputFilter()
     {
         throw new \Exception("Not used");
+    }
+
+    public static function getTable()
+    {
+    	if (!ContactMessage::$table) {
+    		$sm = Context::getCurrent()->getServiceManager();
+    		ContactMessage::$table = $sm->get('PpitContact\Model\ContactMessageTable');
+    	}
+    	return ContactMessage::$table;
     }
 }

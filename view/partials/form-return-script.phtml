@@ -1,0 +1,5 @@
+<?php if ($spa) : ?>
+$("#<?php echo $id ?>").click(function () { hideForm(); } );
+<?php else : ?>
+$("#<?php echo $id ?>").attr("href", "<?php echo $route ?>");
+<?php endif;?>

@@ -1,6 +1,8 @@
 <?php
 namespace PpitContact;
 
+use PpitContact\Model\Community;
+use PpitContact\Model\Contract;
 use PpitContact\Model\ContactEvent;
 use PpitContact\Model\Credits;
 use PpitContact\Model\ContactMessage;
@@ -40,7 +42,29 @@ class Module //implements AutoloaderProviderInterface, ConfigProviderInterface
     {
         return array(
             'factories' => array(
- 	          	'PpitContact\Model\ContactEventTable' =>  function($sm) {
+ 	          	'PpitContact\Model\CommunityTable' =>  function($sm) {
+                    $tableGateway = $sm->get('CommunityTableGateway');
+                    $table = new GenericTable($tableGateway);
+                    return $table;
+                },
+                'CommunityTableGateway' => function ($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $resultSetPrototype = new ResultSet();
+                    $resultSetPrototype->setArrayObjectPrototype(new Community());
+                    return new TableGateway('contact_community', $dbAdapter, null, $resultSetPrototype);
+                },
+ 	          	'PpitContact\Model\ContractTable' =>  function($sm) {
+                    $tableGateway = $sm->get('ContractTableGateway');
+                    $table = new GenericTable($tableGateway);
+                    return $table;
+                },
+                'ContractTableGateway' => function ($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $resultSetPrototype = new ResultSet();
+                    $resultSetPrototype->setArrayObjectPrototype(new Contract());
+                    return new TableGateway('contact_contract', $dbAdapter, null, $resultSetPrototype);
+                },
+            	'PpitContact\Model\ContactEventTable' =>  function($sm) {
                     $tableGateway = $sm->get('ContactEventTableGateway');
                     $table = new GenericTable($tableGateway);
                     return $table;

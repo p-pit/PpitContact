@@ -1,0 +1,9 @@
+<?php if ($spa) : ?>
+$('#<?php echo $id ?>').click(function () {
+	showForm("<?php echo $route ?>", "<?php echo $script ?>");
+	$('.index-btn').removeClass("btn-primary").addClass("btn-default");                 
+	$('#<?php echo $id ?>').removeClass("btn-default").addClass("btn-primary");                 
+} );
+<?php else : ?>
+$('#<?php echo $id ?>').attr("href", "<?php echo $route ?>");
+<?php endif;?>

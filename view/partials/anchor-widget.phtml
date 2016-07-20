@@ -1,0 +1,31 @@
+<?php
+if (!isset($disabled)) $disabled = false;
+if (!isset($class)) { // Depreciated
+	if ($disabled) $class = 'btn-disabled';
+	else $class = 'btn-default';
+}
+?>
+<?php if ($anchorStyle == 'button') : ?>
+							<button type="button" class="btn <?php echo $class ?> <?php echo (isset($showMain)) ? 'menu-btn' : '' ?> <?php echo (isset($size)) ? $size : '' ?> <?php echo (isset($showForm)) ? 'index-btn' : '' ?>" <?php echo (isset($title)) ? ' title="'.$title.'"' : '' ?> id="<?php echo $id ?>" <?php echo ($disabled) ? ' style="color: gray" disabled="disabled"' : '' ?>>
+								<span <?php echo ($disabled) ? ' style="color: gray"' : '' ?>><?php echo (isset($text)) ? $text : '' ?></span>
+								<span class="glyphicon <?php echo (isset($glyphicon)) ? $glyphicon : '' ?>" id="<?php echo $id ?>-glyphicon"<?php if (isset($title)) echo ' title="'.$title.'"' ?></span>
+							</button>
+<?php else : ?>
+	<?php if ($disabled) $markup = 'span'; else $markup = 'a'; ?>
+	<?php if (isset($glyphicon)) : ?>
+								<<?php echo $markup?> class="glyphicon <?php echo $glyphicon ?>" title="<?php echo $title ?>" id="<?php echo $id ?>" href="#"></<?php echo $markup?>>
+	<?php else : ?>
+								<<?php echo $markup?> id="<?php echo $id ?>" href="#"><?php echo $text ?></<?php echo $markup?>>
+	<?php endif; ?>
+<?php endif; ?>
+
+<!-- Behaviour part -->
+<script id="<?php echo $id ?>-script">
+
+	$('#<?php echo $id ?>').click(function () {
+<?php if (isset($href)) : ?>
+		document.location.href = '<?php echo $href ?>';
+<?php endif;?>
+	})
+
+</script>

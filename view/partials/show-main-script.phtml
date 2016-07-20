@@ -1,0 +1,7 @@
+<?php if ($spa) : ?>
+$("#<?php echo $id ?>").click(function () {
+	currentIndexPanel.reload('<?php echo $route ?>', '<?php echo $script ?>', <?php echo ($hideForm) ? 'true' : 'false' ?>);
+} );
+<?php else : ?>
+$("#<?php echo $id ?>").attr("href", "<?php echo $route ?>");
+<?php endif;?>

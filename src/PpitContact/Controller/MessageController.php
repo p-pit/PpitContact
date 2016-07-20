@@ -1,64 +1,56 @@
 <?php
 namespace PpitContact\Controller;
 
-use PpitCore\Controller\Functions;
-use PpitCore\Controller\PpitController;
 use PpitCore\Form\CsrfForm;
+use PpitCore\Model\Context;
 use PpitCore\Model\Csrf;
 use PpitContact\Model\ContactMessage;
 use PpitContact\Model\smsenvoi;
 use PpitContact\Model\UnitaryTarget;
 use Zend\Log\Logger;
 use Zend\Log\Writer;
+use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
-class MessageController extends PpitController
+class MessageController extends AbstractActionController
 {
-	protected $creditTable;
-	protected $contactMessageTable;
-	
-	public function getTargetExemplary($message, $controller) { 
-
-		// Retrieve the context
-		$settings = $this->getServiceLocator()->get('config');
-		$currentUser = Functions::getUser($this);
-		return new UnitaryTarget($message, null, $currentUser, $controller); 
+	public function getTargetExemplary($message)
+	{ 
+		return new UnitaryTarget($message); 
 	}
 	
 	public function indexAction()
 	{
 		// Retrieve the context
-		$settings = $this->getServiceLocator()->get('config');
-		$currentUser = Functions::getUser($this);
-		$currentUser->retrieveHabilitations($this);
+		$context = Context::getCurrent();
 
 		// Retrieve the messages
 		$major = $this->params()->fromQuery('major', NULL);
 		if (!$major) $major = 'id';
 		$dir = $this->params()->fromQuery('dir', NULL);
 		if (!$dir) $dir = 'DESC';
-		$select = $this->getContactMessageTable()->getSelect()
+		$select = ContactMessage::getTable()->getSelect()
 			->order(array($major.' '.$dir, 'id DESC'));
-		$cursor = $this->getContactMessageTable()->selectWith($select, $currentUser);
+		$cursor = ContactMessage::getTable()->selectWith($select);
 		$messages = array();
 		foreach ($cursor as $message) $messages[] = $message;
 	
 		// Return the message list
-		return new ViewModel(array(
-				'currentUser' => $currentUser,
-				'settings' => $settings,
+		$view = new ViewModel(array(
+				'context' => $context,
+				'config' => $context->getconfig(),
 				'major' => $major,
 				'dir' => $dir,
 				'messages' => $messages,
 		));
+//   		$view->setTerminal(true);
+   		return $view;
 	}
 
 	public function simulateAction()
 	{
 		// Retrieve the context
-		$settings = $this->getServiceLocator()->get('config');
-		$currentUser = Functions::getUser($this);
-		$currentUser->retrieveHabilitations($this);
+		$context = Context::getCurrent();
 	
 		// Retrieve the message and the target
 		$modelMessage = new ContactMessage;
@@ -71,29 +63,27 @@ class MessageController extends PpitController
 
 		// Return the message list
 		$view = new ViewModel(array(
-				'settings' => $settings,
-				'currentUser' => $currentUser,
+				'context' => $context,
+				'config' => $context->getconfig(),
 				'contacts' => $contacts,
 		));
-		$view->setTerminal(true);
-		return $view;
+   		if ($context->isSpaMode()) $view->setTerminal(true);
+   		return $view;
 	}
 
 	public function updateAction()
 	{
 		// Retrieve the context
-		$settings = $this->getServiceLocator()->get('config');
-		$currentUser = Functions::getUser($this);
-		$currentUser->retrieveHabilitations($this);
+		$context = Context::getCurrent();
 
 		// Retrieve the message and the target
 		$id = (int) $this->params()->fromRoute('id', 0);
-		if ($id) $modelMessage = $this->getContactMessageTable()->get($id, $currentUser);
+		if ($id) $modelMessage = ContactMessage::getTable()->get($id);
 		else {
 			$modelMessage = new ContactMessage;
 			$modelMessage->type = 'SMS';
 		}
-		$target = $this->getTargetExemplary($modelMessage, $this);
+		$target = $this->getTargetExemplary($modelMessage);
 		
 		// Retrieve credits
 		if ($modelMessage->type == 'SMS') {
@@ -121,12 +111,12 @@ class MessageController extends PpitController
 					else {
 						
 						// From
-						$modelMessage->from = $settings['ppitCoreSettings']['mailAdmin'];
+						$modelMessage->from = $context->getConfig()['ppitCoreSettings']['mailAdmin'];
 						
 						// Save
 						
 						if ($request->getPost('action') != 'transmit') {
-							$this->getContactMessageTable()->save($modelMessage, $currentUser);
+							ContactMessage::getTable()->save($modelMessage);
 							$message = 'OK';
 						}						
 						// Transmit the message
@@ -139,17 +129,17 @@ class MessageController extends PpitController
 								$modelMessage->rejected = array();
 								$modelMessage->volume = 0;
 								foreach ($tos as $to) {
-									$return = ($settings['ppitContactSettings']['isSmsActive']) ? $sms->sendSMS($to, $modelMessage->subject, 'PREMIUM', $settings['ppitCoreSettings']['nameAdmin']) : 1;
+									$return = ($context->getConfig()['ppitContactSettings']['isSmsActive']) ? $sms->sendSMS($to, $modelMessage->subject, 'PREMIUM', $context->getConfig()['ppitCoreSettings']['nameAdmin']) : 1;
 									if (!$return) $modelMessage->rejected[] = $to;
 									else {
 										$modelMessage->accepted[] = $to;
 								
 										// Write to the log
-										if ($settings['ppitCoreSettings']['isTraceActive']) {
+										if ($context->getConfig()['ppitCoreSettings']['isTraceActive']) {
 											$writer = new Writer\Stream('data/log/mailing.txt');
 											$logger = new Logger();
 											$logger->addWriter($writer);
-											if ($settings['ppitContactSettings']['isSmsActive']) {
+											if ($context->getConfig()['ppitContactSettings']['isSmsActive']) {
 												if ($return) $result = 'OK'; else $result = 'KO';
 											}
 											else $result = 'SMS function not enabled => NOT SENT';
@@ -160,8 +150,8 @@ class MessageController extends PpitController
 								// Save the emission_time and cost
 								$modelMessage->emission_time = date("Y-m-d H:i:s");
 								$modelMessage->volume = count($modelMessage->accepted);
-								$modelMessage->cost = $modelMessage->volume * $settings['ppitContactSettings']['smsCost'];
-								$this->getContactMessageTable()->save($modelMessage, $currentUser);
+								$modelMessage->cost = $modelMessage->volume * $context->getConfig()['ppitContactSettings']['smsCost'];
+								ContactMessage::getTable()->save($modelMessage);
 							
 								$message = 'OK';
 							}
@@ -170,16 +160,18 @@ class MessageController extends PpitController
 				}
 			}
 		}
-		return array(
-				'currentUser' => $currentUser,
-				'settings' => $settings,
+		$view = new ViewModel(array(
+				'context' => $context,
+				'config' => $context->getconfig(),
 				'csrfForm' => $csrfForm,
 				'message' => $message,
 				'error' => $error,
 				'id' => $id,
 				'modelMessage' => $modelMessage,
 				'target' => $target,
-		);
+		));
+   		if ($context->isSpaMode()) $view->setTerminal(true);
+   		return $view;
 	}
 
 	public function deleteAction()
@@ -188,16 +180,12 @@ class MessageController extends PpitController
 		$id = (int) $this->params()->fromRoute('id', 0);
 		if (!$id) return $this->redirect()->toRoute('index');
 	
-		// Retrieve the settings
-		$settings = $this->getServiceLocator()->get('config');
-		 
-		// Retrieve the current user
-		$currentUser = Functions::getUser($this);
-		$currentUser->retrieveHabilitations($this);
+		// Retrieve the context
+		$context = Context::getCurrent();
 	
 		// Retrieve the message
-		$modelMessage = $this->getContactMessageTable()->get($id, $currentUser);
-		$target = $this->getTargetExemplary($modelMessage, $this);
+		$modelMessage = ContactMessage::getTable()->get($id);
+		$target = $this->getTargetExemplary($modelMessage);
 
 		$csrfForm = new CsrfForm();
 		$csrfForm->addCsrfElement('csrf');
@@ -213,40 +201,24 @@ class MessageController extends PpitController
 				else {
 	
 					if ($modelMessage) { // In case the link has already been deleted in the meantime
-						$this->getContactMessageTable()->delete($id, $currentUser);
+						ContactMessage::getTable()->delete($id);
 					}
 					$message = 'OK';
 				}
 			}
 		}
 	
-		return array(
-				'currentUser' => $currentUser,
-				'settings' => $settings,
+		$view = new ViewModel(array(
+				'context' => $context,
+				'config' => $context->getconfig(),
 				'csrfForm' => $csrfForm,
 				'message' => $message,
 				'error' => $error,
 				'id' => $id,
 				'modelMessage' => $modelMessage,
 				'target' => $target,
-		);
+		));
+   		if ($context->isSpaMode()) $view->setTerminal(true);
+   		return $view;
 	}
-
-	public function getCreditTable()
-	{
-		if (!$this->creditTable) {
-			$sm = $this->getServiceLocator();
-			$this->creditTable = $sm->get('PpitContact\Model\CreditTable');
-		}
-		return $this->creditTable;
-	}
-	
-    public function getContactMessageTable()
-    {
-    	if (!$this->contactMessageTable) {
-    		$sm = $this->getServiceLocator();
-    		$this->contactMessageTable = $sm->get('PpitContact\Model\ContactMessageTable');
-    	}
-    	return $this->contactMessageTable;
-    }
 }
