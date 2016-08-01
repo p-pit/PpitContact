@@ -40,6 +40,7 @@ class Vcard implements InputFilterAwareInterface
     public $origine;
     public $photo_link_id;
     public $roles = array();
+    public $locale;
     public $is_notified;
     public $update_time;
 
@@ -95,7 +96,8 @@ class Vcard implements InputFilterAwareInterface
         $this->nationality = (isset($data['nationality'])) ? $data['nationality'] : null;
         $this->origine = (isset($data['origine'])) ? $data['origine'] : null;
         $this->roles = (isset($data['roles'])) ? json_decode($data['roles'], true) : null;
-	    $this->is_notified = (isset($data['is_notified'])) ? $data['is_notified'] : null;
+        $this->locale = (isset($data['locale'])) ? $data['locale'] : null;
+        $this->is_notified = (isset($data['is_notified'])) ? $data['is_notified'] : null;
         $this->photo_link_id = (isset($data['photo_link_id'])) ? $data['photo_link_id'] : null;
         $this->update_time = (isset($data['update_time'])) ? $data['update_time'] : null;
 
@@ -130,6 +132,7 @@ class Vcard implements InputFilterAwareInterface
     	$data['nationality'] = $this->nationality;
     	$data['origine'] = $this->origine;
     	$data['roles'] = json_encode($this->roles);
+    	$data['locale'] = $this->locale;
     	$data['is_notified'] = $this->is_notified;
     	$data['photo_link_id'] = $this->photo_link_id;
     	 

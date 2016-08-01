@@ -171,7 +171,7 @@ class ContactMessage implements InputFilterAwareInterface
     public static function sendMail($email, $textContent, $subject, $cc = null)
     {
     	$context = Context::getCurrent();
-		$settings = $context->getInstance()->specifications;
+		$settings = $context->getConfig();
     	if ($context->getInstanceId() != 0) { // instance 0 is for demo
     		$text = new MimePart($textContent);
     		$text->type = "text/plain; charset = UTF-8";
