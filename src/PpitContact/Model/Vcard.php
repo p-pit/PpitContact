@@ -17,6 +17,8 @@ class Vcard implements InputFilterAwareInterface
 {
     public $id;
 	public $instance_id;
+	public $attributed_credits;
+	public $last_credit_consumption_date;
 	public $community_id;
 	public $n_title;
     public $n_first;
@@ -73,6 +75,8 @@ class Vcard implements InputFilterAwareInterface
     public function exchangeArray($data)
     {
         $this->id = (isset($data['id'])) ? $data['id'] : null;
+        $this->attributed_credits = (isset($data['attributed_credits'])) ? json_decode($data['attributed_credits'], false) : null;
+        $this->last_credit_consumption_date = (isset($data['last_credit_consumption_date'])) ? $data['last_credit_consumption_date'] : null;
         $this->instance_id = (isset($data['instance_id'])) ? $data['instance_id'] : null;
         $this->community_id = (isset($data['community_id'])) ? $data['community_id'] : null;
         $this->n_title = (isset($data['n_title'])) ? $data['n_title'] : null;
@@ -110,6 +114,8 @@ class Vcard implements InputFilterAwareInterface
     	$data = array();
     	$data['id'] = (int) $this->id;
     	$data['instance_id'] = (int) $this->instance_id;
+    	$data['attributed_credits'] = json_encode($this->attributed_credits);
+    	$data['last_credit_consumption_date'] = ($this->last_credit_consumption) ? $this->last_credit_consumption_date : null;
     	$data['community_id'] = (int) $this->community_id;
     	$data['n_title'] = $this->n_title;
     	$data['n_first'] = $this->n_first;

@@ -172,6 +172,7 @@ class ContactMessage implements InputFilterAwareInterface
     {
     	$context = Context::getCurrent();
 		$settings = $context->getConfig();
+
     	if ($context->getInstanceId() != 0) { // instance 0 is for demo
     		$text = new MimePart($textContent);
     		$text->type = "text/plain; charset = UTF-8";
