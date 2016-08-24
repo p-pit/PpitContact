@@ -316,7 +316,8 @@ class VcardController extends AbstractActionController
     	$contact = Vcard::get($id);
     	if (!$contact) $this->redirect()->toRoute('index'); // Not allowed
 
-    	$file = 'data/documents/'.$contact->photo_link_id;
+    	if ($contact->photo_link_id) $file = 'data/documents/'.$contact->photo_link_id;
+    	else $file = 'data/photos/'.$contact->id;
     	$type = 'image/jpeg';
     	header('Content-Type:'.$type);
     	header('Content-Length: ' . filesize($file));

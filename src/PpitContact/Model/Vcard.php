@@ -56,14 +56,13 @@ class Vcard implements InputFilterAwareInterface
     public $previous_email;
     public $previous_tel_cell;
     public $files;
+    public $properties;
     
     protected $inputFilter;
     protected $devisInputFilter;
 
     // Static fields
     private static $table;
-
-    // Static fields
     public static $emailRegex = "/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}/";
     public static $telRegex = "/^\+?([0-9\. ]*)$/";
 
@@ -115,7 +114,7 @@ class Vcard implements InputFilterAwareInterface
     	$data['id'] = (int) $this->id;
     	$data['instance_id'] = (int) $this->instance_id;
     	$data['attributed_credits'] = json_encode($this->attributed_credits);
-    	$data['last_credit_consumption_date'] = ($this->last_credit_consumption) ? $this->last_credit_consumption_date : null;
+    	$data['last_credit_consumption_date'] = ($this->last_credit_consumption_date) ? $this->last_credit_consumption_date : null;
     	$data['community_id'] = (int) $this->community_id;
     	$data['n_title'] = $this->n_title;
     	$data['n_first'] = $this->n_first;
@@ -296,6 +295,8 @@ class Vcard implements InputFilterAwareInterface
     public static function instanciate()
     {
     	$vcard = new Vcard;
+    	$vcard->properties = array();
+    	$vcard->attributed_credits = array();
     	return $vcard;
     }
 
@@ -343,7 +344,7 @@ class Vcard implements InputFilterAwareInterface
     	return $vcard;
     }
 
-    public function loadData($data, $community_id)
+    public function loadData($data, $community_id = 0)
     {
     	$context = Context::getCurrent();
 
@@ -354,6 +355,11 @@ class Vcard implements InputFilterAwareInterface
     	$this->previous_tel_cell = $this->tel_cell;
     	 
     	// Retrieve the data from the request
+    	if (array_key_exists('attributed_credits', $data)) {
+    		foreach ($data['attributed_credits'] as $product) $product = trim(strip_tags($product));
+    		if (strlen($this->attributed_credits) > 255) return 'Integrity';
+    		$this->attributed_credits[] = $product;
+    	}
     	if (isset($data['community_id'])) $this->community_id = (int) $data['community_id'];
     	$this->n_title =  trim(strip_tags($data['n_title']));
     	$this->n_last =  trim(strip_tags($data['n_last']));
@@ -375,47 +381,47 @@ class Vcard implements InputFilterAwareInterface
     	if (!$this->email && !$this->tel_cell) return 'Integrity'; // At least an email or a phone
 
     	// Retrieve the input value for authorized properties (restriction list at community level, no restriction if no community)
-    	if (!$this->properties || array_key_exists('adr_street', $this->properties)) {
+    	if (array_key_exists('adr_street', $this->properties)) {
     		$this->adr_street = trim(strip_tags($data['adr_street']));
     		if (strlen($this->adr_street) > 255) return 'Integrity';
     	}
-    	if (!$this->properties || array_key_exists('adr_extended', $this->properties)) {
+    	if (array_key_exists('adr_extended', $this->properties)) {
     		$this->adr_extended = trim(strip_tags($data['adr_extended']));
     		if (strlen($this->adr_extended) > 255) return 'Integrity';
     	}
-    	if (!$this->properties || array_key_exists('adr_post_office_box', $this->properties)) {
+    	if (array_key_exists('adr_post_office_box', $this->properties)) {
     		$this->adr_post_office_box = trim(strip_tags($data['adr_post_office_box']));
     		if (strlen($this->adr_post_office_box) > 255) return 'Integrity';
     	}
-    	if (!$this->properties || array_key_exists('adr_zip', $this->properties)) {
+    	if (array_key_exists('adr_zip', $this->properties)) {
     		$this->adr_zip = trim(strip_tags($data['adr_zip']));
     		if (strlen($this->adr_zip) > 255) return 'Integrity';
     	}
-    	if (!$this->properties || array_key_exists('adr_city', $this->properties)) {
+    	if (array_key_exists('adr_city', $this->properties)) {
     		$this->adr_city = trim(strip_tags($data['adr_city']));
     		if (strlen($this->adr_city) > 255) return 'Integrity';
     	}
-    	if (!$this->properties || array_key_exists('adr_state', $this->properties)) {
+    	if (array_key_exists('adr_state', $this->properties)) {
     		$this->adr_state = trim(strip_tags($data['adr_state']));
     		if (strlen($this->adr_state) > 255) return 'Integrity';
     	}
-    	if (!$this->properties || array_key_exists('adr_country', $this->properties)) {
+    	if (array_key_exists('adr_country', $this->properties)) {
     		$this->adr_country = trim(strip_tags($data['adr_country']));
     		if (strlen($this->adr_country) > 255) return 'Integrity';
     	}
-    	if (!$this->properties || array_key_exists('sex', $this->properties)) {
+    	if (array_key_exists('sex', $this->properties)) {
     		$this->sex = trim(strip_tags($data['sex']));
     		if (strlen($this->sex) > 255) return 'Integrity';
     	}
-    	if (!$this->properties || array_key_exists('birth_date', $this->properties)) {
+    	if (array_key_exists('birth_date', $this->properties)) {
     		$this->birth_date = trim(strip_tags($data['birth_date']));
 			if ($this->birth_date && !checkdate(substr($this->birth_date, 5, 2), substr($this->birth_date, 8, 2), substr($this->birth_date, 0, 4))) return 'Integrity';
        	}
-    	if (!$this->properties || array_key_exists('place_of_birth', $this->properties)) {
+    	if (array_key_exists('place_of_birth', $this->properties)) {
     		$this->place_of_birth = trim(strip_tags($data['place_of_birth']));
     		if (strlen($this->place_of_birth) > 255) return 'Integrity';
     	}
-    	if (!$this->properties || array_key_exists('nationality', $this->properties)) {
+    	if (array_key_exists('nationality', $this->properties)) {
     		$this->nationality = trim(strip_tags($data['nationality']));
     		if (strlen($this->nationality) > 255) return 'Integrity';
     	}
@@ -528,6 +534,40 @@ class Vcard implements InputFilterAwareInterface
 	    return 'OK';
     }
 
+    public function saveFile($file) {
+    	if ($context->getInstanceId() != 0) {
+	    	$context = Context::getCurrent();
+    		if ($file['size'] > $context->getConfig()['ppitCoreSettings']['maxUploadSize']) $error = 'Size';
+    		else {
+    			$name = $file['name'];
+    			$type = $file['type'];
+    			$src = $this->id;
+    			$dest = $this->id.'.jpg';
+    			$path = 'data/photos/';
+    
+    			$adapter = new \Zend\File\Transfer\Adapter\Http();
+    
+    			// Create the file on the file system with $id as a name
+    			$adapter->addFilter('Rename', $path.$src);
+    			if (file_exists($path.$src)) unlink($path.$src);
+    			if ($adapter->receive($file['name'])) {
+
+		    		$info = getimagesize($path.$src);
+    				if ($info['mime'] == 'image/gif' || $info['mime'] == 'image/png') {
+	 	    			// Compress the image
+		    			if ($info['mime'] == 'image/gif') $image = imagecreatefromgif($path.$src);
+		    			elseif ($info['mime'] == 'image/png') $image = imageCreateFromPng($path.$src);
+		
+		    			//compress and save file to jpg
+		    			imagejpeg($image, $path.$dest, 75);
+		    			unlink($path.$src);
+		    			rename($path.$dest, $path.$src);
+    				}
+    			}
+    		}
+    	}
+    }
+    
     public function isUsed($object)
     {
     	// Allow or not deleting an instance

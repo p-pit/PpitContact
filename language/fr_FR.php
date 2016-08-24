@@ -49,6 +49,7 @@
 			'F' => 'F',
 			'Female' => 'Féminin',
 			'Filter' => 'Filtre',
+			'Enterprise' => 'Entreprise',
 			'First name' => 'Prénom',
 			'From' => 'De',
 			'Last name' => 'Nom',
