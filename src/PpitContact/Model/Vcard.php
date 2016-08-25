@@ -357,7 +357,7 @@ class Vcard implements InputFilterAwareInterface
     	// Retrieve the data from the request
     	if (array_key_exists('attributed_credits', $data)) {
     		foreach ($data['attributed_credits'] as $product) $product = trim(strip_tags($product));
-    		if (strlen($this->attributed_credits) > 255) return 'Integrity';
+    		if (strlen($product) > 255) return 'Integrity';
     		$this->attributed_credits[] = $product;
     	}
     	if (isset($data['community_id'])) $this->community_id = (int) $data['community_id'];
@@ -535,6 +535,7 @@ class Vcard implements InputFilterAwareInterface
     }
 
     public function saveFile($file) {
+    	$context = Context::getCurrent();
     	if ($context->getInstanceId() != 0) {
 	    	$context = Context::getCurrent();
     		if ($file['size'] > $context->getConfig()['ppitCoreSettings']['maxUploadSize']) $error = 'Size';
