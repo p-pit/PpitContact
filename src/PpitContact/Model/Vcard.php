@@ -42,7 +42,9 @@ class Vcard implements InputFilterAwareInterface
     public $origine;
     public $photo_link_id;
     public $roles = array();
+    public $perimeters;
     public $locale;
+    public $is_demo_mode_active;
     public $is_notified;
     public $update_time;
 
@@ -74,7 +76,7 @@ class Vcard implements InputFilterAwareInterface
     public function exchangeArray($data)
     {
         $this->id = (isset($data['id'])) ? $data['id'] : null;
-        $this->attributed_credits = (isset($data['attributed_credits'])) ? json_decode($data['attributed_credits'], false) : null;
+        $this->attributed_credits = (isset($data['attributed_credits'])) ? json_decode($data['attributed_credits'], true) : null;
         $this->last_credit_consumption_date = (isset($data['last_credit_consumption_date'])) ? $data['last_credit_consumption_date'] : null;
         $this->instance_id = (isset($data['instance_id'])) ? $data['instance_id'] : null;
         $this->community_id = (isset($data['community_id'])) ? $data['community_id'] : null;
@@ -99,8 +101,10 @@ class Vcard implements InputFilterAwareInterface
         $this->nationality = (isset($data['nationality'])) ? $data['nationality'] : null;
         $this->origine = (isset($data['origine'])) ? $data['origine'] : null;
         $this->roles = (isset($data['roles'])) ? json_decode($data['roles'], true) : null;
+        $this->perimeters = (isset($data['perimeters'])) ? json_decode($data['perimeters'], true) : null;
         $this->locale = (isset($data['locale'])) ? $data['locale'] : null;
         $this->is_notified = (isset($data['is_notified'])) ? $data['is_notified'] : null;
+        $this->is_demo_mode_active = (isset($data['is_demo_mode_active'])) ? $data['is_demo_mode_active'] : null;
         $this->photo_link_id = (isset($data['photo_link_id'])) ? $data['photo_link_id'] : null;
         $this->update_time = (isset($data['update_time'])) ? $data['update_time'] : null;
 
@@ -137,8 +141,10 @@ class Vcard implements InputFilterAwareInterface
     	$data['nationality'] = $this->nationality;
     	$data['origine'] = $this->origine;
     	$data['roles'] = json_encode($this->roles);
+    	$data['perimeters'] = json_encode($this->perimeters);
     	$data['locale'] = $this->locale;
     	$data['is_notified'] = $this->is_notified;
+    	$data['is_demo_mode_active'] = $this->is_demo_mode_active;
     	$data['photo_link_id'] = $this->photo_link_id;
     	 
     	return $data;
@@ -183,8 +189,11 @@ class Vcard implements InputFilterAwareInterface
 					if (!$vcard->place_of_birth) $vcard->place_of_birth = $cursor->current()->place_of_birth;
 					if (!$vcard->nationality) $vcard->nationality = $cursor->current()->nationality;
 					if (!$vcard->photo_link_id) $vcard->photo_link_id = $cursor->current()->photo_link_id;
+					if (!$vcard->locale) $vcard->locale = $cursor->current()->locale;
 					if (!$vcard->is_notified) $vcard->is_notified = $cursor->current()->is_notified;
+					if (!$vcard->is_demo_mode_active) $vcard->is_demo_mode_active = $cursor->current()->is_demo_mode_active;
 					if (!$vcard->roles) $vcard->role = $cursor->current()->roles;
+					if (!$vcard->perimeters) $vcard->perimeters = $cursor->current()->perimeters;
 				}
 	    	}
 		}
@@ -241,6 +250,7 @@ class Vcard implements InputFilterAwareInterface
     		if (isset($params['place_of_birth'])) $where->like('place_of_birth', '%'.$params['place_of_birth'].'%');
     		if (isset($params['nationality'])) $where->like('nationality', '%'.$params['nationality'].'%');
     		if (isset($params['is_notified'])) $where->like('is_notified', '%'.$params['is_notified'].'%');
+    		if (isset($params['is_demo_mode_active'])) $where->like('is_demo_mode_active', '%'.$params['is_demo_mode_active'].'%');
     	}
 
     	$select->where($where)->order(array($major.' '.$dir, 'n_fn'));
@@ -255,14 +265,16 @@ class Vcard implements InputFilterAwareInterface
     	return $vcards;
     }
 
-    public static function getNew($instance_id, $community_id)
+    public static function getNew($community_id)
     {
     	$context = Context::getCurrent();
     	$vcard = new Vcard;
+    	$vcard->roles = array();
+    	$vcard->perimeters = array();
 
     	// Access control
     	$community = null;
-		$vcard->instance_id = $context->getInstanceId();
+//		$vcard->instance_id = $context->getInstanceId();
     	if ($community_id) {
     		$community = Community::getTable()->get($community_id);
     		if ($community) $vcard->community_id = $community_id;
@@ -270,9 +282,7 @@ class Vcard implements InputFilterAwareInterface
     	}
     	else $vcard->community_id = $context->getCommunityId();
 
-    	// Retrieve the authorized properties
-    	if ($community) $vcard->properties = $community->vcard_properties;
-    	else $vcard->properties = array();
+    	$vcard->properties = array();
 
     	// Retrieve the authorized roles
     	$roleList = $context->getConfig()['ppitRoles'];
@@ -280,23 +290,28 @@ class Vcard implements InputFilterAwareInterface
     	if ($community) {
     		foreach ($community->authorized_roles as $roleId) {
     			$role = $roleList[$roleId];
-    			if ($role['show']) $vcard->authorized_roles[$roleId] = array('labels' => $role['labels'], 'isChecked' => false);
+  //  			if ($role['show']) $vcard->authorized_roles[$roleId] = array('labels' => $role['labels'], 'isChecked' => false);
     		}
     	}
     	else {
     		foreach ($roleList as $roleId => $role) {
-    			if ($role['show']) $vcard->authorized_roles[$roleId] = array('labels' => $role['labels'], 'isChecked' => false);
+//    			if ($role['show']) $vcard->authorized_roles[$roleId] = array('labels' => $role['labels'], 'isChecked' => false);
     		}
     	}
     	
     	return $vcard;
     }
     
-    public static function instanciate()
+    public static function instanciate($community_id = 0)
     {
     	$vcard = new Vcard;
-    	$vcard->properties = array();
+		$vcard->community_id = $community_id;
+		$vcard->properties = array();
     	$vcard->attributed_credits = array();
+    	$vcard->roles = array();
+    	$vcard->perimeters = array();
+    	$vcard->locale = 'fr_FR';
+    	$vcard->properties = $vcard->toArray();
     	return $vcard;
     }
 
@@ -320,26 +335,28 @@ class Vcard implements InputFilterAwareInterface
 	    	}
 	    
 	    	if ($community_id) $vcard->community_name = $community->name;
-	
-	    	// Retrieve the authorized properties
-	    	if ($community) $vcard->properties = $community->vcard_properties;
-	    	else $vcard->properties = array();
-	
+
+	    	$roles = array();
+	    	foreach ($vcard->roles as $role) $roles[$role] = $role;
+	    	$vcard->roles = $roles;
+	    	
 	    	// Retrieve the authorized roles
 	    	$roleList = $context->getConfig()['ppitRoles'];
 	    	$vcard->authorized_roles = array();
 	    	if ($community) {
 	    		foreach ($community->authorized_roles as $roleId) {
 	    			$role = $roleList[$roleId];
-	    			if ($role['show']) $vcard->authorized_roles[$roleId] = array('labels' => $role['labels'], 'isChecked' => false);
+//	    			if ($role['show']) $vcard->authorized_roles[$roleId] = array('labels' => $role['labels'], 'isChecked' => false);
 	    		}
 	    	}
 	    	else {
 	    		foreach ($roleList as $roleId => $role) {
-	    			if ($role['show']) $vcard->authorized_roles[$roleId] = array('labels' => $role['labels'], 'isChecked' => false);
+//	    			if ($role['show']) $vcard->authorized_roles[$roleId] = array('labels' => $role['labels'], 'isChecked' => false);
 	    		}
 	    	}
 	    	foreach ($vcard->roles as $role) if (array_key_exists($role, $vcard->authorized_roles)) $vcard->authorized_roles[$role]['isChecked'] = true;
+	
+			$vcard->properties = $vcard->toArray();
     	}
     	return $vcard;
     }
@@ -353,87 +370,113 @@ class Vcard implements InputFilterAwareInterface
     	$this->previous_n_first = $this->n_first;
     	$this->previous_email = $this->email;
     	$this->previous_tel_cell = $this->tel_cell;
-    	 
-    	// Retrieve the data from the request
-    	if (array_key_exists('attributed_credits', $data)) {
-    		foreach ($data['attributed_credits'] as $product) $product = trim(strip_tags($product));
-    		if (strlen($product) > 255) return 'Integrity';
-    		$this->attributed_credits[] = $product;
+
+    	if (array_key_exists('credits', $data)) {
+	    	foreach($data['credits'] as $credit => $checked) {
+	    		if ($checked) $this->attributed_credits[$credit] = null;
+	    		else unset($this->attributed_credits[$credit]);
+	    	}
+    	}    	
+    	if (array_key_exists('community_id', $data)) $this->community_id = (int) $data['community_id'];
+    	if (array_key_exists('n_title', $data)) {
+    		$this->n_title =  trim(strip_tags($data['n_title']));
+    		if (strlen($this->n_title) > 255) return 'Integrity';
     	}
-    	if (isset($data['community_id'])) $this->community_id = (int) $data['community_id'];
-    	$this->n_title =  trim(strip_tags($data['n_title']));
-    	$this->n_last =  trim(strip_tags($data['n_last']));
-    	$this->n_first =  trim(strip_tags($data['n_first']));
-    	$this->email =  trim(strip_tags($data['email']));
-    	$this->tel_work =  trim(strip_tags($data['tel_work']));
-    	$this->tel_cell =  trim(strip_tags($data['tel_cell']));
-
-    	// Check integrity
-    	if (strlen($this->n_title) > 255) return 'Integrity';
-    	if ($this->n_first == '' || strlen($this->n_first) > 255) return 'Integrity';
-    	if ($this->n_last == '' || strlen($this->n_last) > 255) return 'Integrity';
-    	if (strlen($this->email) > 255) return 'Integrity';
-    	if ($this->email && !preg_match(Vcard::$emailRegex, $this->email)) return 'Integrity';
-    	if (strlen($this->tel_work) > 255) return 'Integrity';
-    	if ($this->tel_work && !preg_match(Vcard::$telRegex, $this->tel_work)) return 'Integrity';
-    	if (strlen($this->tel_cell) > 255) return 'Integrity';
-    	if ($this->tel_cell && !preg_match(Vcard::$telRegex, $this->tel_cell)) return 'Integrity';
-    	if (!$this->email && !$this->tel_cell) return 'Integrity'; // At least an email or a phone
-
-    	// Retrieve the input value for authorized properties (restriction list at community level, no restriction if no community)
-    	if (array_key_exists('adr_street', $this->properties)) {
+    	if (array_key_exists('n_last', $data)) {
+    		$this->n_last =  trim(strip_tags($data['n_last']));
+    		if ($this->n_last == '' || strlen($this->n_last) > 255) return 'Integrity';
+    	}
+    	if (array_key_exists('n_first', $data)) {
+    		$this->n_first =  trim(strip_tags($data['n_first']));
+    		if ($this->n_first == '' || strlen($this->n_first) > 255) return 'Integrity';
+    	}
+    	if (array_key_exists('email', $data)) {
+    		$this->email =  trim(strip_tags($data['email']));
+    		if (strlen($this->email) > 255) return 'Integrity';
+    		if ($this->email && !preg_match(Vcard::$emailRegex, $this->email)) return 'Integrity';
+    	}
+    	if (array_key_exists('tel_work', $data)) {
+    		$this->tel_work =  trim(strip_tags($data['tel_work']));
+	    	if (strlen($this->tel_work) > 255) return 'Integrity';
+	    	if ($this->tel_work && !preg_match(Vcard::$telRegex, $this->tel_work)) return 'Integrity';
+	    }
+    	if (array_key_exists('tel_cell', $data)) {
+    		$this->tel_cell =  trim(strip_tags($data['tel_cell']));
+	    	if (strlen($this->tel_cell) > 255) return 'Integrity';
+	    	if ($this->tel_cell && !preg_match(Vcard::$telRegex, $this->tel_cell)) return 'Integrity';
+    	}
+    	if (array_key_exists('adr_street', $data)) {
     		$this->adr_street = trim(strip_tags($data['adr_street']));
     		if (strlen($this->adr_street) > 255) return 'Integrity';
     	}
-    	if (array_key_exists('adr_extended', $this->properties)) {
+    	if (array_key_exists('adr_extended', $data)) {
     		$this->adr_extended = trim(strip_tags($data['adr_extended']));
     		if (strlen($this->adr_extended) > 255) return 'Integrity';
     	}
-    	if (array_key_exists('adr_post_office_box', $this->properties)) {
+    	if (array_key_exists('adr_post_office_box', $data)) {
     		$this->adr_post_office_box = trim(strip_tags($data['adr_post_office_box']));
     		if (strlen($this->adr_post_office_box) > 255) return 'Integrity';
     	}
-    	if (array_key_exists('adr_zip', $this->properties)) {
+    	if (array_key_exists('adr_zip', $data)) {
     		$this->adr_zip = trim(strip_tags($data['adr_zip']));
     		if (strlen($this->adr_zip) > 255) return 'Integrity';
     	}
-    	if (array_key_exists('adr_city', $this->properties)) {
+    	if (array_key_exists('adr_city', $data)) {
     		$this->adr_city = trim(strip_tags($data['adr_city']));
     		if (strlen($this->adr_city) > 255) return 'Integrity';
     	}
-    	if (array_key_exists('adr_state', $this->properties)) {
+    	if (array_key_exists('adr_state', $data)) {
     		$this->adr_state = trim(strip_tags($data['adr_state']));
     		if (strlen($this->adr_state) > 255) return 'Integrity';
     	}
-    	if (array_key_exists('adr_country', $this->properties)) {
+    	if (array_key_exists('adr_country', $data)) {
     		$this->adr_country = trim(strip_tags($data['adr_country']));
     		if (strlen($this->adr_country) > 255) return 'Integrity';
     	}
-    	if (array_key_exists('sex', $this->properties)) {
+    	if (array_key_exists('sex', $data)) {
     		$this->sex = trim(strip_tags($data['sex']));
     		if (strlen($this->sex) > 255) return 'Integrity';
     	}
-    	if (array_key_exists('birth_date', $this->properties)) {
+    	if (array_key_exists('birth_date', $data)) {
     		$this->birth_date = trim(strip_tags($data['birth_date']));
 			if ($this->birth_date && !checkdate(substr($this->birth_date, 5, 2), substr($this->birth_date, 8, 2), substr($this->birth_date, 0, 4))) return 'Integrity';
        	}
-    	if (array_key_exists('place_of_birth', $this->properties)) {
+    	if (array_key_exists('place_of_birth', $data)) {
     		$this->place_of_birth = trim(strip_tags($data['place_of_birth']));
     		if (strlen($this->place_of_birth) > 255) return 'Integrity';
     	}
-    	if (array_key_exists('nationality', $this->properties)) {
+    	if (array_key_exists('nationality', $data)) {
     		$this->nationality = trim(strip_tags($data['nationality']));
     		if (strlen($this->nationality) > 255) return 'Integrity';
     	}
-
-    	$this->roles = array();
-    	foreach ($data['roles'] as $id) {
-    		$this->roles[] = trim(strip_tags($id));
-    		if (strlen($id) > 255) return 'Integrity';
+    	if (array_key_exists('locale', $data)) {
+    		$this->locale = trim(strip_tags($data['locale']));
+    		if (strlen($this->locale) > 255) return 'Integrity';
     	}
-    
-    	$this->is_notified =  (int) $data['is_notified'];
-
+    	if (array_key_exists('is_notified', $data)) {
+    		$this->is_notified = (int) $data['is_notified'];
+    	}
+        if (array_key_exists('is_demo_mode_active', $data)) {
+    		$this->is_demo_mode_active = (int) $data['is_demo_mode_active'];
+    	}
+    	if (array_key_exists('roles', $data)) {
+	    	$roles = array();
+	    	foreach ($this->roles as $role) {
+	    		if (array_key_exists($role, $data['roles'])) {
+	    			if ($data['roles']) $roles[] = $role;
+	    		}
+	    		else $roles[] = $role;
+	    	}
+	    	foreach($data['roles'] as $role => $checked) {
+	    		if ($checked) $roles[] = $role;
+	    	}
+	    	$this->roles = $roles;
+    	}
+    	if (array_key_exists('perimeters', $data)) {
+	    	foreach ($data['perimeters'] as $perimeterId => $perimeter) {
+	    		$this->perimeters[$perimeterId] = $perimeter;
+	    	}
+    	}
     	$this->n_fn = $this->n_last.', '.$this->n_first;
     
     	// Retrieve the photo file
@@ -479,7 +522,8 @@ class Vcard implements InputFilterAwareInterface
     	}
     	
     	$data['is_notified'] = $request->getPost('is_notified');
-
+    	$data['is_demo_mode_active'] = $request->getPost('is_demo_mode_active');
+    	 
     	// Retrieve the photo file
     	$files = $request->getFiles()->toArray();
     	if (array_key_exists('vcard_photo', $files)) $data['file'] = $files['vcard_photo'];

@@ -428,11 +428,13 @@ return array(
 	),
 
 	'ppitRoles' => array(
-			'admin' => array(
-					'show' => true,
-					'labels' => array(
-							'en_US' => 'Admin',
-							'fr_FR' => 'Admin',
+			'ppitCommitment' => array(
+					'admin' => array(
+							'show' => true,
+							'labels' => array(
+									'en_US' => 'Admin',
+									'fr_FR' => 'Admin',
+							),
 					),
 			),
 	),
@@ -442,5 +444,128 @@ return array(
 
 	'ppitCoreDependencies' => array(
 			'contact_vcard' => new \PpitContact\Model\Vcard,
+	),
+
+	'vcard/properties' => array(
+			'n_title' => array(
+					'type' => 'input',
+					'maxSize' => 255,
+					'labels' => array(
+							'en_US' => 'Title',
+							'fr_FR' => 'Civilité',
+					),
+			),
+			'n_first' => array(
+					'type' => 'input',
+					'maxSize' => 255,
+					'labels' => array(
+							'en_US' => 'First name',
+							'fr_FR' => 'Prénom',
+					),
+			),
+			'n_last' => array(
+					'type' => 'input',
+					'maxSize' => 255,
+					'labels' => array(
+							'en_US' => 'Last name',
+							'fr_FR' => 'Nom',
+					),
+			),
+			'n_fn' => array(
+					'type' => 'input',
+					'maxSize' => 255,
+					'labels' => array(
+							'en_US' => 'Name',
+							'fr_FR' => 'Nom',
+					),
+			),
+			'tel_work' => array(
+					'type' => 'phone',
+					'labels' => array(
+							'en_US' => 'Phone',
+							'fr_FR' => 'Téléphone',
+					),
+			),
+			'tel_cell' => array(
+					'type' => 'phone',
+					'labels' => array(
+							'en_US' => 'Cellular',
+							'fr_FR' => 'Mobile',
+					),
+			),
+			'email' => array(
+					'type' => 'email',
+					'labels' => array(
+							'en_US' => 'Email',
+							'fr_FR' => 'Email',
+					),
+			),
+			'adr_street' => array(
+					'type' => 'input',
+					'maxSize' => 255,
+					'labels' => array(
+							'en_US' => 'Address - street',
+							'fr_FR' => 'Adresse - rue',
+					),
+			),
+			'adr_extended' => array(
+					'type' => 'input',
+					'maxSize' => 255,
+					'labels' => array(
+							'en_US' => 'Address - extended',
+							'fr_FR' => 'Adresse - complément',
+					),
+			),
+			'adr_post_office_box' => array(
+					'type' => 'input',
+					'maxSize' => 255,
+					'labels' => array(
+							'en_US' => 'Address - post office box',
+							'fr_FR' => 'Adresse - boîte postale',
+					),
+			),
+			'adr_zip' => array(
+					'type' => 'input',
+					'maxSize' => 255,
+					'labels' => array(
+							'en_US' => 'Address - ZIP',
+							'fr_FR' => 'Adresse - Code postal',
+					),
+			),
+			'adr_city' => array(
+					'type' => 'input',
+					'maxSize' => 255,
+					'labels' => array(
+							'en_US' => 'Address - city',
+							'fr_FR' => 'Adresse - ville',
+					),
+			),
+			'adr_state' => array(
+					'type' => 'input',
+					'maxSize' => 255,
+					'labels' => array(
+							'en_US' => 'Address - state',
+							'fr_FR' => 'Adresse - état',
+					),
+			),
+			'adr_country' => array(
+					'type' => 'input',
+					'maxSize' => 255,
+					'labels' => array(
+							'en_US' => 'Address - country',
+							'fr_FR' => 'Adresse - pays',
+					),
+			),
+			'locale' => array(
+					'type' => 'select',
+					'modalities' => array(
+							'en_US' => array('en_US' => 'en_US', 'fr_FR' => 'en_US'),
+							'fr_FR' => array('en_US' => 'fr_FR', 'fr_FR' => 'fr_FR'),
+					),
+					'labels' => array(
+							'en_US' => 'Locale',
+							'fr_FR' => 'Traduction',
+					),
+			),
 	),
 );

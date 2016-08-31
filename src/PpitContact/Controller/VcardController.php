@@ -239,7 +239,7 @@ class VcardController extends AbstractActionController
     		$contact = Vcard::get($id);
     		if (!$contact) $this->redirect()->toRoute('index'); // Not allowed
     	}
-    	else $contact = Vcard::getNew($instance_id, $community_id);
+    	else $contact = Vcard::getNew($community_id);
 
     	if ($community_id) {
     		// Retrieve the vcards

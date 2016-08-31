@@ -65,6 +65,7 @@
 			'Nationality' => 'Nationalité',
 			'Place' => 'Lieu',
 			'Organization' => 'Entreprise',
+			'Perimeters' => 'Périmètres',
 			'Personal data' => 'Données personnelles',
 			'Place of birth' => 'Lieu naissance',
 			'Please input at least one phone' => 'Veuillez saisir au moins un téléphone',
