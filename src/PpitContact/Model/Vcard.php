@@ -285,19 +285,20 @@ class Vcard implements InputFilterAwareInterface
     	$vcard->properties = array();
 
     	// Retrieve the authorized roles
-    	$roleList = $context->getConfig()['ppitRoles'];
+/*    	$roleList = $context->getConfig()['ppitRoles'];
+
     	$vcard->authorized_roles = array();
     	if ($community) {
     		foreach ($community->authorized_roles as $roleId) {
     			$role = $roleList[$roleId];
-  //  			if ($role['show']) $vcard->authorized_roles[$roleId] = array('labels' => $role['labels'], 'isChecked' => false);
+    			if ($role['show']) $vcard->authorized_roles[$roleId] = array('labels' => $role['labels'], 'isChecked' => false);
     		}
     	}
     	else {
     		foreach ($roleList as $roleId => $role) {
-//    			if ($role['show']) $vcard->authorized_roles[$roleId] = array('labels' => $role['labels'], 'isChecked' => false);
+    			if ($role['show']) $vcard->authorized_roles[$roleId] = array('labels' => $role['labels'], 'isChecked' => false);
     		}
-    	}
+    	}*/
     	
     	return $vcard;
     }
@@ -341,20 +342,20 @@ class Vcard implements InputFilterAwareInterface
 	    	$vcard->roles = $roles;
 	    	
 	    	// Retrieve the authorized roles
-	    	$roleList = $context->getConfig()['ppitRoles'];
+/*	    	$roleList = $context->getConfig()['ppitRoles'];
 	    	$vcard->authorized_roles = array();
 	    	if ($community) {
 	    		foreach ($community->authorized_roles as $roleId) {
 	    			$role = $roleList[$roleId];
-//	    			if ($role['show']) $vcard->authorized_roles[$roleId] = array('labels' => $role['labels'], 'isChecked' => false);
+	    			if ($role['show']) $vcard->authorized_roles[$roleId] = array('labels' => $role['labels'], 'isChecked' => false);
 	    		}
 	    	}
 	    	else {
 	    		foreach ($roleList as $roleId => $role) {
-//	    			if ($role['show']) $vcard->authorized_roles[$roleId] = array('labels' => $role['labels'], 'isChecked' => false);
+	    			if ($role['show']) $vcard->authorized_roles[$roleId] = array('labels' => $role['labels'], 'isChecked' => false);
 	    		}
 	    	}
-	    	foreach ($vcard->roles as $role) if (array_key_exists($role, $vcard->authorized_roles)) $vcard->authorized_roles[$role]['isChecked'] = true;
+	    	foreach ($vcard->roles as $role) if (array_key_exists($role, $vcard->authorized_roles)) $vcard->authorized_roles[$role]['isChecked'] = true;*/
 	
 			$vcard->properties = $vcard->toArray();
     	}
@@ -461,14 +462,14 @@ class Vcard implements InputFilterAwareInterface
     	}
     	if (array_key_exists('roles', $data)) {
 	    	$roles = array();
-	    	foreach ($this->roles as $role) {
+/*	    	foreach ($this->roles as $role) {
 	    		if (array_key_exists($role, $data['roles'])) {
 	    			if ($data['roles']) $roles[] = $role;
 	    		}
 	    		else $roles[] = $role;
-	    	}
+	    	}*/
 	    	foreach($data['roles'] as $role => $checked) {
-	    		if ($checked) $roles[] = $role;
+	    		if ($checked) $roles[$role] = $role;
 	    	}
 	    	$this->roles = $roles;
     	}

@@ -568,4 +568,68 @@ return array(
 					),
 			),
 	),
+	'community/consumeCredit' => array(
+			'messages' => array(
+					'availabilityAlertTitle' => array(
+							'en_US' => 'P-PIT Communities credits available',
+							'fr_FR' => 'Crédits P-PIT Communities disponibles',
+					),
+					'availabilityAlertText' => array(
+							'en_US' => 'Hello %s,
+							
+Your available P-PIT Communities credits reserve for %s is almost out of stock (*). 
+In order to avoid the risk of suffering use restrictions, you can right now renew your subscription, for the desired period of time.
+Our tip : Have peace of mind by renewing for a 1-year period of time.
+					
+(*) Your current P-PIT Communities reserve rises %s units. Your next monthly consumption is estimated up to now to %s units, estimation based on the current active subscriptions.
+
+We hope that our services are giving you full satisfaction. Plesase send your requests or questions to the P-PIT support: support@p-pit.fr or 06 29 87 90 02.
+					
+Best regards,
+
+The P-PIT staff
+',
+							'fr_FR' => 'Bonjour %s,
+							
+Votre réserve de crédits P-PIT Communities disponibles pour %s est bientôt épuisée (*). 
+Pour ne pas risquer de subir des restrictions à l\'utilisation, vous pouvez dès à présent renouveller en ligne votre souscription pour la durée que vous souhaitez.
+Notre conseil : Ayez l\'esprit tranquille en renouvelant pour un an.
+
+(*) Votre réserve actuelle P-PIT Communities est de %s unités. Votre prochain décompte mensuel est estimé à ce jour à %s unités, estimation basée sur le nombre de dossiers actifs à ce jour.
+
+Nous espérons que nos services vous donnent entière satisfaction. Veuillez adresser toute requête ou question au support P-PIT : support@p-pit.fr ou 06 29 87 90 02.
+					
+Bien cordialement,
+
+L\'équipe P-PIT
+',
+					),
+					'consumeCreditTitle' => array(
+							'en_US' => 'Monthly P-PIT Communities credits consumption report',
+							'fr_FR' => 'Rapport mensuel de consommation de crédits P-PIT Communities',
+					),
+					'consumeCreditText' => array(
+							'en_US' => 'Hello %s,
+							
+Please note that the monthly count of P-PIT Communities credits has occurred on %s. Given the current %s active subscriptions, %s units have been consumed. Your new P-PIT Communities reserve rises %s units.
+
+We hope that our services are giving you full satisfaction. Plesase send your requests or questions to the P-PIT support: support@p-pit.fr or 06 29 87 90 02.
+					
+Best regards,
+
+The P-PIT staff
+',
+							'fr_FR' => 'Bonjour %s,
+							
+Veuillez noter que le décompte mensuel de crédits P-PIT Communities a été effectué en date du %s. Compte tenu du nombre de dossiers %s actifs à ce jour, %s unités ont été décomptées. Votre nouvelle réserve P-PIT Communities est de %s unités.
+
+Nous espérons que nos services vous donnent entière satisfaction. Veuillez adresser toute requête ou question au support P-PIT : support@p-pit.fr ou 06 29 87 90 02.
+					
+Bien cordialement,
+
+L\'équipe P-PIT
+',
+					),
+			),
+	),
 );
