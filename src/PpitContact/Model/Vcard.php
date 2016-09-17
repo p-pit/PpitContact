@@ -479,7 +479,7 @@ class Vcard implements InputFilterAwareInterface
 	    	}
     	}
     	$this->n_fn = $this->n_last.', '.$this->n_first;
-    
+
     	// Retrieve the photo file
     	if (array_key_exists('file', $data)) $this->file = $data['file'];
     

@@ -581,9 +581,9 @@ Your available P-PIT Communities credits reserve for %s is almost out of stock (
 In order to avoid the risk of suffering use restrictions, you can right now renew your subscription, for the desired period of time.
 Our tip : Have peace of mind by renewing for a 1-year period of time.
 					
-(*) Your current P-PIT Communities reserve rises %s units. Your next monthly consumption is estimated up to now to %s units, estimation based on the current active subscriptions.
+(*) Your current P-PIT Communities reserve rises %s units. For the 7 next days, your monthly consumption is estimated up to now to %s units, estimation based on the current active communities.
 
-We hope that our services are giving you full satisfaction. Plesase send your requests or questions to the P-PIT support: support@p-pit.fr or 06 29 87 90 02.
+We hope that our services are giving you satisfaction. Please send your requests or questions to the P-PIT support: support@p-pit.fr or 06 29 87 90 02.
 					
 Best regards,
 
@@ -595,7 +595,7 @@ Votre réserve de crédits P-PIT Communities disponibles pour %s est bientôt é
 Pour ne pas risquer de subir des restrictions à l\'utilisation, vous pouvez dès à présent renouveller en ligne votre souscription pour la durée que vous souhaitez.
 Notre conseil : Ayez l\'esprit tranquille en renouvelant pour un an.
 
-(*) Votre réserve actuelle P-PIT Communities est de %s unités. Votre prochain décompte mensuel est estimé à ce jour à %s unités, estimation basée sur le nombre de dossiers actifs à ce jour.
+(*) Votre réserve actuelle P-PIT Communities est de %s unités. Pour les 7 prochains jours, votre décompte mensuel est estimé à %s unités, estimation basée sur le nombre de communautés actives à ce jour.
 
 Nous espérons que nos services vous donnent entière satisfaction. Veuillez adresser toute requête ou question au support P-PIT : support@p-pit.fr ou 06 29 87 90 02.
 					
@@ -613,7 +613,7 @@ L\'équipe P-PIT
 							
 Please note that the monthly count of P-PIT Communities credits has occurred on %s. Given the current %s active subscriptions, %s units have been consumed. Your new P-PIT Communities reserve rises %s units.
 
-We hope that our services are giving you full satisfaction. Plesase send your requests or questions to the P-PIT support: support@p-pit.fr or 06 29 87 90 02.
+We hope that our services are giving you satisfaction. Please send your requests or questions to the P-PIT support: support@p-pit.fr or 06 29 87 90 02.
 					
 Best regards,
 
@@ -629,6 +629,49 @@ Bien cordialement,
 
 L\'équipe P-PIT
 ',
+					),
+					'suspendedServiceTitle' => array(
+							'en_US' => 'P-PIT Communities subscription suspended',
+							'fr_FR' => 'Souscription P-PIT Communities suspendue',
+					),
+					'suspendedServiceText' => array(
+							'en_US' => 'Hello %s,
+							
+Your available P-PIT Communities credits reserve for %s is out of stock (*). 
+Please note that in the case where the credit reserve decreases under zero, the service is automatically suspended until a regularization occurs.
+Our tip : Have peace of mind by renewing for a 1-year period of time (12 monthly credits per active community).
+					
+(*) Your current P-PIT Communities solde rises %s units.
+
+We hope that our services are giving you satisfaction. Please send your requests or questions to the P-PIT support: support@p-pit.fr or 06 29 87 90 02.
+					
+Best regards,
+
+The P-PIT staff
+',
+							'fr_FR' => 'Bonjour %s,
+							
+Votre réserve de crédits P-PIT Communities pour %s est épuisée (*). 
+Veuillez noter que dans le cas où la réserve de crédits devient négative, le service est automatiquement suspendu jusqu\'à régularisation.
+Notre conseil : Ayez l\'esprit tranquille en renouvelant pour un an (12 crédits mensuels par communauté active).
+
+(*) Votre solde actuel P-PIT Communities est de %s unités.
+
+Nous espérons que nos services vous donnent entière satisfaction. Veuillez adresser toute requête ou question au support P-PIT : support@p-pit.fr ou 06 29 87 90 02.
+					
+Bien cordialement,
+
+L\'équipe P-PIT
+',
+					),
+					'suspendedServiceMessage' => array(
+							'en_US' => 'Your available P-PIT Communities credits reserve is out of stock.<br>
+Please note that in the case where the credit reserve decreases under zero, the service is automatically suspended until a regularization occurs.<br>
+You can add credits at <a href="%s">this place</a>',
+
+							'fr_FR' => 'Votre réserve de crédits <em>P-Pit Communities</em> est épuisée.<br> 
+Veuillez noter que dans le cas où la réserve de crédits devient négative, le service est automatiquement suspendu jusqu\'à régularisation.<br>
+Vous pouvez ajouter des crédits depuis <a href="%s">cet emplacement</a>',
 					),
 			),
 	),

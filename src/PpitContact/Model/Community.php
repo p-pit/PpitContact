@@ -18,8 +18,10 @@ use Zend\Log\Writer;
 class Community implements InputFilterAwareInterface
 {
     public $id;
-    public $last_credit_consumption_date;
     public $instance_id;
+    public $activation_date;
+    public $next_credit_consumption_date;
+    public $last_credit_consumption_date;
     public $status;
     public $name;
     public $contact_1_id;
@@ -55,8 +57,10 @@ class Community implements InputFilterAwareInterface
     {
         $this->id = (isset($data['id'])) ? $data['id'] : null;
         $this->instance_id = (isset($data['instance_id'])) ? $data['instance_id'] : null;
-        $this->last_credit_consumption_date = (isset($data['last_credit_consumption_date'])) ? $data['last_credit_consumption_date'] : null;
         $this->status = (isset($data['status'])) ? $data['status'] : null;
+        $this->activation_date = (isset($data['activation_date'])) ? $data['activation_date'] : null;
+        $this->next_credit_consumption_date = (isset($data['next_credit_consumption_date'])) ? $data['next_credit_consumption_date'] : null;
+        $this->last_credit_consumption_date = (isset($data['last_credit_consumption_date'])) ? $data['last_credit_consumption_date'] : null;
         $this->name = (isset($data['name'])) ? $data['name'] : null;
         $this->contact_1_id = (isset($data['contact_1_id'])) ? $data['contact_1_id'] : null;
         $this->contact_1_status = (isset($data['contact_1_status'])) ? $data['contact_1_status'] : null;
@@ -83,6 +87,8 @@ class Community implements InputFilterAwareInterface
     	$data = array();
     	$data['id'] = (int) $this->id;
     	$data['status'] =  $this->status;
+    	$data['activation_date'] =  $this->activation_date;
+    	$data['next_credit_consumption_date'] = ($this->next_credit_consumption_date) ? $this->next_credit_consumption_date : null;
     	$data['last_credit_consumption_date'] = ($this->last_credit_consumption_date) ? $this->last_credit_consumption_date : null;
     	$data['name'] =  $this->name;
     	$data['contact_1_id'] =  (int) $this->contact_1_id;
@@ -341,11 +347,94 @@ class Community implements InputFilterAwareInterface
     
     	// Check enough credits are available
     	foreach ($credits as $credit) {
-    		$counter = count($credit->consumers);
-    		if ($credit->quantity < $counter) {
+  
+			// Compute the credit consumption at -7 days and at due date
+    		$counter7 = 0;
+			$counter0 = 0;
+			$dailyConsumption = 0;
+			$creditModified = false;
+			foreach($credit->consumers as $community) {
+    			if ($community->next_credit_consumption_date <= date('Y-m-d', strtotime(date('Y-m-d').' + 7 days'))) $counter7++;
+    			if ($community->next_credit_consumption_date <= date('Y-m-d')) $counter0++;
+    			
+    			if ($community->next_credit_consumption_date == date('Y-m-d')) {
+	    			// Consume 1 credit
+    				$dailyConsumption++;
+    				$credit->quantity--;
+					$community->next_credit_consumption_date = date('Y-m-d', strtotime(date('Y-'.(date('m') + 1).'-'.substr($community->activation_date, 8, 2)).' + 0 days'));
+					$community->last_credit_consumption_date = date('Y-m-d');
+    				$community->audit[] = array(
+    						'status' => $community->status,
+    						'time' => Date('Y-m-d G:i:s'),
+    						'n_fn' => 'P-PIT',
+    						'comment' => 'Monthly consuming',
+    				);
+    				if ($live) Community::getTable()->transSave($community);
+    
+    				// Log
+    				if ($config['isTraceActive']) {
+   						$logText = 'Community : instance_id='.$community->instance_id.', id='.$community->id.', caption='.$community->name.', status='.$community->status;
+    					if ($live) $logger->info($logText);
+    					else print_r($logText."\n");
+    				}
+					$creditModified = true;
+    			}
+			}
+			// Suspend the subscription service if no enough credits at due date
+			if ($credit->quantity < 0) {
+				if ($credit->status == 'active') {
+					$credit->status = 'suspended';
+					$creditModified = true;
+				}
+			}
+			// Re-activate the subscription service if enough credits at due date
+			else {
+				if ($credit->status == 'suspended') {
+					$credit->status = 'active';
+    				$creditModified = true;
+				}
+			}
+			if ($creditModified) {
+    			$credit->audit[date('Y-m')] = array(
+    					'status' => $credit->status,
+    					'quantity' => $credit->quantity,
+    					'time' => Date('Y-m-d G:i:s'),
+    					'n_fn' => 'P-PIT',
+    					'comment' => 'Daily consuming',
+    			);
+    			if ($live) Credit::getTable()->transSave($credit);
+			}
+
+			// Notify a suspension of service
+    		if ($credit->status == 'suspended') {
+
+    			// Log
+    			$logText = 'ALERT : Not enough credits for P-PIT Communities available on instance '.$credit->instance_id.'. Available='.$credit->quantity.', 7 days estimation='.$counter7;
+    			if ($live) $logger->info($logText);
+    			else print_r($logText."\n");
+    			
+    			// Notify
+    			if ($live) {
+    				$url = $config['ppitCoreSettings']['domainName'];
+    				$instance = $instances[$credit->instance_id];
+    				foreach ($instance->administrators as $contact) {
+    					if (!$mailTo || !strcmp($contact->email, $mailTo)) { // Restriction on the given mailTo parameter
+    						$title = sprintf($config['community/consumeCredit']['messages']['suspendedServiceTitle'][$contact->locale], 'P-PIT Communities');
+    						$text = sprintf(
+    								$config['community/consumeCredit']['messages']['suspendedServiceText'][$contact->locale],
+    								$contact->n_first,
+    								$instance->caption,
+    								$credit->quantity
+    						);
+    						ContactMessage::sendMail($contact->email, $text, $title);
+    					}
+    				}
+    			}
+    		}
+    		elseif ($credit->quantity - $counter7 < 0) {
     
     			// Log
-    			$logText = 'ALERT : Not enough credits for P-PIT Communities available on instance '.$credit->instance_id.'. Available='.$credit->quantity.', required='.$counter;
+    			$logText = 'ALERT : Risk of credits lacking for P-PIT Communities on instance '.$credit->instance_id.'. Available='.$credit->quantity.', 7 days estimation='.$counter7;
     			if ($live) $logger->info($logText);
     			else print_r($logText."\n");
     
@@ -361,53 +450,21 @@ class Community implements InputFilterAwareInterface
     								$contact->n_first,
     								$instance->caption,
     								$credit->quantity,
-    								count($credit->consumers)
+    								$counter7
     								);
     						ContactMessage::sendMail($contact->email, $text, $title);
     					}
     				}
     			}
     		}
-    		if (	date('m') != substr($credit->activation_date, 5, 2) // The first month is free
-    				&&	!array_key_exists(date('Y-m'), $credit->audit) // The current month has not already been consumed
-    				&&	date('Y-m-d') >= date('Y-m-').substr($credit->activation_date, 8, 2) // The monthly date is reached
-    				)
+    		// Notify is a consumption accurs
+    		if ($dailyConsumption > 0)
     		{
-    			$logText = 'Consuming '.$counter.' credits for instance: '.$credit->instance_id;
+    			$logText = 'Consuming '.$dailyConsumption.' credits for instance: '.$credit->instance_id;
     			if ($live) {
     				$connection = Credit::getTable()->getAdapter()->getDriver()->getConnection();
     				$connection->beginTransaction();
     				try {
-    
-    					// Update the credit quantity
-    					$credit->quantity -= $counter;
-    					$credit->audit[date('Y-m')] = array(
-    							'status' => 'used',
-    							'quantity' => $counter,
-    							'time' => Date('Y-m-d G:i:s'),
-    							'n_fn' => 'P-PIT',
-    							'comment' => 'Monthly consuming',
-    					);
-    					Credit::getTable()->transSave($credit);
-    
-    					// Audit the credit consumption in the community records
-    					foreach ($credit->consumers as $community) {
-    						$community->last_credit_consumption_date = date('Y-m-d');
-    						$community->audit[] = array(
-    								'time' => Date('Y-m-d G:i:s'),
-    								'n_fn' => 'P-PIT',
-    								'comment' => 'Monthly consuming',
-    						);
-
-    						Community::getTable()->transSave($community);
-    
-    						// Log
-    						if ($config['isTraceActive']) {
-    							$logText = 'Community : instance_id='.$community->instance_id.', id='.$community->id.', caption='.$community->name.', status='.$community->status;
-    							if ($live) $logger->info($logText);
-    							else print_r($logText."\n");
-    						}
-    					}
     
     					// Notify
     					$url = $config['ppitCoreSettings']['domainName'];
