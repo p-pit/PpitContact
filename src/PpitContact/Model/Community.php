@@ -247,7 +247,7 @@ class Community implements InputFilterAwareInterface
     	$context = Context::getCurrent();
     
     	// Check consistency
-//    	if (Generic::getTable()->cardinality('contact_community', array('name' => $this->name)) > 0) return 'Duplicate';
+    	if (Generic::getTable()->cardinality('contact_community', array('name' => $this->name)) > 0) return 'Duplicate';
 
     	// Create the root document for the new community
     	$rootDoc = new Document;
