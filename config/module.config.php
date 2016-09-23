@@ -428,14 +428,7 @@ return array(
 	),
 
 	'ppitRoles' => array(
-			'ppitCommitment' => array(
-					'admin' => array(
-							'show' => true,
-							'labels' => array(
-									'en_US' => 'Admin',
-									'fr_FR' => 'Admin',
-							),
-					),
+			'PpitContact' => array(
 			),
 	),
 		
