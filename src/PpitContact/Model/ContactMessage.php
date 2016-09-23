@@ -184,7 +184,7 @@ class ContactMessage implements InputFilterAwareInterface
     		$mail->setBody($body);
     		$mail->setFrom($settings['mailAdmin'], $settings['nameAdmin']);
     		$mail->setSubject($subject);
-    
+
     		// Send the mail to a test mailbox if a 'mailTo' setting is set (test environment) otherwise in the given mail (production)
     		if ($settings['mailTo']) $mail->addTo($settings['mailTo'], $settings['mailTo']);
     		else $mail->addTo($email, $email);
