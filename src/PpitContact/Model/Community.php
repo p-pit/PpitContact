@@ -268,7 +268,7 @@ class Community implements InputFilterAwareInterface
     	$Community = Community::get($this->id);
     
     	// Isolation check
-    	if ($Community->update_time > $update_time) return 'Isolation';
+    	if ($update_time && $Community->update_time > $update_time) return 'Isolation';
     
     	Community::getTable()->save($this);
     

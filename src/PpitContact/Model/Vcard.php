@@ -455,9 +455,9 @@ class Vcard implements InputFilterAwareInterface
     		if (strlen($this->locale) > 255) return 'Integrity';
     	}
     	if (array_key_exists('is_notified', $data)) {
-    		$this->is_notified = (int) $data['is_notified'];
+    		$this->is_notified = $data['is_notified'];
     	}
-        if (array_key_exists('is_demo_mode_active', $data)) {
+    	if (array_key_exists('is_demo_mode_active', $data)) {
     		$this->is_demo_mode_active = (int) $data['is_demo_mode_active'];
     	}
     	if (array_key_exists('roles', $data)) {
@@ -559,9 +559,10 @@ class Vcard implements InputFilterAwareInterface
     	$context = Context::getCurrent();
 
     	// Check isolation
-	    $vcard = Vcard::getTable()->transGet($this->id);
-	    if ($vcard && $vcard->update_time > $update_time) return 'Isolation';
-
+    	if ($update_time) {
+		    $vcard = Vcard::getTable()->transGet($this->id);
+		    if ($vcard && $vcard->update_time > $update_time) return 'Isolation';
+    	}
     	// Save the photo and the vcard
     	if ($this->files) {
     		if ($context->getCommunityId()) {
