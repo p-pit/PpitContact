@@ -593,7 +593,7 @@ class Vcard implements InputFilterAwareInterface
     			$path = 'data/photos/';
     
     			$adapter = new \Zend\File\Transfer\Adapter\Http();
-    
+
     			// Create the file on the file system with $id as a name
     			$adapter->addFilter('Rename', $path.$src);
     			if (file_exists($path.$src)) unlink($path.$src);
