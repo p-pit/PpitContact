@@ -372,9 +372,9 @@ class Vcard implements InputFilterAwareInterface
     	$this->previous_email = $this->email;
     	$this->previous_tel_cell = $this->tel_cell;
 
-    	if (array_key_exists('credits', $data)) {
-	    	foreach($data['credits'] as $credit => $checked) {
-	    		if ($checked) $this->attributed_credits[$credit] = null;
+    	if (array_key_exists('attributed_credits', $data)) {
+	    	foreach($data['attributed_credits'] as $credit => $checked) {
+	    		if ($checked) $this->attributed_credits[$credit] = true;
 	    		else unset($this->attributed_credits[$credit]);
 	    	}
     	}    	
