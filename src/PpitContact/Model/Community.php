@@ -19,7 +19,6 @@ class Community implements InputFilterAwareInterface
 {
     public $id;
     public $instance_id;
-    public $activation_date;
     public $next_credit_consumption_date;
     public $last_credit_consumption_date;
     public $status;
@@ -43,6 +42,9 @@ class Community implements InputFilterAwareInterface
     public $vcard_properties;
     public $authorized_roles = array();
 
+    // Deprecated
+    public $activation_date;
+    
     protected $inputFilter;
 
     // Static fields
@@ -58,7 +60,6 @@ class Community implements InputFilterAwareInterface
         $this->id = (isset($data['id'])) ? $data['id'] : null;
         $this->instance_id = (isset($data['instance_id'])) ? $data['instance_id'] : null;
         $this->status = (isset($data['status'])) ? $data['status'] : null;
-        $this->activation_date = (isset($data['activation_date'])) ? $data['activation_date'] : null;
         $this->next_credit_consumption_date = (isset($data['next_credit_consumption_date'])) ? $data['next_credit_consumption_date'] : null;
         $this->last_credit_consumption_date = (isset($data['last_credit_consumption_date'])) ? $data['last_credit_consumption_date'] : null;
         $this->name = (isset($data['name'])) ? $data['name'] : null;
@@ -80,6 +81,9 @@ class Community implements InputFilterAwareInterface
         // => Contract
         $this->vcard_properties = (isset($data['vcard_properties'])) ? json_decode($data['vcard_properties'], true) : null;
         $this->authorized_roles = (isset($data['authorized_roles'])) ? json_decode($data['authorized_roles'], true) : null;
+
+        // Deprecated
+        $this->activation_date = (isset($data['activation_date'])) ? $data['activation_date'] : null;
     }
     
     public function toArray()
@@ -87,7 +91,6 @@ class Community implements InputFilterAwareInterface
     	$data = array();
     	$data['id'] = (int) $this->id;
     	$data['status'] =  $this->status;
-    	$data['activation_date'] =  $this->activation_date;
     	$data['next_credit_consumption_date'] = ($this->next_credit_consumption_date) ? $this->next_credit_consumption_date : null;
     	$data['last_credit_consumption_date'] = ($this->last_credit_consumption_date) ? $this->last_credit_consumption_date : null;
     	$data['name'] =  $this->name;
@@ -108,6 +111,9 @@ class Community implements InputFilterAwareInterface
     	// => Contract
     	$data['vcard_properties'] = json_encode($this->vcard_properties);
     	$data['authorized_roles'] = json_encode($this->authorized_roles);
+
+    	// Deprecated
+    	$data['activation_date'] =  $this->activation_date;
 
     	return $data;
     }
@@ -321,7 +327,7 @@ class Community implements InputFilterAwareInterface
     		$credit->consumers = array();
     		$credits[$credit->instance_id] = $credit;
     	}
-    
+
     	// Retrieve communities and count
     	$select = Community::getTable()->getSelect()
 	    	->join('core_instance', 'contact_community.instance_id = core_instance.id', array(), 'left');
@@ -334,7 +340,7 @@ class Community implements InputFilterAwareInterface
     	foreach ($cursor as $community) {
     		if (array_key_exists($community->instance_id, $credits)) $credits[$community->instance_id]->consumers[] = $community;
     	}
-    
+
     	// Retrieve administrators to be notified
     	$select = Vcard::getTable()->getSelect();
     	$where = new Where;
@@ -353,60 +359,63 @@ class Community implements InputFilterAwareInterface
 			$counter0 = 0;
 			$dailyConsumption = 0;
 			$creditModified = false;
+			$blocked = array();
 			foreach($credit->consumers as $community) {
-    			if ($community->next_credit_consumption_date <= date('Y-m-d', strtotime(date('Y-m-d').' + 7 days'))) $counter7++;
-    			if ($community->next_credit_consumption_date <= date('Y-m-d')) $counter0++;
-    			
-    			if ($community->next_credit_consumption_date == date('Y-m-d')) {
-	    			// Consume 1 credit
-    				$dailyConsumption++;
-    				$credit->quantity--;
-					$community->next_credit_consumption_date = date('Y-m-d', strtotime(date('Y-'.(date('m') + 1).'-'.substr($community->activation_date, 8, 2)).' + 0 days'));
-					$community->last_credit_consumption_date = date('Y-m-d');
-    				$community->audit[] = array(
-    						'status' => $community->status,
-    						'time' => Date('Y-m-d G:i:s'),
-    						'n_fn' => 'P-PIT',
-    						'comment' => 'Monthly consuming',
-    				);
-    				if ($live) Community::getTable()->transSave($community);
-    
-    				// Log
-    				if ($config['isTraceActive']) {
-   						$logText = 'Community : instance_id='.$community->instance_id.', id='.$community->id.', caption='.$community->name.', status='.$community->status;
-    					if ($live) $logger->info($logText);
-    					else print_r($logText."\n");
-    				}
-					$creditModified = true;
+				if ($community->status == 'blocked') $blocked[] = $community->name;
+    			else {
+					if ($community->next_credit_consumption_date <= date('Y-m-d', strtotime(date('Y-m-d').' + 7 days'))) $counter7++;
+	    			if ($community->next_credit_consumption_date <= date('Y-m-d')) $counter0++;
+	    			if ($community->next_credit_consumption_date <= date('Y-m-d')) {
+	    				if ($credit->quantity > 0) {
+		    				// Consume 1 credit
+		    				$credit->quantity--;
+							$community->next_credit_consumption_date = date('Y-m-d', strtotime(date('Y-m-d').' + 31 days'));
+							$community->last_credit_consumption_date = date('Y-m-d');
+		    				$credit->audit[] = array(
+		    						'period' => date('Y-m'),
+		    						'quantity' => 1,
+		    						'status' => 'used',
+		    						'reference' => $community->name,
+		    						'time' => Date('Y-m-d G:i:s'),
+		    						'n_fn' => 'P-PIT',
+		    						'comment' => array(
+		    								'en_US' => 'Monthly use for period '.$context->decodeDate($community->last_credit_consumption_date).' to '.$context->decodeDate($community->last_credit_consumption_date),
+		    								'fr_FR' => 'Utilisation mensuelle pour la période du '.$context->decodeDate($community->last_credit_consumption_date).' au '.$context->decodeDate($community->last_credit_consumption_date),
+		    						),
+		    				);
+		    
+		    				// Log
+		    				if ($config['isTraceActive']) {
+		   						$logText = 'Community : instance_id='.$community->instance_id.', id='.$community->id.', caption='.$community->name.', status='.$community->status;
+		    					if ($live) $logger->info($logText);
+		    					else print_r($logText."\n");
+		    				}
+	    				}
+	    				else {
+	    					$blocked[] = $community->name;
+	    					$community->status = 'blocked';
+			    			$credit->audit[] = array(
+		    						'period' => date('Y-m'),
+			    					'quantity' => 0,
+			    					'status' => 'blocked',
+			    					'reference' => $community->name,
+			    					'time' => Date('Y-m-d G:i:s'),
+			    					'n_fn' => 'P-PIT',
+			    					'comment' => array(
+										'en_US' => 'Community suspended due to lack of credit',
+										'fr_FR' => 'Communauté suspendue faute de crédit suffisant',
+									),
+			    			);
+	    				}
+		    			$creditModified = true;
+	    				if ($live) Community::getTable()->transSave($community);
+	    			}
     			}
 			}
-			// Suspend the subscription service if no enough credits at due date
-			if ($credit->quantity < 0) {
-				if ($credit->status == 'active') {
-					$credit->status = 'suspended';
-					$creditModified = true;
-				}
-			}
-			// Re-activate the subscription service if enough credits at due date
-			else {
-				if ($credit->status == 'suspended') {
-					$credit->status = 'active';
-    				$creditModified = true;
-				}
-			}
-			if ($creditModified) {
-    			$credit->audit[date('Y-m')] = array(
-    					'status' => $credit->status,
-    					'quantity' => $credit->quantity,
-    					'time' => Date('Y-m-d G:i:s'),
-    					'n_fn' => 'P-PIT',
-    					'comment' => 'Daily consuming',
-    			);
-    			if ($live) Credit::getTable()->transSave($credit);
-			}
+			if ($creditModified && $live) Credit::getTable()->transSave($credit);
 
 			// Notify a suspension of service
-    		if ($credit->status == 'suspended') {
+    		if ($blocked) {
 
     			// Log
     			$logText = 'ALERT : Not enough credits for P-PIT Communities available on instance '.$credit->instance_id.'. Available='.$credit->quantity.', 7 days estimation='.$counter7;
@@ -424,6 +433,7 @@ class Community implements InputFilterAwareInterface
     								$config['community/consumeCredit']['messages']['suspendedServiceText'][$contact->locale],
     								$contact->n_first,
     								$instance->caption,
+    								implode(' ; ', $blocked),
     								$credit->quantity
     						);
     						ContactMessage::sendMail($contact->email, $text, $title);
@@ -431,7 +441,7 @@ class Community implements InputFilterAwareInterface
     				}
     			}
     		}
-    		elseif ($credit->quantity - $counter7 < 0) {
+    		elseif ($credit->quantity >= 0 && $credit->quantity - $counter7 < 0) {
     
     			// Log
     			$logText = 'ALERT : Risk of credits lacking for P-PIT Communities on instance '.$credit->instance_id.'. Available='.$credit->quantity.', 7 days estimation='.$counter7;
@@ -451,52 +461,11 @@ class Community implements InputFilterAwareInterface
     								$instance->caption,
     								$credit->quantity,
     								$counter7
-    								);
+    						);
     						ContactMessage::sendMail($contact->email, $text, $title);
     					}
     				}
     			}
-    		}
-    		// Notify is a consumption accurs
-    		if ($dailyConsumption > 0)
-    		{
-    			$logText = 'Consuming '.$dailyConsumption.' credits for instance: '.$credit->instance_id;
-    			if ($live) {
-    				$connection = Credit::getTable()->getAdapter()->getDriver()->getConnection();
-    				$connection->beginTransaction();
-    				try {
-    
-    					// Notify
-    					$url = $config['ppitCoreSettings']['domainName'];
-    					$instance = $instances[$credit->instance_id];
-    					foreach ($instance->administrators as $contact) {
-    						if (!$mailTo || !strcmp($contact->email, $mailTo)) { // Restriction on the given mailTo parameter
-    							$title = sprintf($config['community/consumeCredit']['messages']['consumeCreditTitle'][$contact->locale], 'P-PIT Communities');
-    							$text = sprintf(
-    									$config['community/consumeCredit']['messages']['consumeCreditText'][$contact->locale],
-    									$contact->n_first,
-    									Context::sDecodeDate(date('Y-m-d'), $contact->locale),
-    									$instance->caption,
-    									count($credit->consumers),
-    									$credit->quantity
-    									);
-    							ContactMessage::sendMail($contact->email, $text, $title);
-    						}
-    					}
-    					$connection->commit();
-    
-    					// Log
-    					$logger->info($logText);
-    				}
-    				catch (\Exception $e) {
-    					$connection->rollback();
-    					throw $e;
-    				}
-    			}
-    			else {
-    				if ($config['isTraceActive']) print_r($logText."\n");
-    			}
-    
     		}
     	}
     }
