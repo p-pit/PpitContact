@@ -162,6 +162,11 @@ class Community implements InputFilterAwareInterface
     		$this->status = trim(strip_tags($data['status']));
     		if (strlen($this->status) > 255) return 'Integrity';
     	}
+    	
+    	if (array_key_exists('next_credit_consumption_date', $data)) {
+    		$this->next_credit_consumption_date = trim(strip_tags($data['next_credit_consumption_date']));
+    		if ($this->next_credit_consumption_date && !checkdate(substr($this->next_credit_consumption_date, 5, 2), substr($this->next_credit_consumption_date, 8, 2), substr($this->next_credit_consumption_date, 0, 4))) return 'Integrity';
+    	}
     	 
 		if (array_key_exists('name', $data)) {
 	    	$this->name = trim(strip_tags($data['name']));
@@ -253,7 +258,8 @@ class Community implements InputFilterAwareInterface
     	$context = Context::getCurrent();
     
     	// Check consistency
-    	if (Generic::getTable()->cardinality('contact_community', array('name' => $this->name)) > 0) return 'Duplicate';
+    	$exist = Community::get($this->name);
+    	if ($exist) return 'Duplicate';
 
     	// Create the root document for the new community
     	$rootDoc = new Document;
@@ -517,7 +523,7 @@ class Community implements InputFilterAwareInterface
     
 //		Document::getTable()->delete($this->root_document_id);
 		$this->status = 'deleted';
-    	Community::getTable()->update($this);
+    	Community::getTable()->save($this);
     
     	return 'OK';
     }
