@@ -375,8 +375,9 @@ class Community implements InputFilterAwareInterface
 	    				if ($credit->quantity > 0) {
 		    				// Consume 1 credit
 		    				$credit->quantity--;
-							$community->next_credit_consumption_date = date('Y-m-d', strtotime(date('Y-m-d').' + 31 days'));
-							$community->last_credit_consumption_date = date('Y-m-d');
+		    				$credit_consumption_date = $community->next_credit_consumption_date;
+							$community->next_credit_consumption_date = date('Y-m-d', strtotime($credit_consumption_date.' + 31 days'));
+							$community->last_credit_consumption_date = $credit_consumption_date;
 		    				$credit->audit[] = array(
 		    						'period' => date('Y-m'),
 		    						'quantity' => 1,
@@ -384,10 +385,7 @@ class Community implements InputFilterAwareInterface
 		    						'reference' => $community->name,
 		    						'time' => Date('Y-m-d G:i:s'),
 		    						'n_fn' => 'P-PIT',
-		    						'comment' => array(
-		    								'en_US' => 'Monthly use for period '.$context->decodeDate($community->last_credit_consumption_date).' to '.$context->decodeDate($community->last_credit_consumption_date),
-		    								'fr_FR' => 'Utilisation mensuelle pour la période du '.$context->decodeDate($community->last_credit_consumption_date).' au '.$context->decodeDate($community->last_credit_consumption_date),
-		    						),
+		    						'comment' => 'Utilisation mensuelle pour la période du '.$context->decodeDate($community->last_credit_consumption_date).' au '.$context->decodeDate($community->next_credit_consumption_date),
 		    				);
 		    
 		    				// Log
