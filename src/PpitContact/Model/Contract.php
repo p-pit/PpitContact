@@ -78,8 +78,8 @@ class Contract implements InputFilterAwareInterface
     public static function getList($major, $dir, $filter = array())
     {
 		$select = Contract::getTable()->getSelect()
-			->join(array('supplyer' => 'contact_community'), 'contact_contract.supplyer_community_id = supplyer.id', array('supplyer_name' => 'name'), 'left')
-			->join(array('customer' => 'contact_community'), 'contact_contract.customer_community_id = customer.id', array('customer_name' => 'name'), 'left')
+			->join(array('supplyer' => 'core_community'), 'contact_contract.supplyer_community_id = supplyer.id', array('supplyer_name' => 'name'), 'left')
+			->join(array('customer' => 'core_community'), 'contact_contract.customer_community_id = customer.id', array('customer_name' => 'name'), 'left')
 			->order(array($major.' '.$dir, 'supplyer_name', 'customer_name'));
 		$where = new Where;
 		foreach ($filter as $property => $value) {

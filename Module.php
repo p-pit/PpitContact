@@ -1,13 +1,13 @@
 <?php
 namespace PpitContact;
 
-use PpitContact\Model\Community;
+//use PpitContact\Model\Community;
 use PpitContact\Model\Contract;
 use PpitContact\Model\ContactEvent;
 use PpitContact\Model\Credits;
 use PpitContact\Model\ContactMessage;
-use PpitContact\Model\Vcard;
-use PpitContact\Model\VcardProperty;
+//use PpitContact\Model\Vcard;
+//use PpitContact\Model\VcardProperty;
 use PpitCore\Model\GenericTable;
 use Zend\Db\ResultSet\ResultSet;
 use Zend\Db\TableGateway\TableGateway;
@@ -42,17 +42,6 @@ class Module //implements AutoloaderProviderInterface, ConfigProviderInterface
     {
         return array(
             'factories' => array(
- 	          	'PpitContact\Model\CommunityTable' =>  function($sm) {
-                    $tableGateway = $sm->get('CommunityTableGateway');
-                    $table = new GenericTable($tableGateway);
-                    return $table;
-                },
-                'CommunityTableGateway' => function ($sm) {
-                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
-                    $resultSetPrototype = new ResultSet();
-                    $resultSetPrototype->setArrayObjectPrototype(new Community());
-                    return new TableGateway('contact_community', $dbAdapter, null, $resultSetPrototype);
-                },
  	          	'PpitContact\Model\ContractTable' =>  function($sm) {
                     $tableGateway = $sm->get('ContractTableGateway');
                     $table = new GenericTable($tableGateway);
@@ -85,28 +74,6 @@ class Module //implements AutoloaderProviderInterface, ConfigProviderInterface
                     $resultSetPrototype = new ResultSet();
                     $resultSetPrototype->setArrayObjectPrototype(new ContactMessage());
                     return new TableGateway('contact_message', $dbAdapter, null, $resultSetPrototype);
-                },
-                'PpitContact\Model\VcardTable' =>  function($sm) {
-                    $tableGateway = $sm->get('VcardTableGateway');
-                    $table = new GenericTable($tableGateway);
-                    return $table;
-                },
-                'VcardTableGateway' => function ($sm) {
-                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
-                    $resultSetPrototype = new ResultSet();
-                    $resultSetPrototype->setArrayObjectPrototype(new Vcard());
-                    return new TableGateway('contact_vcard', $dbAdapter, null, $resultSetPrototype);
-                },
- 	          	'PpitContact\Model\VcardPropertyTable' =>  function($sm) {
-                    $tableGateway = $sm->get('VcardPropertyTableGateway');
-                    $table = new GenericTable($tableGateway);
-                    return $table;
-                },
-                'VcardPropertyTableGateway' => function ($sm) {
-                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
-                    $resultSetPrototype = new ResultSet();
-                    $resultSetPrototype->setArrayObjectPrototype(new VcardProperty());
-                    return new TableGateway('contact_vcard_property', $dbAdapter, null, $resultSetPrototype);
                 },
             ),
         );

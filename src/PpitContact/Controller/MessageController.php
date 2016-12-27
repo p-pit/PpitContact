@@ -67,7 +67,7 @@ class MessageController extends AbstractActionController
 				'config' => $context->getconfig(),
 				'contacts' => $contacts,
 		));
-   		if ($context->isSpaMode()) $view->setTerminal(true);
+   		$view->setTerminal(true);
    		return $view;
 	}
 
@@ -170,7 +170,7 @@ class MessageController extends AbstractActionController
 				'modelMessage' => $modelMessage,
 				'target' => $target,
 		));
-   		if ($context->isSpaMode()) $view->setTerminal(true);
+   		$view->setTerminal(true);
    		return $view;
 	}
 
@@ -218,7 +218,7 @@ class MessageController extends AbstractActionController
 				'modelMessage' => $modelMessage,
 				'target' => $target,
 		));
-   		if ($context->isSpaMode()) $view->setTerminal(true);
+   		$view->setTerminal(true);
    		return $view;
 	}
 }

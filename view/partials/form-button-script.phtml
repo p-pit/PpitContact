@@ -1,7 +1,5 @@
 <?php if (!isset($target)) $target = 'form_action'; ?>
 <?php if (!isset($formId)) $formId = 'ppit-form'; ?>
-
-<?php if ($context->isSpaMode()) : ?>
 	
 	// Add the per-property checking scripts
 	<?php foreach ($properties as $property => $type) : ?>
@@ -74,22 +72,3 @@
 		}
 		else return false;
 	};
-
-<?php else : ?>
-
-	$("#<?php echo $formId?>").attr('action', '<?php echo $formRoute ?>');
-	$("#<?php echo $formId?>").submit(function () {
-	<?php if (isset($checkFunction)) : ?>
-		return <?php echo $checkFunction ?>();
-	<?php else : ?>
-		var validity = true;
-		<?php foreach ($properties as $property => $type) : ?>
-			<?php if ($type != 'file' && $type != 'hidden' && $type != 'checkbox' && $type != 'ckeditor') : ?>
-				if (!check_<?php echo $property ?>()) validity = false;
-			<?php endif;?>
-		<?php endforeach;?>
-		return validity;
-	<?php endif;?>
-	} );
-
-<?php endif;?>

@@ -108,7 +108,6 @@
 <input type="hidden" id="autocompletion_tel_cell" />
 	
 <!-- Street -->
-<?php if (!$contact->properties || array_key_exists('adr_street', $contact->properties)) : ?>
 	<?php
 		echo $this->partial('/partials/input-widget.phtml', array(
 			'property' => 'adr_street',
@@ -120,10 +119,8 @@
 	));
 	?>
 	<input type="hidden" id="autocompletion_adr_street" />
-<?php endif;?>
 	
 <!-- Address extended -->
-<?php if (!$contact->properties || array_key_exists('adr_extended', $contact->properties)) : ?>
 	<?php
 		echo $this->partial('/partials/input-widget.phtml', array(
 			'property' => 'adr_extended',
@@ -135,10 +132,8 @@
 	));
 	?>
 	<input type="hidden" id="autocompletion_adr_extended" />
-<?php endif;?>
 	
 <!-- Post office box -->
-<?php if (!$contact->properties || array_key_exists('adr_post_office_box', $contact->properties)) : ?>
 	<?php
 		echo $this->partial('/partials/input-widget.phtml', array(
 			'property' => 'adr_post_office_box',
@@ -150,10 +145,8 @@
 	));
 	?>
 	<input type="hidden" id="autocompletion_adr_post_office_box" />
-<?php endif;?>
 	
 <!-- Zip -->
-<?php if (!$contact->properties || array_key_exists('adr_zip', $contact->properties)) : ?>
 	<?php
 		echo $this->partial('/partials/input-widget.phtml', array(
 			'property' => 'adr_zip',
@@ -165,10 +158,8 @@
 	));
 	?>
 	<input type="hidden" id="autocompletion_adr_zip" />
-<?php endif;?>
 	
 <!-- City -->
-<?php if (!$contact->properties || array_key_exists('adr_city', $contact->properties)) : ?>
 	<?php
 		echo $this->partial('/partials/input-widget.phtml', array(
 			'property' => 'adr_city',
@@ -180,10 +171,8 @@
 	));
 	?>
 	<input type="hidden" id="autocompletion_adr_city" />
-<?php endif;?>
 	
 <!-- State -->
-<?php if (!$contact->properties || array_key_exists('adr_state', $contact->properties)) : ?>
 	<?php
 		echo $this->partial('/partials/input-widget.phtml', array(
 			'property' => 'adr_state',
@@ -195,10 +184,8 @@
 	));
 	?>
 	<input type="hidden" id="autocompletion_adr_state" />
-<?php endif;?>
 	
 <!-- Country -->
-<?php if (!$contact->properties || array_key_exists('adr_country', $contact->properties)) : ?>
 	<?php
 		echo $this->partial('/partials/input-widget.phtml', array(
 			'property' => 'adr_country',
@@ -210,10 +197,8 @@
 	));
 	?>
 	<input type="hidden" id="autocompletion_adr_country" />
-<?php endif;?>
 	
 <!-- Sex -->
-<?php if (!$contact->properties || array_key_exists('sex', $contact->properties)) : ?>
 	<?php
 		echo $this->partial('/partials/select-widget.phtml', array(
 			'property' => 'sex',
@@ -226,10 +211,8 @@
 	));
 	?>
 	<input type="hidden" id="autocompletion_sex" />
-<?php endif;?>
 	
 <!-- Birth date -->
-<?php if (!$contact->properties || array_key_exists('birth_date', $contact->properties)) : ?>
 	<?php
 		echo $this->partial('/partials/date-widget.phtml', array(
 			'property' => 'birth_date',
@@ -241,10 +224,8 @@
 	));
 	?>
 	<input type="hidden" id="autocompletion_birth_date" />
-<?php endif;?>
 	
 <!-- Place of birth -->
-<?php if (!$contact->properties || array_key_exists('place_of_birth', $contact->properties)) : ?>
 	<?php
 		echo $this->partial('/partials/input-widget.phtml', array(
 			'property' => 'place_of_birth',
@@ -256,10 +237,8 @@
 	));
 	?>
 	<input type="hidden" id="autocompletion_place_of_birth" />
-<?php endif;?>
 	
 <!-- Nationality -->
-<?php if (!$contact->properties || array_key_exists('nationality', $contact->properties)) : ?>
 	<?php
 		echo $this->partial('/partials/input-widget.phtml', array(
 			'property' => 'nationality',
@@ -271,7 +250,6 @@
 	));
 	?>
 	<input type="hidden" id="autocompletion_nationality" />
-<?php endif;?>
 
 <!-- Roles -->
 <div class="col-sm-12"><h3><?php echo $this->translate('Roles', 'ppit-contact', $context->getLocale()) ?>:</h3></div>
@@ -311,39 +289,17 @@ $('#autocompletion').autocomplete({
         			document.getElementById("autocompletion_email").value = object.email;
         			document.getElementById("autocompletion_tel_work").value = object.tel_work;
         			document.getElementById("autocompletion_tel_cell").value = object.tel_cell;
-<?php if (!$contact->properties || array_key_exists('adr_street', $contact->properties)) : ?>
         			document.getElementById("autocompletion_adr_street").value = object.adr_street;
-<?php endif ?>
-<?php if (!$contact->properties || array_key_exists('adr_extended', $contact->properties)) : ?>
 					document.getElementById("autocompletion_adr_extended").value = object.adr_extended;
-<?php endif ?>
-<?php if (!$contact->properties || array_key_exists('adr_post_office_box', $contact->properties)) : ?>
 					document.getElementById("autocompletion_adr_post_office_box").value = object.adr_post_office_box;
-<?php endif ?>
-<?php if (!$contact->properties || array_key_exists('adr_zip', $contact->properties)) : ?>
 					document.getElementById("autocompletion_adr_zip").value = object.adr_zip;
-<?php endif ?>
-<?php if (!$contact->properties || array_key_exists('adr_city', $contact->properties)) : ?>
 					document.getElementById("autocompletion_adr_city").value = object.adr_city;
-<?php endif ?>
-<?php if (!$contact->properties || array_key_exists('adr_state', $contact->properties)) : ?>
 					document.getElementById("autocompletion_adr_state").value = object.adr_state;
-<?php endif ?>
-<?php if (!$contact->properties || array_key_exists('adr_country', $contact->properties)) : ?>
 					document.getElementById("autocompletion_adr_country").value = object.adr_country;
-<?php endif ?>
-<?php if (!$contact->properties || array_key_exists('sex', $contact->properties)) : ?>
 					document.getElementById("autocompletion_sex").value = object.sex;
-<?php endif ?>
-<?php if (!$contact->properties || array_key_exists('birth_date', $contact->properties)) : ?>
 					document.getElementById("autocompletion_birth_date").value = object.birth_date;
-<?php endif ?>
-<?php if (!$contact->properties || array_key_exists('place_of_birth', $contact->properties)) : ?>
 					document.getElementById("autocompletion_place_of_birth").value = object.place_of_birth;
-<?php endif ?>
-<?php if (!$contact->properties || array_key_exists('nationality', $contact->properties)) : ?>
 					document.getElementById("autocompletion_nationality").value = object.nationality;
-<?php endif ?>
 					return object.label;
                 }));
             }
@@ -356,39 +312,17 @@ $('#autocompletion').autocomplete({
 		document.getElementById("email").value = document.getElementById("autocompletion_email").value;
 		document.getElementById("tel_work").value = document.getElementById("autocompletion_tel_work").value;
 		document.getElementById("tel_cell").value = document.getElementById("autocompletion_tel_cell").value;
-<?php if (!$contact->properties || array_key_exists('adr_street', $contact->properties)) : ?>
 		document.getElementById("adr_street").value = document.getElementById("autocompletion_adr_street").value;
-<?php endif ?>
-<?php if (!$contact->properties || array_key_exists('adr_extended', $contact->properties)) : ?>
 		document.getElementById("adr_extended").value = document.getElementById("autocompletion_adr_extended").value;
-<?php endif ?>
-<?php if (!$contact->properties || array_key_exists('adr_post_office_box', $contact->properties)) : ?>
 		document.getElementById("adr_post_office_box").value = document.getElementById("autocompletion_adr_post_office_box").value;
-<?php endif ?>
-<?php if (!$contact->properties || array_key_exists('adr_zip', $contact->properties)) : ?>
 		document.getElementById("adr_zip").value = document.getElementById("autocompletion_adr_zip").value;
-<?php endif ?>
-<?php if (!$contact->properties || array_key_exists('adr_city', $contact->properties)) : ?>
 		document.getElementById("adr_city").value = document.getElementById("autocompletion_adr_city").value;
-<?php endif ?>
-<?php if (!$contact->properties || array_key_exists('adr_state', $contact->properties)) : ?>
 		document.getElementById("adr_state").value = document.getElementById("autocompletion_adr_state").value;
-<?php endif ?>
-<?php if (!$contact->properties || array_key_exists('adr_country', $contact->properties)) : ?>
 		document.getElementById("adr_country").value = document.getElementById("autocompletion_adr_country").value;
-<?php endif ?>
-<?php if (!$contact->properties || array_key_exists('sex', $contact->properties)) : ?>
 		document.getElementById("sex").value = document.getElementById("autocompletion_sex").value;
-<?php endif ?>
-<?php if (!$contact->properties || array_key_exists('birth_date', $contact->properties)) : ?>
 		document.getElementById("birth_date").value = document.getElementById("autocompletion_birth_date").value;
-<?php endif ?>
-<?php if (!$contact->properties || array_key_exists('place_of_birth', $contact->properties)) : ?>
 		document.getElementById("place_of_birth").value = document.getElementById("autocompletion_place_of_birth").value;
-<?php endif ?>
-<?php if (!$contact->properties || array_key_exists('nationality', $contact->properties)) : ?>
 		document.getElementById("nationality").value = document.getElementById("autocompletion_nationality").value;
-<?php endif ?>
 },
 	minLength: 3
 });

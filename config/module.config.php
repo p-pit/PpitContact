@@ -436,7 +436,6 @@ return array(
 	),
 
 	'ppitCoreDependencies' => array(
-			'contact_vcard' => new \PpitContact\Model\Vcard,
 	),
 
 	'vcard/properties' => array(

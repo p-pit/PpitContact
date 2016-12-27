@@ -4,12 +4,12 @@ namespace PpitContact\Controller;
 use PpitCore\Controller\PpitController;
 use Zend\View\Model\ViewModel;
 use Zend\Session\Container;
-use PpitContact\Model\Community;
 use PpitContact\Model\ContactEvent;
-use PpitContact\Model\Vcard;
 use PpitCore\Form\CsrfForm;
+use PpitCore\Model\Community;
 use PpitCore\Model\Context;
 use PpitCore\Model\Csrf;
+use PpitCore\Model\Vcard;
 use PpitOrder\Model\Order;
 use PpitUser\Model\User;
 use PpitUser\Model\UserRoleLinker;
@@ -47,7 +47,7 @@ class VcardController extends AbstractActionController
 				'dir' => $dir,
 				'vcards' => $vcards,
 		));
-		if ($context->isSpaMode()) $view->setTerminal(true);
+		$view->setTerminal(true);
 		return $view;
 	}
 
@@ -58,12 +58,9 @@ class VcardController extends AbstractActionController
 		
 		// Retrieve the community
 		$community_id = (int) $this->params()->fromRoute('community_id', 0);
-		if ($community_id) {
-			$community = Community::getTable()->get($community_id);
-			$properties = $community->vcard_properties;
-		}
-		else $properties = null;
-		
+		if ($community_id) $community = Community::getTable()->get($community_id);
+		$properties = null; // To be managed in configuration layer
+
 		// Return the link list
 		$view = new ViewModel(array(
 				'context' => $context,
@@ -124,11 +121,8 @@ class VcardController extends AbstractActionController
     	
     	// Retrieve the community id
 		$community_id = (int) $this->params()->fromRoute('community_id', 0);
-		if ($community_id) {
-			$community = Community::getTable()->get($community_id);
-			$properties = $community->vcard_properties;
-		}
-		else $properties = null;
+		if ($community_id) $community = Community::getTable()->get($community_id);
+		$properties = null; // To be managed in configuration layer
 
 		// Retrieve the vcard list
     	$params = $this->getFilters($this->params());
@@ -149,7 +143,7 @@ class VcardController extends AbstractActionController
     			'vcards' => $vcards,
 				'properties' => $properties,
     	));
-    	if ($context->isSpaMode()) $view->setTerminal(true);
+    	$view->setTerminal(true);
     	return $view;
     }
 
@@ -293,13 +287,13 @@ class VcardController extends AbstractActionController
 	    		'communities' => $communities,
     			'vcards' => $vcards,
     			'community_id' => $community_id,
-				'properties' => ($community) ? $community->vcard_properties : null,
+				'properties' => null, // To be managed in configuration layer
     			'id' => $id,
     			'csrfForm' => $csrfForm,
     			'message' => $message,
     			'error' => $error
     	));
-    	if ($context->isSpaMode()) $view->setTerminal(true);
+    	$view->setTerminal(true);
     	return $view;
     }
     
@@ -318,6 +312,7 @@ class VcardController extends AbstractActionController
 
     	if ($contact->photo_link_id) $file = 'data/documents/'.$contact->photo_link_id;
     	else $file = 'data/photos/'.$contact->id;
+    	if (!file_exists($file)) $file = 'public/img/no-photo.png';
     	$type = 'image/jpeg';
     	header('Content-Type:'.$type);
     	header('Content-Length: ' . filesize($file));
@@ -366,7 +361,7 @@ class VcardController extends AbstractActionController
     		'message' => $message,
         	'error' => $error
         ));
-   		if ($context->isSpaMode()) $view->setTerminal(true);
+   		$view->setTerminal(true);
    		return $view;
     }
 }

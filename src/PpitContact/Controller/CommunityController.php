@@ -2,7 +2,7 @@
 
 namespace PpitContact\Controller;
 
-use PpitContact\Model\Community;
+use PpitCore\Model\Community;
 use PpitCore\Model\Csrf;
 use PpitCore\Model\Context;
 use PpitCore\Form\CsrfForm;
@@ -21,7 +21,7 @@ class CommunityController extends AbstractActionController
     			'context' => $context,
 				'config' => $context->getconfig(),
     	));
-   		if ($context->isSpaMode()) $view->setTerminal(true);
+   		$view->setTerminal(true);
    		return $view;
     }
 
@@ -134,7 +134,7 @@ class CommunityController extends AbstractActionController
     			'message' => $message,
     			'error' => $error
     	));
-   		if ($context->isSpaMode()) $view->setTerminal(true);
+   		$view->setTerminal(true);
    		return $view;
     }
     
@@ -192,7 +192,7 @@ class CommunityController extends AbstractActionController
     		'message' => $message,
     		'error' => $error,
     	));
-   		if ($context->isSpaMode()) $view->setTerminal(true);
+   		$view->setTerminal(true);
    		return $view;
     }
 }

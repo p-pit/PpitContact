@@ -81,8 +81,6 @@
 			<div class="col-sm-12"><p class="help-block" id="email_error"></p></div>
 		</div>
 
-<?php if (!$contact->properties || array_key_exists('tel_work', $properties)) : ?>
-
 <!-- Tel work -->
 		<div class="form-group" id="tel_work_group">
 			<label class="col-sm-5 control-label"><?php echo $this->translate('Work phone', 'ppit-contact', $context->getLocale()) ?></label>
@@ -91,9 +89,6 @@
 			</div>
 			<div class="col-sm-12"><p class="help-block" id="tel_work_error"></p></div>
 		</div>
-<?php endif;?>
-
-<?php if (!$contact->properties || array_key_exists('tel_cell', $properties)) : ?>
 
 <!-- Tel cell -->
 		<div class="form-group" id="tel_cell_group">
@@ -103,9 +98,6 @@
 			</div>
 			<div class="col-sm-12"><p class="help-block" id="tel_cell_error"></p></div>
 		</div>
-<?php endif;?>
-
-<?php if (!$contact->properties || array_key_exists('adr_street', $properties)) : ?>
 
 <!-- Address - street -->
 		<div class="form-group" id="adr_street_group">
@@ -115,9 +107,6 @@
 			</div>
 			<div class="col-sm-12"><p class="help-block" id="adr_street_error"></p></div>
 		</div>
-<?php endif;?>
-
-<?php if (!$contact->properties || array_key_exists('adr_extended', $properties)) : ?>
 
 <!-- Address - extended -->
 		<div class="form-group" id="adr_extended_group">
@@ -127,9 +116,6 @@
 			</div>
 			<div class="col-sm-12"><p class="help-block" id="adr_extended_error"></p></div>
 		</div>
-<?php endif;?>
-
-<?php if (!$contact->properties || array_key_exists('adr_post_office_box', $properties)) : ?>
 
 <!-- Address - post office box -->
 		<div class="form-group" id="post_office_box_group">
@@ -139,9 +125,6 @@
 			</div>
 			<div class="col-sm-12"><p class="help-block" id="adr_post_office_box_error"></p></div>
 		</div>
-<?php endif;?>
-
-<?php if (!$contact->properties || array_key_exists('adr_zip', $properties)) : ?>
 
 <!-- Address - street -->
 		<div class="form-group" id="adr_zip_group">
@@ -151,9 +134,6 @@
 			</div>
 			<div class="col-sm-12"><p class="help-block" id="adr_zip_error"></p></div>
 		</div>
-<?php endif;?>
-
-<?php if (!$contact->properties || array_key_exists('adr_street', $properties)) : ?>
 
 <!-- Address - city -->
 		<div class="form-group" id="adr_city_group">
@@ -163,9 +143,6 @@
 			</div>
 			<div class="col-sm-12"><p class="help-block" id="adr_city_error"></p></div>
 		</div>
-<?php endif;?>
-
-<?php if (!$contact->properties || array_key_exists('adr_state', $properties)) : ?>
 
 <!-- Address - state -->
 		<div class="form-group" id="adr_state_group">
@@ -175,9 +152,6 @@
 			</div>
 			<div class="col-sm-12"><p class="help-block" id="adr_state_error"></p></div>
 		</div>
-<?php endif;?>
-
-<?php if (!$contact->properties || array_key_exists('adr_country', $properties)) : ?>
 
 <!-- Address - country -->
 		<div class="form-group" id="adr_country_group">
@@ -187,9 +161,6 @@
 			</div>
 			<div class="col-sm-12"><p class="help-block" id="adr_country_error"></p></div>
 		</div>
-<?php endif;?>
-
-<?php if (!$contact->properties || array_key_exists('sex', $properties)) : ?>
 
 <!-- Sex -->
 		<div class="form-group" id="sex_group">
@@ -199,9 +170,6 @@
 			</div>
 			<div class="col-sm-12"><p class="help-block" id="sex_error"></p></div>
 		</div>
-<?php endif;?>
-
-<?php if (!$contact->properties || array_key_exists('birth_date', $properties)) : ?>
 
 <!-- Birth date -->
 		<div class="form-group" id="birth_date_group">
@@ -211,9 +179,6 @@
 			</div>
 			<div class="col-sm-12"><p class="help-block" id="birth_date_error"></p></div>
 		</div>
-<?php endif;?>
-
-<?php if (!$contact->properties || array_key_exists('adr_street', $properties)) : ?>
 
 <!-- Place of birth -->
 		<div class="form-group" id="place_of_birth_group">
@@ -223,9 +188,6 @@
 			</div>
 			<div class="col-sm-12"><p class="help-block" id="place_of_birth_error"></p></div>
 		</div>
-<?php endif;?>
-
-<?php if (!$contact->properties || array_key_exists('nationality', $properties)) : ?>
 
 <!-- Nationality -->
 		<div class="form-group" id="nationality_group">
@@ -235,7 +197,6 @@
 			</div>
 			<div class="col-sm-12"><p class="help-block" id="nationality_error"></p></div>
 		</div>
-<?php endif;?>
 				
 <?php if ($message == 'OK') : ?>
 

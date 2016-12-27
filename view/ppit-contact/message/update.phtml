@@ -13,10 +13,7 @@ $this->headTitle($title);
 <div class="row">
     <div class="col-md-6 col-md-offset-3">
 
-<?php
-if (!$context->isSpaMode()) $returnHref = $this->url('message/index');
-else $returnHref = "#";
-?>
+<?php $returnHref = "#" ?>
     <div class="panel panel-default">
             <div class="panel-heading">
 				<strong><?php echo $this->translate($title);?></strong>
@@ -48,11 +45,6 @@ else $returnHref = "#";
 <?php endif;?>
 
 				</table>
-
-<!-- Form provided for MPA view mode -->
-<?php if (!$context->isSpaMode()) : ?>
-				<form action="<?php echo $this->url('message/update', array('id' => $id)) ?>" method="post" class="form-horizontal">
-<?php endif;?>
 
 <?php if ($message == 'OK') : ?>
 <!-- Global message -->
@@ -138,10 +130,6 @@ else $returnHref = "#";
 					</div>
 <?php endif;?>
 
-<?php if (!$context->isSpaMode()) : ?>
-				</form>
-<?php endif;?>
-
 <!-- Result -->
 				<hr>
 				<div id="sms_update_target"></div>
@@ -149,8 +137,6 @@ else $returnHref = "#";
 		</div>
 	</div>
 </div>
-
-<?php if (!$context->isSpaMode()) echo $this->partial('partials/view-controller') ?>
 
 <script id='message_update_script'>
 //Menu
@@ -225,10 +211,6 @@ function messageForm()
  	else {
  		renderElement("subject", null);
 	}
-	
-<?php if (!$context->isSpaMode()) : ?>
-	return validity;
-<?php else : ?>
 	if (validity) {
 		var data = new FormData();
 		data.append('to', document.getElementById("to").value);
@@ -236,7 +218,6 @@ function messageForm()
 		postForm("<?php echo $this->url('message/update', array('id' => $id)) ?>", 'message_update_script', 'form_action', data);
 		currentIndexPanel.reload("<?php echo $this->url('message') ?>", 'message_index_script', false);
 	}
-<?php endif;?>
 }
 
 function messageSaveForm() 

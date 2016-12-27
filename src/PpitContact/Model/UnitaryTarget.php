@@ -36,8 +36,8 @@ class UnitaryTarget implements iTarget {
 	public function compute()
 	{
 		$select = Vcard::getTable()->getSelect()->order(array('n_fn'))
-			->join('customer', 'contact_vcard.id = customer.contact_id', array('customer' => 'id'), 'left')
-			->join(array('backup_customer' => 'customer'), 'contact_vcard.id = customer.contact_2_id', array('backup_customer' => 'id'), 'left');
+			->join('customer', 'core_vcard.id = customer.contact_id', array('customer' => 'id'), 'left')
+			->join(array('backup_customer' => 'customer'), 'core_vcard.id = customer.contact_2_id', array('backup_customer' => 'id'), 'left');
 		$where = new Where();
 		if ($this->filter == 'customer') {
 			$where->nest->notEqualTo('customer.id', '')->or->notEqualTo('backup_customer.id', '')->unnest;

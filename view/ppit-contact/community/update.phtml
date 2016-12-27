@@ -1,5 +1,5 @@
 <?php 
-$spa = $context->isSpaMode();
+$spa = true;
 $anchorStyle = ($spa) ? $context->getAnchorStyle() : 'classic';
 $isDeletable = $community->isDeletable();
 ?>
@@ -86,8 +86,6 @@ $isDeletable = $community->isDeletable();
 	</div>
 </div>
 <?php endif;?>
-
-<?php if (!$context->isSpaMode()) echo $this->partial('partials/view-controller') ?>
 
 <script id='community_update_script'>
 
