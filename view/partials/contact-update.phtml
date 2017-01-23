@@ -255,15 +255,13 @@
 <div class="col-sm-12"><h3><?php echo $this->translate('Roles', 'ppit-contact', $context->getLocale()) ?>:</h3></div>
 
 <?php foreach ($contact->authorized_roles as $roleId => $role) : ?>
-	<?php
-	echo $this->partial('/partials/checkbox-widget.phtml', array(
-		'property' => 'role_'.$roleId,
-		'label' => $this->translate($role['labels']['fr_FR'], $context->getLocale()),
-		'value' => $role['isChecked'],
-		'context' => $context,
-		'isDisabled' => $isDisabled,
-	));
-	?>
+	<div class="form-group" id="role_<?php echo $roleId ?>_group">
+		<label class="col-sm-5 control-label"><?php echo $this->translate($role['labels']['fr_FR'], $context->getLocale()) ?></label>
+		<div class="col-sm-7">
+			<input type="checkbox" name="role_<?php echo $roleId ?>" id="role_<?php echo $roleId ?>" class="form-control" value="1"<?php if ($value) echo ' checked="checked"' ?><?php if (isset($isDisabled) && $isDisabled) echo ' disabled ="disabled"' ?>>
+		</div>
+		<div class="col-sm-12"><p class="help-block" id="role_<?php echo $roleId ?>_error"></p></div>
+	</div>
 	<input type="hidden" id="autocompletion_<?php echo $roleId ?>" />
 <?php endforeach;?>
 

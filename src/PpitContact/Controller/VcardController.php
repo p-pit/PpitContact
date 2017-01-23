@@ -1,22 +1,16 @@
 <?php
 namespace PpitContact\Controller;
 
-use PpitCore\Controller\PpitController;
-use Zend\View\Model\ViewModel;
-use Zend\Session\Container;
-use PpitContact\Model\ContactEvent;
 use PpitCore\Form\CsrfForm;
 use PpitCore\Model\Community;
 use PpitCore\Model\Context;
 use PpitCore\Model\Csrf;
 use PpitCore\Model\Vcard;
-use PpitOrder\Model\Order;
 use PpitCore\Model\User;
-use PpitCore\Model\UserRoleLinker;
-use SplFileObject;
-use Zend\Db\Sql\Expression;
 use Zend\Mvc\Controller\AbstractActionController;
+use Zend\Session\Container;
 use Zend\View\Model\JsonModel;
+use Zend\View\Model\ViewModel;
 
 class VcardController extends AbstractActionController
 {
