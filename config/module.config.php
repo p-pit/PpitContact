@@ -317,6 +317,15 @@ return array(
 	                        ),
 	                    ),
 	                ),
+	       			'demoMode' => array(
+	                    'type' => 'segment',
+	                    'options' => array(
+	                        'route' => '/demo-mode',
+	                    	'defaults' => array(
+	                            'action' => 'demoMode',
+	                        ),
+	                    ),
+	                ),
 	       			'delete' => array(
 	                    'type' => 'segment',
 	                    'options' => array(
@@ -382,6 +391,7 @@ return array(
 				array('route' => 'vcard', 'roles' => array('admin')),
 				array('route' => 'vcard/add', 'roles' => array('admin')),
 				array('route' => 'vcard/photo', 'roles' => array('user')),
+				array('route' => 'vcard/demoMode', 'roles' => array('user')),
 				array('route' => 'vcard/delete', 'roles' => array('admin')),
 				array('route' => 'vcard/detail', 'roles' => array('admin')),
 				array('route' => 'vcard/export', 'roles' => array('admin')),

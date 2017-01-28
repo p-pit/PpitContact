@@ -316,6 +316,18 @@ class VcardController extends AbstractActionController
     	return $view;
     }
 
+    public function demoModeAction()
+    {
+    	// Retrieve the context
+    	$context = Context::getCurrent();
+    		
+		$contact = Vcard::get($context->getContactId());
+    	if (!$contact) $this->redirect()->toRoute('index'); // Not allowed
+    	$contact->is_demo_mode_active = !$contact->is_demo_mode_active;
+    	$contact->update(null);
+    	return $this->redirect()->toRoute('home');
+    }
+    
     public function deleteAction()
     {
 		// Control access
