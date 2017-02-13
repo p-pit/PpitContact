@@ -227,7 +227,7 @@ class VcardController extends AbstractActionController
     		$contact = Vcard::get($id);
     		if (!$contact) $this->redirect()->toRoute('index'); // Not allowed
     	}
-    	else $contact = Vcard::getNew($community_id);
+    	else $contact = Vcard::instanciate($community_id);
 
     	if ($community_id) {
     		// Retrieve the vcards
@@ -254,12 +254,43 @@ class VcardController extends AbstractActionController
     
     		if ($csrfForm->isValid())
     		{
+		    	$data = array();
+		    	if ($request->getPost('community_id')) $data['community_id'] = $request->getPost('community_id');
+		    	$data['n_title'] = $request->getPost('n_title');
+		    	$data['n_last'] =  $request->getPost('n_last');
+		    	$data['n_first'] = $request->getPost('n_first');
+		    	$data['email'] = $request->getPost('email');
+		    	$data['tel_work'] = $request->getPost('tel_work');
+		    	$data['tel_cell'] = $request->getPost('tel_cell');
+		    
+		    	// Retrieve the input value for authorized properties (restriction list at community level, no restriction if no community)
+		    	$data['adr_street'] = $request->getPost('adr_street');
+		    	$data['adr_extended'] = $request->getPost('adr_extended');
+		    	$data['adr_post_office_box'] = $request->getPost('adr_post_office_box');
+		    	$data['adr_zip'] = $request->getPost('adr_zip');
+		    	$data['adr_city'] = $request->getPost('adr_city');
+		    	$data['adr_state'] = $request->getPost('adr_state');
+		    	$data['adr_country'] = $request->getPost('adr_country');
+		    	$data['sex'] = $request->getPost('sex');
+		    	$data['birth_date'] = $request->getPost('birth_date');
+		    	$data['place_of_birth'] = $request->getPost('place_of_birth');
+		    	$data['nationality'] = $request->getPost('nationality');
+
+		    	$data['roles'] = array();
+		    	foreach ($context->getConfig('ppitModules') as $module) {
+		    		foreach ($context->getConfig('ppitRoles')[$module] as $roleId => $role) {
+		    			if ($request->getPost('role_'.$roleId)) $data['roles'][$roleId] = true;
+		    			else $data['roles'][$roleId] = false;
+		    		}
+		    	}
+		    	$data['is_notified'] = $request->getPost('is_notified');
+		    	$data['is_demo_mode_active'] = $request->getPost('is_demo_mode_active');
+		    	if ($contact->loadData($data, $community_id) != 'OK') throw new \Exception('View error');
+    			
     			// Atomically save
     			$connection = Vcard::getTable()->getAdapter()->getDriver()->getConnection();
     			$connection->beginTransaction();
     			try {
-    				$contact->loadDataFromRequest($request, $community_id);
-    
     				// Save
     				if ($contact->id) $contact->update($request->getPost('update_time'));
     				else $contact->add();
@@ -305,7 +336,7 @@ class VcardController extends AbstractActionController
     	if (!$contact) $this->redirect()->toRoute('index'); // Not allowed
 
     	if ($contact->photo_link_id) $file = 'data/documents/'.$contact->photo_link_id;
-    	else $file = 'data/photos/'.$contact->id;
+    	else $file = 'data/photos/'.$contact->id.'.jpg';
     	if (!file_exists($file)) $file = 'public/img/no-photo.png';
     	$type = 'image/jpeg';
     	header('Content-Type:'.$type);
@@ -323,7 +354,8 @@ class VcardController extends AbstractActionController
     		
 		$contact = Vcard::get($context->getContactId());
     	if (!$contact) $this->redirect()->toRoute('index'); // Not allowed
-    	$contact->is_demo_mode_active = !$contact->is_demo_mode_active;
+    	if ($contact->is_demo_mode_active) $contact->is_demo_mode_active = false;
+    	else $contact->is_demo_mode_active = true;
     	$contact->update(null);
     	return $this->redirect()->toRoute('home');
     }

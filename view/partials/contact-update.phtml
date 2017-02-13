@@ -254,7 +254,8 @@
 <!-- Roles -->
 <div class="col-sm-12"><h3><?php echo $this->translate('Roles', 'ppit-contact', $context->getLocale()) ?>:</h3></div>
 
-<?php foreach ($contact->authorized_roles as $roleId => $role) : ?>
+<?php foreach ($context->getConfig('ppitModules') as $module)  : ?>
+	<?php foreach ($context->getConfig('ppitRoles')[$module] as $roleId => $role) : ?>
 	<div class="form-group" id="role_<?php echo $roleId ?>_group">
 		<label class="col-sm-5 control-label"><?php echo $this->translate($role['labels']['fr_FR'], $context->getLocale()) ?></label>
 		<div class="col-sm-7">
@@ -263,6 +264,7 @@
 		<div class="col-sm-12"><p class="help-block" id="role_<?php echo $roleId ?>_error"></p></div>
 	</div>
 	<input type="hidden" id="autocompletion_<?php echo $roleId ?>" />
+	<?php endforeach;?>
 <?php endforeach;?>
 
 <script id="contact_update_script">
