@@ -3,6 +3,7 @@ namespace PpitContact\Model;
 
 use PpitContact\Model\Vcard;
 use PpitCore\Model\Context;
+use Zend\Db\Sql\Where;
 use Zend\InputFilter\Factory as InputFactory;
 use Zend\InputFilter\InputFilter;
 use Zend\InputFilter\InputFilterAwareInterface;
@@ -18,23 +19,22 @@ class ContactMessage implements InputFilterAwareInterface
 {
     public $id;
 	public $type;
-	public $to = array();
+	public $to;
 	public $cc;
 	public $cci;
 	public $subject;
-	public $from;
+	public $from_mail;
+	public $from_name;
 	public $body;
+	public $image;
     public $emission_time;
+    public $update_time;
+    
+    // Depreciated
     public $volume;
     public $cost;
     public $accepted;
     public $rejected;
-    
-    // Additional field
-    public $update_time;
-
-    // Transient fields
-    public $credits;
 
     protected $inputFilter;
     protected $devisInputFilter;
@@ -53,121 +53,219 @@ class ContactMessage implements InputFilterAwareInterface
         $this->type = (isset($data['type'])) ? $data['type'] : null;
 
         // Json decode for lists of "to", "cc", "cci", "accepted" and "rejected"
-        $this->to = (isset($data['to'])) ? ((json_decode($data['to'])) ? json_decode($data['to']) : array()) : null;
-        $this->cc = (isset($data['cc'])) ? ((json_decode($data['cc'])) ? json_decode($data['cc']) : array()) : null;
-        $this->cci = (isset($data['cci'])) ? ((json_decode($data['cci'])) ? json_decode($data['cci']) : array()) : null;
-        $this->accepted = (isset($data['accepted'])) ? ((json_decode($data['accepted'])) ? json_decode($data['accepted']) : array()) : null;
-        $this->rejected = (isset($data['rejected'])) ? ((json_decode($data['rejected'])) ? json_decode($data['rejected']) : array()) : null;
-        
+        $this->to = (isset($data['to'])) ? json_decode($data['to'], true) : null;
+        $this->cc = (isset($data['cc'])) ? json_decode($data['cc'], true) : null;
+        $this->cci = (isset($data['cci'])) ? json_decode($data['cci'], true) : null;
         $this->subject = (isset($data['subject'])) ? $data['subject'] : null;
-        $this->from = (isset($data['from'])) ? $data['from'] : null;
+        $this->from_mail = (isset($data['from_mail'])) ? $data['from_mail'] : null;
+        $this->from_name = (isset($data['from_name'])) ? $data['from_name'] : null;
         $this->body = (isset($data['body'])) ? $data['body'] : null;
         $this->emission_time = (isset($data['emission_time'])) ? $data['emission_time'] : null;
+        $this->update_time = (isset($data['updated_time'])) ? $data['updated_time'] : null;
+        
+    	// Depreciated
         $this->volume = (isset($data['volume'])) ? $data['volume'] : null;
         $this->cost = (isset($data['cost'])) ? $data['cost'] : null;
-        
-    	// Additional field
-        $this->update_time = (isset($data['updated_time'])) ? $data['updated_time'] : null;
+        $this->accepted = (isset($data['accepted'])) ? ((json_decode($data['accepted'])) ? json_decode($data['accepted']) : array()) : null;
+        $this->rejected = (isset($data['rejected'])) ? ((json_decode($data['rejected'])) ? json_decode($data['rejected']) : array()) : null;
     }
 
-    public function toArray()
+    public function getProperties()
     {
     	$data = array();
     	$data['id'] = (int) $this->id;
     	$data['type'] = $this->type;
-
-		// Json encode for lists of "to", "cc", "cci" and "rejected"
-    	if ($this->to) {
-	    	$data['to'] = json_encode($this->to);
-	    	$this->to = json_decode($data['to']);
-    	}
-    	else $data['to'] = '';
-
-    	if ($this->cc) {
-    		$data['cc'] = json_encode($this->cc);
-    		$this->cc = json_decode($data['cc']);
-    	}
-    	else $data['cc'] = '';
-
-    	if ($this->cci) {
-    		$data['cci'] = json_encode($this->cci);
-    		$this->cci = json_decode($data['cci']);
-    	}
-    	else $data['cci'] = '';
-
-    	if ($this->accepted) {
-    		$data['accepted'] = json_encode($this->accepted);
-    		$this->accepted = json_decode($data['accepted']);
-    	}
-    	else $data['accepted'] = '';
-    	 
-    	if ($this->rejected) {
-    		$data['rejected'] = json_encode($this->rejected);
-    		$this->rejected = json_decode($data['rejected']);
-    	}
-    	else $data['rejected'] = '';
-    	 
+	    $data['to'] = $this->to;
+	    $data['cc'] = $this->cc;
+    	$data['cci'] = $this->cci;
     	$data['subject'] = $this->subject;
-    	$data['from'] = $this->from;
+    	$data['from_mail'] = $this->from_mail;
+    	$data['from_name'] = $this->from_name;
     	$data['body'] = $this->body;
     	$data['emission_time'] = $this->emission_time;
+    	
+    	// Depreciated
     	$data['volume'] = (int) $this->volume;
     	$data['cost'] = (float) $this->cost;
-
+    	$data['accepted'] = json_encode($this->accepted);
+    	$data['rejected'] = json_encode($this->rejected);
+    	 
     	return $data;
     }
 
-    public function loadData($data, $type, $target) {
-
-		// To
-		$this->to = $target->to;
-
-    	if ($type != 'SMS') {
-			// Cc
-    		$this->cc = trim(strip_tags($data['cc']));
-	    	if (!$this->cc || strlen($this->cc) > 255) return 400;
-
-			// Cci
-	    	$this->cci = trim(strip_tags($data['cci']));
-	    	if (!$this->cci || strlen($this->cci) > 255) return 400;
-
-			// Body
-	    	$this->body = trim(strip_tags($data['body']));
-    	}
-
-		// Subject
-    	$this->subject = trim(strip_tags($data['subject']));
-    	if (!$this->subject || strlen($this->subject) > 160) return 400;
-
-    	return 200;
-    }
-
-    public function loadDataFromRequest($request, $type, $target) {
-    	$data = array();
-		$return = $target->loadDataFromRequest($request);
-		if ($return != 200) return $return;
-    	$data['to'] = $request->getPost('to');
-    	if ($type != 'SMS') {
-	    	$data['cc'] = $request->getPost('cc');
-	    	$data['cci'] = $request->getPost('cci');
-	    	$data['body'] = $request->getPost('body');
-    	}
-	    $data['subject'] = $request->getPost('subject');
-    	return $this->loadData($data, $type, $target);
-    }
-
-    public static function getToList($community_id, $role_id)
+    public function toArray()
     {
-    	$select = Vcard::getTable()->getSelect()
-	    	->where(array('community_id' => $community_id));
-    	$cursor = Vcard::getTable()->selectWith($select);
-    	$result = array();
-    	foreach($cursor as $vcard) {
-    		if (array_search($role, $vcard->roles)) $result[$vcard->email] = $vcard;
+    	$data = $this->getProperties();
+	    $data['to'] = json_encode($this->to);
+	    $data['cc'] = json_encode($this->cc);
+    	$data['cci'] = json_encode($this->cci);
+    	return $data;
+    }
+    
+    public static function getList($type, $params, $major = 'emission_time', $dir = 'DESC', $mode = 'todo')
+    {
+    	$select = ContactMessage::getTable()->getSelect()
+	    	->order(array($major.' '.$dir, 'emission_time DESC'));
+    	$where = new Where;
+    	if ($type) $where->equalTo('type', $type);
+
+    	// Todo list vs search modes
+    	if ($mode == 'todo') {
+    		$where->isNull('emission_time');
     	}
-    	return $result;
+    	else {
+    		// Set the filters
+    		foreach ($params as $propertyId => $property) {
+    			if (substr($propertyId, 0, 4) == 'min_') $where->greaterThanOrEqualTo('contact_message.'.substr($propertyId, 4), $params[$propertyId]);
+    			elseif (substr($propertyId, 0, 4) == 'max_') $where->lessThanOrEqualTo('contact_message.'.substr($propertyId, 4), $params[$propertyId]);
+    			else $where->like('contact_message.'.$propertyId, '%'.$params[$propertyId].'%');
+    		}
+    	}
+    	$select->where($where);
+    
+    	$cursor = ContactMessage::getTable()->selectWith($select);
+    	$contactMessages = array();
+    	foreach ($cursor as $contactMessage) {
+    		$contactMessage->properties = $contactMessage->getProperties();
+       		$contactMessages[$contactMessage->id] = $contactMessage;
+    	}
+    	return $contactMessages;
     }
 
+    public static function get($id, $column = 'id')
+    {
+    	$context = Context::getCurrent();
+    	$contactMessage = ContactMessage::getTable()->get($id, $column);
+    
+    	if ($contactMessage) {
+    		$contactMessage->properties = $contactMessage->getProperties();
+    	}
+    
+    	return $contactMessage;
+    }
+    
+    public static function instanciate()
+    {
+    	$message = new ContactMessage;
+    	$message->to = array();
+    	$message->cc = array();
+    	$message->cci = array();
+    	return $message;
+    }
+    
+    public function loadData($data) {
+
+    	$context = Context::getCurrent();
+    	
+    	if (array_key_exists('to', $data)) $this->to = $data['to'];
+    	if (array_key_exists('cc', $data)) $this->cc = $data['cc'];
+    	if (array_key_exists('cci', $data)) $this->cci = $data['cci'];
+
+    	if (array_key_exists('subject', $data)) {
+    		$this->subject = trim(strip_tags($data['subject']));
+    		if (!$this->subject || strlen($this->subject) > 65535) return 'Integrity';
+    	}
+
+    	if (array_key_exists('from_mail', $data)) {
+    		$this->from_mail = trim(strip_tags($data['from_mail']));
+    		if (!$this->from_mail || strlen($this->from_mail) > 255) return 'Integrity';
+    	}
+
+    	if (array_key_exists('from_name', $data)) {
+    		$this->from_name = trim(strip_tags($data['from_name']));
+    		if (!$this->from_name || strlen($this->from_name) > 255) return 'Integrity';
+    	}
+    	 
+    	if (array_key_exists('body', $data)) {
+	    	$this->body = $data['body'];
+    		if (!$this->body || strlen($this->body) > 65535) return 'Integrity';
+    	}
+
+    	if (array_key_exists('emission_time', $data)) $this->emission_time = $data['emission_time'];
+    	 
+    	return 'OK';
+    }
+
+    public function send()
+    {
+    	$context = Context::getCurrent();
+    	$settings = $context->getConfig();
+    
+    	if ($settings['isDemoAccountUpdatable'] || $context->getInstanceId() != 0) { // instance 0 is for demo
+    		$text = new MimePart($this->body);
+    		$text->type = "text/plain; charset = UTF-8";
+    		$body = new MimeMessage();
+    		$body->setParts(array($text));
+    		 
+    		$mail = new Mail\Message();
+    		$mail->setEncoding("UTF-8");
+    		$mail->setBody($body);
+    		$mail->setFrom($this->from_mail, $this->from_name);
+    		$mail->setSubject($this->subject);
+    
+    		foreach ($this->to as $toMail => $toName) $mail->addTo($toMail, $toName);
+    		foreach ($this->cc as $ccEmail => $ccName) $mail->addCc($ccEmail, $ccName);
+    		if ($settings['mailProtocol'] == 'Smtp') {
+    			$transport = new Mail\Transport\Smtp();
+    		}
+    		elseif ($settings['mailProtocol'] == 'Sendmail') {
+    			$transport = new Mail\Transport\SendMail();
+    		}
+    
+    		if ($settings['mailProtocol']) $transport->send($mail);
+    
+    		if ($settings['isTraceActive']) {
+    
+    			// Write to the log
+    			$writer = new Writer\Stream('data/log/mailing.txt');
+    			$logger = new Logger();
+    			$logger->addWriter($writer);
+    			$logger->info('to: '.explode(', ', $this->to).' - subject: '.$subject.' - body: '.$textContent);
+    		}
+    	}
+    }
+
+    function sendHtmlMail()
+    {
+    	$context = Context::getCurrent();
+    	$settings = $context->getConfig();
+    	
+    	if ($settings['isDemoAccountUpdatable'] || $context->getInstanceId() != 0) { // instance 0 is for demo
+    		$text = new MimePart($this->body);
+    		$text->type = "text/html";
+    		$body = new MimeMessage();
+    		$body->setParts(array($text));
+    		 
+    		$mail = new Mail\Message();
+    		$mail->setEncoding("UTF-8");
+    		$mail->setBody($body);
+    		$mail->setFrom($this->from_mail, $this->from_name);
+    		$mail->setSubject($this->subject);
+
+    		foreach ($this->to as $toMail => $toName) $mail->addTo($toMail, $toName);
+    		foreach ($this->cc as $ccEmail => $ccName) $mail->addCc($ccEmail, $ccName);
+    		if ($settings['mailProtocol'] == 'Smtp') {
+    			$transport = new Mail\Transport\Smtp();
+    		}
+    		elseif ($settings['mailProtocol'] == 'Sendmail') {
+    			$transport = new Mail\Transport\SendMail();
+    		}
+
+    		if ($settings['mailProtocol']) $transport->send($mail);
+    		$this->emission_time = date('Y-m-d H:i:s');
+    		ContactMessage::getTable()->transSave($this);
+    	    
+    		if ($settings['isTraceActive']) {
+    
+    			// Write to the log
+    			$writer = new Writer\Stream('data/log/mailing.txt');
+    			$logger = new Logger();
+    			$logger->addWriter($writer);
+    			$logger->info('to: '.implode(', ', $this->to).' - subject: '.$this->subject.' - body: '.$this->body);
+    		}
+    	}
+    }
+    
     public static function sendMail($email, $textContent, $subject, $cc = null)
     {
     	$context = Context::getCurrent();
@@ -209,29 +307,21 @@ class ContactMessage implements InputFilterAwareInterface
     	}
     }
 
-    function sendMultipartMail($htmlBody, $textBody, $subject, $from, $to)
+    public function add()
     {
-    	$htmlPart = new MimePart($htmlBody);
-    	$htmlPart->type = "text/html";
+		ContactMessage::getTable()->save($this);
+		return 'OK';
+    }
+
+    public function update($update_time)
+    {
+    	$contactMessage = ContactMessage::get($this->id);
+    	if ($update_time && $contactMessage->update_time > $update_time) return 'Isolation';
+    	ContactMessage::getTable()->save($this);
     
-    	$textPart = new MimePart($textBody);
-    	$textPart->type = "text/plain";
-    
-    	$body = new MimeMessage();
-    	$body->setParts(array($textPart, $htmlPart));
-    
-    	$message = new MailMessage();
-    	$message->setFrom($from);
-    	$message->addTo($to);
-    	$message->setSubject($subject);
-    
-    	$message->setEncoding("UTF-8");
-    	$message->setBody($body);
-    	$message->getHeaders()->get('content-type')->setType('multipart/alternative');
-    
-    	$transport = new Mail\Transport\Sendmail();
-    	$transport->send($message);
-    }    
+    	return ('OK');
+    }
+
     // Add content to this method:
     public function setInputFilter(InputFilterInterface $inputFilter)
     {

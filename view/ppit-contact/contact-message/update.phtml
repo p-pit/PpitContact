@@ -1,0 +1,98 @@
+<!-- 
+/**
+ * PpitCore V1.0 (https://github.com/p-pit/PpitCore)
+ *
+ * @link      https://github.com/p-pit/PpitCore
+ * @copyright Copyright (c) 2016 Bruno Lartillot
+ * @license   https://github.com/p-pit/PpitCore/blob/master/license.txt GNU-GPL license
+ */
+-->
+
+<!-- Form header -->
+<?php echo $this->partial('/partials/form-header', array(
+		'update_time' => $contactMessage->update_time,
+		'message' => $message,
+		'error' => $error,
+		'csrfForm' => $csrfForm,
+		'context' => $context,
+));
+?>
+		<input type="hidden" id="contact-message_update_time" value="<?php echo $contactMessage->update_time ?>" />
+
+<?php 
+$isDisabled = true;
+?>
+
+<?php foreach ($context->getConfig('contactMessage/update') as $propertyId => $options) : ?>
+	<?php 
+	$property = $context->getConfig('contactMessage')['properties'][$propertyId];
+	if ($property['type'] == 'repository') $property = $context->getConfig($property['definition']);
+	?>
+		<div class="form-group" id="<?php echo (($property['type'] == 'date' || $property['type'] == 'number') ? 'input_' : '').$propertyId ?>_group">
+			<label class="col-sm-4 control-label">
+				<?php if ($options['mandatory']) echo '* ' ?><?php echo $property['labels'][$context->getLocale()] ?>
+			</label>
+			<div class="col-sm-8">
+				
+		<?php if ($property['type'] == 'date') : ?>
+				<input type="hidden" id="<?php echo $propertyId ?>" name="<?php echo $propertyId ?>" />
+				<input class="form-control" id="input_<?php echo $propertyId ?>" value="<?php echo $context->decodeDate($place->properties[$propertyId]) ?>" <?php if ($isDisabled) echo 'disabled="disabled"'?> />
+
+		<?php elseif ($property['type'] == 'number') : ?>
+				<input type="hidden" id="<?php echo $propertyId ?>" name="<?php echo $propertyId ?>" />
+				<input class="form-control" id="input_<?php echo $propertyId ?>" value="<?php echo $context->formatFloat($place->properties[$propertyId], 2) ?>" <?php if ($isDisabled) echo 'disabled="disabled"'?> />
+
+		<?php elseif ($property['type'] == 'textarea') : ?>
+				<textarea class="form-control" id="<?php echo $propertyId ?>" <?php if ($isDisabled) echo 'disabled="disabled"'?>><?php echo $contactMessage->properties[$propertyId] ?></textarea>
+
+		<?php elseif ($property['type'] == 'select') : ?>
+				<select class="form-control" id="<?php echo $propertyId ?>" <?php if ($isDisabled) echo 'disabled="disabled"'?>>
+	    			<option />
+			<?php foreach ($property['modalities'] as $key => $labels) : ?>
+	    			<option value="<?php echo $key ?>" <?php if ($place->properties[$propertyId] == $key) echo 'selected="selected"' ?>><?php echo $labels[$context->getLocale()] ?></option>
+			<?php endforeach;?>
+				</select>
+
+		<?php elseif ($property['type'] == 'array') : ?>
+				<input class="form-control" id="<?php echo $propertyId ?>" value="<?php echo implode(', ', $contactMessage->properties[$propertyId]) ?>" <?php if ($isDisabled) echo 'disabled="disabled"'?> />
+	
+		<?php else : ?>
+				<input class="form-control" id="<?php echo $propertyId ?>" value="<?php echo $contactMessage->properties[$propertyId] ?>" <?php if ($isDisabled) echo 'disabled="disabled"'?> />
+
+		<?php endif;?>
+			</div>
+			<div class="col-sm-12"><p class="help-block" id="<?php echo (($property['type'] == 'date' || $property['type'] == 'number') ? 'input_' : '').$propertyId ?>_error"></p></div>
+		</div>
+
+<?php endforeach;?>
+
+<!-- Preview -->	
+
+		<div id="content-panel" class="panel panel-default">
+			<div class="panel-body">
+		
+<?php if ($contactMessage->image) : ?>
+				<div align="center">
+	<?php if (array_key_exists('href', $contactMessage->image)) : ?>
+					<a href="<?php echo $contactMessage->image['href'] ?>" target="<?php echo (array_key_exists('target', $contactMessage->image)) ? $contactMessage->image['target'] : '_blank' ?>">
+	<?php endif;?>
+						<img 
+	<?php foreach ($contactMessage->image as $attr => $value) : ?>
+		<?php if ($attr == 'src') : ?>
+							src="<?php echo $this->basePath($value) ?>"
+		<?php elseif ($attr != 'href' && $attr != 'target') : ?>
+							<?php echo $attr ?>="<?php echo $value ?>"
+		<?php endif;?>
+	<?php endforeach;?>
+						/>
+	<?php if (array_key_exists('href', $contactMessage->image)) : ?>
+					</a>
+	<?php endif;?>
+				</div>
+<?php endif;?>
+			
+				<div><?php echo $contactMessage->body ?></div>
+			</div>
+		</div>
+		
+		</form>

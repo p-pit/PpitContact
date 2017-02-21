@@ -5,11 +5,27 @@ return array(
         'invokables' => array(
             'PpitContact\Controller\Community' => 'PpitContact\Controller\CommunityController',
             'PpitContact\Controller\Contract' => 'PpitContact\Controller\ContractController',
-        	'PpitContact\Controller\Message' => 'PpitContact\Controller\MessageController',
+        	'PpitContact\Controller\ContactMessage' => 'PpitContact\Controller\ContactMessageController',
         	'PpitContact\Controller\Vcard' => 'PpitContact\Controller\VcardController',
         ),
     ),
- 
+
+	'console' => array(
+			'router' => array(
+					'routes' => array(
+							'send' => array(
+									'options' => array(
+											'route'    => 'contact-message send',
+											'defaults' => array(
+													'controller' => 'PpitContact\Controller\ContactMessage',
+													'action'     => 'send'
+											)
+									)
+							),
+					),
+			),
+	),
+
     'router' => array(
         'routes' => array(
             'index' => array(
@@ -96,8 +112,93 @@ return array(
 	                        ),
 	                    ),
 	                ),
+	       			'sendMessage' => array(
+	                    'type' => 'segment',
+	                    'options' => array(
+	                        'route' => '/send-message[/:community_id]',
+		                    'constraints' => array(
+		                    	'community_id' => '[0-9]*',
+		                    ),
+	                    	'defaults' => array(
+	                            'action' => 'sendMessage',
+	                        ),
+	                    ),
+	                ),
 	       		),
         	),
+        	'contactMessage' => array(
+                'type'    => 'literal',
+                'options' => array(
+                    'route'    => '/contact-message',
+                    'defaults' => array(
+                        'controller' => 'PpitContact\Controller\ContactMessage',
+                        'action'     => 'index',
+                    ),
+                ),
+           		'may_terminate' => true,
+	       		'child_routes' => array(
+        						'index' => array(
+        								'type' => 'segment',
+        								'options' => array(
+        										'route' => '/index',
+        										'defaults' => array(
+        												'action' => 'index',
+        										),
+        								),
+        						),
+        						'search' => array(
+        								'type' => 'segment',
+        								'options' => array(
+        										'route' => '/search',
+        										'defaults' => array(
+        												'action' => 'search',
+        										),
+        								),
+        						),
+        						'list' => array(
+        								'type' => 'segment',
+        								'options' => array(
+        										'route' => '/list',
+        										'defaults' => array(
+        												'action' => 'list',
+        										),
+        								),
+        						),
+        						'export' => array(
+        								'type' => 'segment',
+        								'options' => array(
+        										'route' => '/export',
+        										'defaults' => array(
+        												'action' => 'export',
+        										),
+        								),
+        						),
+	       						'detail' => array(
+        								'type' => 'segment',
+        								'options' => array(
+        										'route' => '/detail[/:id]',
+        										'constraints' => array(
+        												'id' => '[0-9]*',
+        										),
+        										'defaults' => array(
+        												'action' => 'detail',
+        										),
+        								),
+        						),
+		        				'update' => array(
+		        						'type' => 'segment',
+		        						'options' => array(
+		        								'route' => '/update[/:id][/:act]',
+		        								'constraints' => array(
+		        										'id'     => '[0-9]*',
+		        								),
+		        								'defaults' => array(
+		        										'action' => 'update',
+		        								),
+		        						),
+		        				),
+	       		),
+			),
         	'contract' => array(
                 'type'    => 'literal',
                 'options' => array(
@@ -378,16 +479,28 @@ return array(
 				array('route' => 'community/index', 'roles' => array('admin')),
 				array('route' => 'community/list', 'roles' => array('admin')),
 				array('route' => 'community/update', 'roles' => array('admin')),
+				array('route' => 'community/sendMessage', 'roles' => array('sales_manager')),
+
+				array('route' => 'contactMessage', 'roles' => array('admin')),
+				array('route' => 'contactMessage/index', 'roles' => array('admin')),
+				array('route' => 'contactMessage/search', 'roles' => array('admin')),
+				array('route' => 'contactMessage/export', 'roles' => array('admin')),
+				array('route' => 'contactMessage/list', 'roles' => array('admin')),
+				array('route' => 'contactMessage/detail', 'roles' => array('admin')),
+				array('route' => 'contactMessage/update', 'roles' => array('admin')),
+						
 				array('route' => 'contract', 'roles' => array('admin')),
 				array('route' => 'contract/add', 'roles' => array('admin')),
 				array('route' => 'contract/datalist', 'roles' => array('admin')),
 				array('route' => 'contract/delete', 'roles' => array('admin')),
 				array('route' => 'contract/list', 'roles' => array('admin')),
+
 				array('route' => 'message', 'roles' => array('admin')),
 				array('route' => 'message/delete', 'roles' => array('admin')),
 				array('route' => 'message/index', 'roles' => array('admin')),
 				array('route' => 'message/simulate', 'roles' => array('admin')),
 				array('route' => 'message/update', 'roles' => array('admin')),
+					
 				array('route' => 'vcard', 'roles' => array('admin')),
 				array('route' => 'vcard/add', 'roles' => array('admin')),
 				array('route' => 'vcard/photo', 'roles' => array('user')),
@@ -448,6 +561,20 @@ return array(
 	'ppitCoreDependencies' => array(
 	),
 
+	'menus' => array(
+			'p-pit-contact' => array(
+					'contact-message' => array(
+							'route' => 'contactMessage/index',
+							'params' => array(),
+							'glyphicon' => 'glyphicon-envelope',
+							'label' => array(
+									'en_US' => 'Messages',
+									'fr_FR' => 'Messages',
+							),
+					),
+			),
+	),
+		
 	'vcard/properties' => array(
 			'n_title' => array(
 					'type' => 'input',
@@ -570,6 +697,154 @@ return array(
 					),
 			),
 	),
+
+	'contactMessage/types' => array(
+			'type' => 'select',
+			'modalities' => array(
+					'email' => array('en_US' => 'Email', 'fr_FR' => 'email'),
+			),
+			'labels' => array('en_US' => 'Type', 'fr_FR' => 'Type'),
+	),
+		
+	'contactMessage' => array(
+			'statuses' => array(),
+			'properties' => array(
+					'type' => array(
+							'type' => 'repository',
+							'definition' => 'contactMessage/types',
+					),
+					'to' => array(
+							'type' => 'array',
+							'labels' => array(
+									'en_US' => 'To',
+									'fr_FR' => 'À',
+							),
+					),
+					'cc' => array(
+							'type' => 'array',
+							'labels' => array(
+									'en_US' => 'Cc',
+									'fr_FR' => 'Cc',
+							),
+					),
+					'cci' => array(
+							'type' => 'array',
+							'labels' => array(
+									'en_US' => 'Cci',
+									'fr_FR' => 'Cci',
+							),
+					),
+					'subject' => array(
+							'type' => 'input',
+							'labels' => array(
+									'en_US' => 'Subject',
+									'fr_FR' => 'Objet',
+							),
+					),
+					'from_name' => array(
+							'type' => 'input',
+							'labels' => array(
+									'en_US' => 'From',
+									'fr_FR' => 'De',
+							),
+					),
+					'body' => array(
+							'type' => 'textarea',
+							'labels' => array(
+									'en_US' => 'Body',
+									'fr_FR' => 'Corps',
+							),
+					),
+					'emission_time' => array(
+							'type' => 'time',
+							'labels' => array(
+									'en_US' => 'Emission',
+									'fr_FR' => 'Emission',
+							),
+					),
+			),
+	),
+	
+	'contactMessage/index' => array(
+			'title' => array('en_US' => 'P-Pit Contacts', 'fr_FR' => 'P-Pit Contacts'),
+	),
+	
+	'contactMessage/search' => array(
+			'title' => array('en_US' => 'Messages', 'fr_FR' => 'Messages'),
+			'todoTitle' => array('en_US' => 'current', 'fr_FR' => 'en cours'),
+			'searchTitle' => array('en_US' => 'search', 'fr_FR' => 'recherche'),
+			'main' => array(
+					'type' => 'select',
+					'emission_time' => 'range',
+					'to' => 'contains',
+					'subject' => 'contains',
+			),
+	),
+	
+	'contactMessage/list' => array(
+			'type' => 'select',
+			'emission_time' => 'date',
+			'to' => 'array',
+			'cci' => 'array',
+			'subject' => 'contains',
+	),
+
+	'contactMessage/detail' => array(
+			'title' => array('en_US' => 'Message detail', 'fr_FR' => 'Détail du message'),
+	),
+	
+	'contactMessage/update' => array(
+			'type' => array('mandatory' => true),
+			'to' => array('mandatory' => false),
+			'cc' => array('mandatory' => false),
+			'cci' => array('mandatory' => false),
+			'subject' => array('mandatory' => true),
+			'from_name' => array('mandatory' => true),
+//			'body' => array('mandatory' => false),
+	),
+		
+	'contactMessage/messages' => array(
+			'genericSubject' => array(
+					'en_US' => 'Message subject',
+					'fr_FR' => 'Sujet du message',
+			),
+			'genericText' => array(
+					'en_US' => 'Hello %s,
+
+Message text
+					
+Best regards,
+			
+The P-Pit staff
+',
+					'fr_FR' => 'Bonjour %s,
+				
+Texte du message
+
+Bien cordialement,
+			
+L\'équipe P-Pit
+',
+			),
+	),
+	'community/sendMessage' => array(
+			'to' => 'support@p-pit.fr',
+			'from_mail' => 'support@p-pit.fr',
+			'from_name' => 'noreply@p-pit.fr',
+			'subject' => array('en_US' => 'Important message from P-Pit', 'fr_FR' => 'Message important de P-Pit'),
+			'body' => array(
+					'en_US' => '<p>Hello,</p>
+<p>We hope that our services are giving you satisfaction. Please send your requests or questions to the P-Pit support: support@p-pit.fr.</p>
+<p>Best regards,</p>
+<p>The P-Pit staff</p>
+', 
+					'fr_FR' => '<p>Bonjour,</p>
+<p>Nous espérons que nos services vous donnent entière satisfaction. Veuillez adresser toute requête ou question au support P-Pit : support@p-pit.fr.</p>
+<p>Bien cordialement,</p>
+<p>L\'équipe P-Pit</p>
+',
+			),
+	),
 	'community/consumeCredit' => array(
 			'messages' => array(
 					'availabilityAlertTitle' => array(
@@ -606,32 +881,6 @@ Bien cordialement,
 L\'équipe P-Pit
 ',
 					),
-/*					'consumeCreditTitle' => array(
-							'en_US' => 'Monthly P-PIT Communities credits consumption report',
-							'fr_FR' => 'Rapport mensuel de consommation de crédits P-PIT Communities',
-					),
-					'consumeCreditText' => array(
-							'en_US' => 'Hello %s,
-							
-Please note that the monthly count of P-PIT Communities credits has occurred on %s. Given the current %s active subscriptions, %s units have been consumed. Your new P-PIT Communities reserve rises %s units.
-
-We hope that our services are giving you satisfaction. Please send your requests or questions to the P-PIT support: support@p-pit.fr or 06 29 87 90 02.
-					
-Best regards,
-
-The P-PIT staff
-',
-							'fr_FR' => 'Bonjour %s,
-							
-Veuillez noter que le décompte mensuel de crédits P-PIT Communities a été effectué en date du %s. Compte tenu du nombre de dossiers %s actifs à ce jour, %s unités ont été décomptées. Votre nouvelle réserve P-PIT Communities est de %s unités.
-
-Nous espérons que nos services vous donnent entière satisfaction. Veuillez adresser toute requête ou question au support P-PIT : support@p-pit.fr ou 06 29 87 90 02.
-					
-Bien cordialement,
-
-L\'équipe P-PIT
-',
-					),*/
 					'suspendedServiceTitle' => array(
 							'en_US' => 'P-Pit Communities access suspended',
 							'fr_FR' => 'Accès P-Pit Communities suspendus',
@@ -668,15 +917,6 @@ Bien cordialement,
 L\'équipe P-Pit
 ',
 					),
-/*					'suspendedServiceMessage' => array(
-							'en_US' => 'Your available P-PIT Communities credits reserve is out of stock.<br>
-Please note that in the case where the credit reserve decreases under zero, the service is automatically suspended until a regularization occurs.<br>
-You can add credits at <a href="%s">this place</a>',
-
-							'fr_FR' => 'Votre réserve de crédits <em>P-Pit Communities</em> est épuisée.<br> 
-Veuillez noter que dans le cas où la réserve de crédits devient négative, le service est automatiquement suspendu jusqu\'à régularisation.<br>
-Vous pouvez ajouter des crédits depuis <a href="%s">cet emplacement</a>',
-					),*/
 			),
 	),
 );

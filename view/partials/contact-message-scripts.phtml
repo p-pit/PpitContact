@@ -1,0 +1,260 @@
+/**
+ * PpitCore V1.0 (https://github.com/p-pit/PpitCore)
+ *
+ * @link      https://github.com/p-pit/PpitCore
+ * @copyright Copyright (c) 2016 Bruno Lartillot
+ * @license   https://github.com/p-pit/PpitCore/blob/master/license.txt GNU-GPL license
+ */
+
+
+function connectRemoveIcon(id, target)
+{
+	$('#' + id).click(function () {
+		$('#' + target).hide();
+		filterContactMessageList();
+	});
+}
+
+function contactMessageGetParams() {
+
+	var params = '?', todo = true;
+
+<?php foreach ($context->getConfig('contactMessage/search')['main'] as $propertyId => $rendering) : ?>
+
+	<?php if ($rendering == 'range') : ?>
+	
+	var min_<?php echo $propertyId ?> = document.getElementById('search_min_<?php echo $propertyId ?>').value;
+	if (min_<?php echo $propertyId ?>) min_<?php echo $propertyId ?> = encodeDate(min_<?php echo $propertyId ?>);
+	if (min_<?php echo $propertyId ?>.length >= 2) { params += 'min_<?php echo $propertyId ?>=' + min_<?php echo $propertyId ?> + '&'; todo = false; }
+
+	var max_<?php echo $propertyId ?> = document.getElementById('search_max_<?php echo $propertyId ?>').value;
+	if (max_<?php echo $propertyId ?>) max_<?php echo $propertyId ?> = encodeDate(max_<?php echo $propertyId ?>);
+	if (max_<?php echo $propertyId ?>.length >= 2) { params += 'max_<?php echo $propertyId ?>=' + max_<?php echo $propertyId ?> + '&'; todo = false; }
+
+	<?php elseif ($rendering == 'select') : ?>
+
+	var <?php echo $propertyId ?> = document.getElementById('search_<?php echo $propertyId ?>').value;
+	if (<?php echo $propertyId ?>) { params += '<?php echo $propertyId ?>=' + <?php echo $propertyId ?> + '&'; todo = false; }
+
+	<?php else : ?>
+
+	var <?php echo $propertyId ?> = document.getElementById('search_<?php echo $propertyId ?>').value;
+	if (<?php echo $propertyId ?>.length >= 2) { params += '<?php echo $propertyId ?>=' + <?php echo $propertyId ?> + '&'; todo = false; }
+	
+	<?php endif;?>
+
+<?php endforeach;?>
+
+	<?php
+	$todoTitle = $context->getConfig('contactMessage/search')['todoTitle'][$context->getLocale()];
+	$searchTitle = $context->getConfig('contactMessage/search')['searchTitle'][$context->getLocale()];
+	?>
+	$('#mode-text').text((todo) ? '<?php echo $todoTitle ?>' : '<?php echo $searchTitle ?>');
+
+	return params;
+}
+
+// Export the list
+function exportContactMessageList() {
+
+	var params = contactMessageGetParams();
+	document.location.href = '<?php echo $this->url('contactMessage/export') ?>' + params;
+}
+
+function eraseContactMessageSearch() {
+
+<?php foreach ($context->getConfig('contactMessage/search')['main'] as $propertyId => $rendering) : ?>
+
+	<?php if ($rendering == 'range') : ?>
+	$('#search_min_<?php echo $propertyId ?>').val('');
+	$('#search_max_<?php echo $propertyId ?>').val('');
+
+	<?php else : ?>
+	$('#search_<?php echo $propertyId ?>').val('');
+	
+	<?php endif;?>
+
+<?php endforeach;?>
+
+	getContactMessageList(contactMessageGetParams(), 'emission_time', 'DESC');
+}
+
+function sortContactMessageList(criterion) {
+
+	var dir;
+	ascCriterion = $('.glyphicon-triangle-top').first().parent().attr('id');
+	descCriterion = $('.glyphicon-triangle-bottom').first().parent().attr('id');
+	if (criterion + '-anchor' == ascCriterion) dir = 'DESC'; else dir = 'ASC';
+	getContactMessageList(contactMessageGetParams(), criterion, dir);
+}
+
+function filterContactMessageList() {
+
+	ascCriterion = $('.glyphicon-triangle-top').first().parent().attr('id');
+	descCriterion = $('.glyphicon-triangle-bottom').first().parent().attr('id');
+	if (ascCriterion) {
+		criterion = ascCriterion.split('-')[0];
+		dir = 'ASC';
+	}
+	else {
+		criterion = descCriterion.split('-')[0];
+		dir = 'ASC';
+	}
+	getContactMessageList(contactMessageGetParams(), criterion, dir);
+}
+
+function connectContactMessageSearchInputs() {
+
+	$('#export-button').click(function () { exportContactMessageList(); });
+	
+	$('#erase-button').unbind();
+	$('#erase-button').click(function () { eraseContactMessageSearch(); });
+
+<?php foreach ($context->getConfig('contactMessage/search')['main'] as $propertyId => $rendering) : ?>
+
+	<?php if ($rendering == 'range') : ?>
+	$('#search_min_<?php echo $propertyId ?>').keyup(function () { filterContactMessageList(); });
+	$('#search_max_<?php echo $propertyId ?>').keyup(function () { filterContactMessageList(); });
+
+		<?php if ($context->getConfig('contactMessage')['properties'][$propertyId]['type'] == 'date') : ?>
+	$("#search_min_<?php echo $propertyId ?>").datepicker();
+	$("#search_max_<?php echo $propertyId ?>").datepicker();
+	$('#search_min_<?php echo $propertyId ?>').change(function () { filterContactMessageList(); });
+	$('#search_max_<?php echo $propertyId ?>').change(function () { filterContactMessageList(); });
+		<?php endif;?>
+	
+	<?php elseif ($rendering == 'select') : ?>
+		$('#search_<?php echo $propertyId ?>').change(function () { filterContactMessageList(); });
+	
+	<?php else : ?>
+		$('#search_<?php echo $propertyId ?>').keyup(function () { filterContactMessageList(); });
+
+		<?php if ($context->getConfig('contactMessage')['properties'][$propertyId]['type'] == 'date') : ?>
+	$("#search_<?php echo $propertyId ?>").datepicker();
+	$('#search_<?php echo $propertyId ?>').change(function () { filterContactMessageList(); });
+		<?php endif;?>
+
+	<?php endif;?>
+
+<?php endforeach;?>
+}
+
+// Load the list
+function getContactMessageList(params, major, dir) {		
+
+	// Execute the ajax request
+	route = '<?php echo $this->url('contactMessage/list') ?>' + params + '&major=' + major + ((dir =='ASC') ? '&dir=ASC' : '&dir=DESC');
+	xhttp = new XMLHttpRequest();
+	xhttp.open("GET", route, true);
+	xhttp.onreadystatechange = function() {
+		if (xhttp.status == 401) location.href = '<?php echo $this->url('user/expired')?>';
+		if (xhttp.readyState == 4) {
+	<?php if (!$config['ppitCoreSettings']['isTraceActive']) : ?>
+			if (xhttp.status == 200) {
+	<?php endif;?>
+			document.getElementById('contact-message-list-panel').innerHTML = xhttp.responseText;
+			
+			$(function () {
+			    $('.tip').tooltip({
+			        content: function () {
+			            return $(this).prop('title');
+			        }
+			    });
+			});
+			
+			// Connect the sort anchors
+			$('.ppit-sort-anchor').each(function () {
+				$(this).click(function () {
+					sortContactMessageList($(this).attr('id').split('-')[0]);
+				});
+			});
+			
+			// Connect the detail anchors
+			$('.contact-message-detail-anchor').each(function () {
+				$(this).click(function () {
+					getContactMessageDetail($(this).attr('id').split('_')[1]);
+				});
+			});
+<?php if (!$config['ppitCoreSettings']['isTraceActive']) : ?>
+			}
+<?php endif;?>
+		}
+	}
+	xhttp.send();
+}
+
+function getContactMessageUpdate(id, action, target) {
+
+	var xhttp = new XMLHttpRequest();
+	var route = '<?php echo $this->url('contactMessage/update') ?>/' + id;
+	if (action) route += '/' + action;
+
+	xhttp.open('GET', route, true);
+	xhttp.onreadystatechange = function() {
+		if (xhttp.status == 401) location.href = '<?php echo $this->url('user/expired')?>';
+		if (xhttp.readyState == 4) {
+	<?php if (!$config['ppitCoreSettings']['isTraceActive']) : ?>
+			if (xhttp.status == 200) {
+	<?php endif;?>
+			document.getElementById(target).innerHTML = xhttp.responseText;
+<?php if (!$config['ppitCoreSettings']['isTraceActive']) : ?>
+			}
+<?php endif;?>
+		}
+	}
+	xhttp.send();
+}
+
+// Load the detail panel
+function getContactMessageDetail(id) {
+
+	// Ensure the target is displayed
+	$('#form_action').show();
+
+	// Anchor to the new panel
+	$(location).attr('hash', 'form_action');
+
+	var route = '<?php echo $this->url('contactMessage/detail') ?>/' + id;
+
+	// Execute the ajax request
+	xhttp = new XMLHttpRequest();
+	xhttp.open("GET", route, true);
+	xhttp.onreadystatechange = function() {
+		if (xhttp.status == 401) location.href = '<?php echo $this->url('user/expired')?>';
+		if (xhttp.readyState == 4) {
+	<?php if (!$config['ppitCoreSettings']['isTraceActive']) : ?>
+			if (xhttp.status == 200) {
+	<?php endif;?>
+			document.getElementById('form_action').innerHTML = xhttp.responseText;
+			
+			connectRemoveIcon('remove-anchor', 'form_action');
+
+			getContactMessageUpdate(id, '', 'contact-message-update-panel');
+		}
+	}
+	xhttp.send();
+
+	// Highlight the clicked button (and only it in its class)
+	$('.index-btn').removeClass("btn-primary").addClass("btn-default");
+	$('#contact-message-detail-anchor_' + id).removeClass("btn-default").addClass("btn-primary");
+}
+
+function activateContactMessage() {
+
+	// Load the search panel and highlight the menu entry
+	loadPanel('index_action', '<?php echo $this->url('contactMessage/search') ?>');
+	$('.menu-btn').removeClass("btn-primary").addClass("btn-default");
+	var contactMessageAnchor;
+	contactMessageAnchor = '#contact-message-anchor';
+	$(contactMessageAnchor).removeClass("btn-default").addClass("btn-primary");
+
+	<?php
+	$todoTitle = $context->getConfig('contactMessage/search')['todoTitle'][$context->getLocale()];
+	?>
+	$('#mode-text').text('<?php echo $todoTitle ?>');
+		
+	// Connect the search inputs
+	connectContactMessageSearchInputs();
+	
+	getContactMessageList('?', 'emission_time', 'DESC');
+}

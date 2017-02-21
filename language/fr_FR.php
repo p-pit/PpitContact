@@ -1,7 +1,12 @@
 <?php
 	return array(
 			'A contact with the same email or cellular phone number already exists' => 'Un contact existe déjà avec le même email ou téléphone mobile',
-			'Accountant' => 'Comptable',
+			'Email body' => 'Corps de l\'email',
+			'Mask recipients' => 'Masquer les destinataires',
+			'Send an email' => 'Envoyer un email',
+			'Subject' => 'Sujet',
+
+/*			'Accountant' => 'Comptable',
 			'Add' => 'Ajouter',
 			'Add a contact' => 'Ajouter un contact',
 			'Add a message' => 'Ajouter un message',
@@ -99,5 +104,5 @@
 			'Update a message' => 'Modifier un message',
 			'Update personal data' => 'Modifier les données personnelles',
 			'Work phone' => 'Tél. bureau',
-			'You do not have enough credit to transmit this message' => 'Vous ne disposez pas du solde suffisant pour émettre ce message',
+			'You do not have enough credit to transmit this message' => 'Vous ne disposez pas du solde suffisant pour émettre ce message',*/
 	);
