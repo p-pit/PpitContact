@@ -312,8 +312,13 @@ return array(
  		),
 	),
 
-	'ppitRoles' => array(
-			'PpitContact' => array(
+	'ppitApplications' => array(
+    		'p-pit-contact' => array(
+    				'labels' => array('fr_FR' => 'P-Pit Contacts', 'en_US' => 'Contacts by 2Pit'),
+    				'route' => 'contactMessage/index',
+    				'params' => array(),
+					'roles' => array(
+					),
 			),
 	),
 		
