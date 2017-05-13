@@ -4,6 +4,7 @@ namespace PpitContact\Controller;
 use PpitCore\Form\CsrfForm;
 use PpitCore\Model\Context;
 use PpitCore\Model\Csrf;
+use PpitCore\Model\Place;
 use PpitContact\Model\ContactMessage;
 use PpitContact\ViewHelper\SsmlContactMessageViewHelper;
 use PpitContact\Model\smsenvoi;
@@ -18,6 +19,7 @@ class ContactMessageController extends AbstractActionController
    public function indexAction()
     {
     	$context = Context::getCurrent();
+    	$place = Place::getTable()->transGet($context->getPlaceId());
 
 		$applicationId = 'p-pit-contact';
 		$applicationName = $context->getConfig('ppitApplications')['p-pit-contact']['labels'][$context->getLocale()];
@@ -26,6 +28,7 @@ class ContactMessageController extends AbstractActionController
     	return new ViewModel(array(
     			'context' => $context,
     			'config' => $context->getConfig(),
+    			'place' => $place,
     			'active' => 'application',
     			'applicationId' => $applicationId,
     			'applicationName' => $applicationName,

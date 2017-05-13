@@ -56,7 +56,7 @@
 			// Set up a handler for when the request finishes.
 			xhttp.onload = function () {
 				if (xhttp.status === 200) {
-		<?php if ($this->config['ppitCoreSettings']['isTraceActive']) : ?>
+		<?php if ($this->config['isTraceActive']) : ?>
 					console.log('post, route = ' + <?php echo $formRoute ?>);
 					console.log(xhttp.responseText);
 		<?php endif;?>

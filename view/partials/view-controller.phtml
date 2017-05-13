@@ -11,7 +11,7 @@ reload = function(route, scriptName, target)
 	xhttp.onreadystatechange = function() {
 		if (xhttp.readyState == 4 && xhttp.status == 200) {
 			document.getElementById(target).innerHTML = xhttp.responseText;
-<?php if ($config['ppitCoreSettings']['isTraceActive']) : ?>
+<?php if ($config['isTraceActive']) : ?>
 			console.log('reload, route = ' + route + ', scriptName = ' + scriptName + ', target = ' + target);
 			console.log(xhttp.responseText);
 <?php endif;?>
@@ -86,7 +86,7 @@ PpitIndexPanelClass.prototype.reload = function(route, scriptName, hideOpenForms
 	xhttp.onreadystatechange = function() {
 		if (xhttp.readyState == 4 && xhttp.status == 200) {
 			document.getElementById(name).innerHTML = xhttp.responseText;
-<?php if ($config['ppitCoreSettings']['isTraceActive']) : ?>
+<?php if ($config['isTraceActive']) : ?>
 			console.log('reload, route = ' + route + ', scriptName = ' + scriptName + ', hideOpenForms = ' + hideOpenForms);
 			console.log(xhttp.responseText);
 <?php endif;?>
@@ -110,7 +110,7 @@ function showForm(route, scriptName) {
 	xhttp.onreadystatechange = function() {
 		if (xhttp.readyState == 4 && xhttp.status == 200) {
 			document.getElementById("form_action").innerHTML = xhttp.responseText;
-<?php if ($config['ppitCoreSettings']['isTraceActive']) : ?>
+<?php if ($config['isTraceActive']) : ?>
 			console.log('showForm, route = ' + route + ', scriptName = ' + scriptName);
 			console.log(xhttp.responseText);
 <?php endif;?>
@@ -126,7 +126,7 @@ function postForm(route, scriptName, target, params) {
 	xhttp.open('POST', route, false);
 	xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 	xhttp.send(params);
-<?php if ($config['ppitCoreSettings']['isTraceActive']) : ?>
+<?php if ($config['isTraceActive']) : ?>
 	console.log('postForm, route = ' + route + ', scriptName = ' + scriptName + ', target = ' + target + ', params = ' + params);
 	console.log(xhttp.responseText);
 <?php endif;?>
