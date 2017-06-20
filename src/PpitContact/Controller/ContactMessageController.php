@@ -132,7 +132,7 @@ class ContactMessageController extends AbstractActionController
     	$id = (int) $this->params()->fromRoute('id', 0);
     	if ($id) $contactMessage = ContactMessage::get($id);
     	else $contactMessage = ContactMessage::instanciate();
-    
+
     	$view = new ViewModel(array(
     			'context' => $context,
     			'config' => $context->getconfig(),
