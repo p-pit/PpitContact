@@ -19,6 +19,7 @@ class ContactMessage implements InputFilterAwareInterface
 {
     public $id;
 	public $type;
+	public $status;
 	public $to;
 	public $cc;
 	public $cci;
@@ -51,7 +52,8 @@ class ContactMessage implements InputFilterAwareInterface
     {
         $this->id = (isset($data['id'])) ? $data['id'] : null;
         $this->type = (isset($data['type'])) ? $data['type'] : null;
-
+        $this->status = (isset($data['status'])) ? $data['status'] : null;
+        
         // Json decode for lists of "to", "cc", "cci", "accepted" and "rejected"
         $this->to = (isset($data['to'])) ? json_decode($data['to'], true) : null;
         $this->cc = (isset($data['cc'])) ? json_decode($data['cc'], true) : null;
@@ -75,7 +77,8 @@ class ContactMessage implements InputFilterAwareInterface
     	$data = array();
     	$data['id'] = (int) $this->id;
     	$data['type'] = $this->type;
-	    $data['to'] = $this->to;
+    	$data['status'] = $this->status;
+    	$data['to'] = $this->to;
 	    $data['cc'] = $this->cc;
     	$data['cci'] = $this->cci;
     	$data['subject'] = $this->subject;
@@ -147,6 +150,7 @@ class ContactMessage implements InputFilterAwareInterface
     public static function instanciate()
     {
     	$message = new ContactMessage;
+    	$message->status = 'new';
     	$message->to = array();
     	$message->cc = array();
     	$message->cci = array();
@@ -302,7 +306,7 @@ class ContactMessage implements InputFilterAwareInterface
     			$writer = new Writer\Stream('data/log/mailing.txt');
     			$logger = new Logger();
     			$logger->addWriter($writer);
-    			$logger->info('to: '.$email.' - subject: '.$subject.' - body: '.$textContent);
+    			$logger->info('from: '.$settings['nameAdmin'].' ('.$settings['mailAdmin'].') - to: '.$email.' - subject: '.$subject.' - body: '.$textContent);
     		}
     	}
     }
