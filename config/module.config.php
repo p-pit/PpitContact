@@ -121,7 +121,7 @@ return array(
 		        				),
 	       		),
 			),
-        	'contract' => array(
+/*        	'contract' => array(
                 'type'    => 'literal',
                 'options' => array(
                     'route'    => '/community-function',
@@ -178,7 +178,7 @@ return array(
 	                    ),
 	                ),
 	       		),
-        	),
+        	),*/
         	'message' => array(
                 'type'    => 'literal',
                 'options' => array(
@@ -263,12 +263,12 @@ return array(
 				array('route' => 'contactMessage/list', 'roles' => array('admin')),
 				array('route' => 'contactMessage/detail', 'roles' => array('admin')),
 				array('route' => 'contactMessage/update', 'roles' => array('admin')),
-						
+/*						
 				array('route' => 'contract', 'roles' => array('admin')),
 				array('route' => 'contract/add', 'roles' => array('admin')),
 				array('route' => 'contract/datalist', 'roles' => array('admin')),
 				array('route' => 'contract/delete', 'roles' => array('admin')),
-				array('route' => 'contract/list', 'roles' => array('admin')),
+				array('route' => 'contract/list', 'roles' => array('admin')),*/
 
 				array('route' => 'message', 'roles' => array('admin')),
 				array('route' => 'message/delete', 'roles' => array('admin')),
@@ -595,7 +595,7 @@ L\'équipe P-Pit
 			),
 	),
 	'community/sendMessage' => array(
-			'to' => 'support@p-pit.fr',
+			'cci' => 'support@p-pit.fr',
 			'from_mail' => 'support@p-pit.fr',
 			'from_name' => 'noreply@p-pit.fr',
 			'subject' => array('en_US' => 'Important message from P-Pit', 'fr_FR' => 'Message important de P-Pit'),

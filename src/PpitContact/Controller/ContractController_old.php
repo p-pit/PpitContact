@@ -9,7 +9,7 @@ use PpitCore\Form\CsrfForm;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
-class ContractController extends AbstractActionController
+class ContractController_old extends AbstractActionController
 {
     public function listAction()
     {
@@ -20,12 +20,6 @@ class ContractController extends AbstractActionController
     	$filter = array();
     	$communityId = $this->params()->fromRoute('community_id', NULL);
     	if ($communityId) $filter['customer_community_id'] = $communityId;
-
-		// Order
-    	$major = $this->params()->fromQuery('major', NULL);
-    	if (!$major) $major = 'customer_name';
-    	$dir = $this->params()->fromQuery('dir', NULL);
-    	if (!$dir) $dir = 'ASC';
     
 		$contracts = Contract::getList($major, $dir, $filter);
     

@@ -70,7 +70,7 @@ class ContactMessageController extends AbstractActionController
     	return $view;
     }
 
-    public function getList()
+    public function getList($limitation = 300)
     {
     	// Retrieve the context
     	$context = Context::getCurrent();
@@ -82,7 +82,7 @@ class ContactMessageController extends AbstractActionController
     	if (count($params) == 0) $mode = 'todo'; else $mode = 'search';
 
     	// Retrieve the list
-    	$contactMessages = ContactMessage::getList('email', $params, $major, $dir, $mode);
+    	$contactMessages = ContactMessage::getList('email', $params, $major, $dir, $mode, $limitation);
 
     	// Return the link list
     	$view = new ViewModel(array(

@@ -105,11 +105,13 @@ class ContactMessage implements InputFilterAwareInterface
     	return $data;
     }
     
-    public static function getList($type, $params, $major = 'emission_time', $dir = 'DESC', $mode = 'todo')
+    public static function getList($type, $params, $major = 'emission_time', $dir = 'DESC', $mode = 'todo', $limitation = 300)
     {
     	$select = ContactMessage::getTable()->getSelect()
 	    	->order(array($major.' '.$dir, 'emission_time DESC'));
-    	$where = new Where;
+		if ($limitation) $select->limit($limitation);
+	    
+		$where = new Where;
     	if ($type) $where->equalTo('type', $type);
 
     	// Todo list vs search modes

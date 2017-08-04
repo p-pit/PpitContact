@@ -1,6 +1,7 @@
 <?php
 	return array(
 			'A contact with the same email or cellular phone number already exists' => 'Un contact existe déjà avec le même email ou téléphone mobile',
+			'Attachment' => 'Pièce jointe',
 			'Email body' => 'Corps de l\'email',
 			'Mask recipients' => 'Masquer les destinataires',
 			'Send an email' => 'Envoyer un email',
