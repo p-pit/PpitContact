@@ -250,6 +250,7 @@ class ContactMessage implements InputFilterAwareInterface
 
     		foreach ($this->to as $toMail => $toName) $mail->addTo($toMail, $toName);
     		foreach ($this->cc as $ccEmail => $ccName) $mail->addCc($ccEmail, $ccName);
+    		foreach ($this->cci as $cciEmail => $cciName) $mail->addBcc($cciEmail, $cciName);
     		if ($settings['mailProtocol'] == 'Smtp') {
     			$transport = new Mail\Transport\Smtp();
     		}
