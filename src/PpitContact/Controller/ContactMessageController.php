@@ -19,8 +19,8 @@ class ContactMessageController extends AbstractActionController
    public function indexAction()
     {
     	$context = Context::getCurrent();
-    	$place = Place::getTable()->transGet($context->getPlaceId());
-
+    	$place = Place::get($context->getPlaceId());
+    	
 		$applicationId = 'p-pit-contact';
 		$applicationName = $context->getConfig('ppitApplications')['p-pit-contact']['labels'][$context->getLocale()];
 		$currentEntry = $this->params()->fromQuery('entry', 'contactMessage');
