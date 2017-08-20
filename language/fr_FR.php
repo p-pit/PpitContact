@@ -91,7 +91,7 @@
 			'Save' => 'Enregistrer',
 			'Search by name' => 'Rechercher par nom',
 			'Send a message' => 'Envoyer un message',
-			'Sex' => 'Sexe',
+			'Gender' => 'Genre',
 			'State' => 'Etat',
 			'Subject' => 'Sujet',
 			'Supplyer' => 'Fournisseur',

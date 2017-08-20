@@ -198,13 +198,13 @@
 	?>
 	<input type="hidden" id="autocompletion_adr_country" />
 	
-<!-- Sex -->
+<!-- Gender -->
 	<?php
 		echo $this->partial('/partials/select-widget.phtml', array(
-			'property' => 'sex',
-			'label' => $this->translate('Sex', 'ppit-contact', $context->getLocale()),
+			'property' => 'gender',
+			'label' => $this->translate('Gender', 'ppit-contact', $context->getLocale()),
 			'modalities' => array('F' => $this->translate('Female', 'ppit-contact', $context->getLocale()), 'M' => $this->translate('Male', 'ppit-contact', $context->getLocale()), '?' => '?'),
-			'value' => $contact->sex,
+			'value' => $contact->gender,
 			'isMandatory' => false,
 			'context' => $context,
 			'isDisabled' => $isDisabled,
@@ -296,7 +296,7 @@ $('#autocompletion').autocomplete({
 					document.getElementById("autocompletion_adr_city").value = object.adr_city;
 					document.getElementById("autocompletion_adr_state").value = object.adr_state;
 					document.getElementById("autocompletion_adr_country").value = object.adr_country;
-					document.getElementById("autocompletion_sex").value = object.sex;
+					document.getElementById("autocompletion_gender").value = object.gender;
 					document.getElementById("autocompletion_birth_date").value = object.birth_date;
 					document.getElementById("autocompletion_place_of_birth").value = object.place_of_birth;
 					document.getElementById("autocompletion_nationality").value = object.nationality;
@@ -319,7 +319,7 @@ $('#autocompletion').autocomplete({
 		document.getElementById("adr_city").value = document.getElementById("autocompletion_adr_city").value;
 		document.getElementById("adr_state").value = document.getElementById("autocompletion_adr_state").value;
 		document.getElementById("adr_country").value = document.getElementById("autocompletion_adr_country").value;
-		document.getElementById("sex").value = document.getElementById("autocompletion_sex").value;
+		document.getElementById("gender").value = document.getElementById("autocompletion_gender").value;
 		document.getElementById("birth_date").value = document.getElementById("autocompletion_birth_date").value;
 		document.getElementById("place_of_birth").value = document.getElementById("autocompletion_place_of_birth").value;
 		document.getElementById("nationality").value = document.getElementById("autocompletion_nationality").value;
