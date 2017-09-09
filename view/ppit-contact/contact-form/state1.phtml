@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="<?php echo $this->basePath('dist/css/main.css') ?>">
+  <script src="<?php echo $this->basePath('dist/lib/jquery-3.2.1.min.js') ?>" charset="utf-8"></script>
+  <title>Inscription au admission</title>
+  <link rel="shortcut icon" href="<?php echo $this->basePath('favicon.ico') ?>" type="image/x-icon">
+  <link rel="icon" href="<?php echo $this->basePath('favicon.ico') ?>" type="image/x-icon">
+</head>
+<body>
+  <header class="header">
+    <div class="header_container">
+      <img src="<?php echo $this->basePath('dist/img/logo.png') ?>" alt="ESI Environment Social Impact Business School" class="header_logo">
+      <div class="header_state">
+        <div class="header_number header_number-full">1</div>
+        <div class="header_line"></div>
+        <div class="header_number">2</div>
+        <div class="header_line"></div>
+        <div class="header_number">3</div>
+        <div class="header_line"></div>
+        <div class="header_number">4</div>
+      </div>
+    </div>
+  </header>
+  <section class="state state1">
+    <form action="state2.html" method="post">
+      <h1 class="state_title">Etapes 1 : Information personnelles</h1>
+      <div class="state_container">
+
+        <!-- Identité -->
+        <div class="state_module">
+          <div class="state_moduleTitleContainer">
+            <h2 class="state_moduleTitle">Identité</h2>
+          </div>
+          <div class="state_moduleContainer">
+
+            <div class="input_container">
+              <label class="input_label" for="name">Nom :</label>
+              <input class="input_text" type="text" name="name" id="name" data-test="string require">
+            </div>
+
+            <div class="input_container">
+              <label class="input_label" for="surname">Prénom :</label>
+              <input class="input_text" type="text" name="surname" id="surname" data-test="string require">
+            </div>
+
+            <div class="input_container">
+              <label class="input_label" for="gender">Sexe :</label>
+              <select class="input_select" name="gender" id="gender">
+                <option value="homme">Homme</option>
+                <option value="femme">Femme</option>
+              </select>
+            </div>
+
+            <div class="input_container">
+              <label class="input_label" for="nationality">Nationalité :</label>
+              <input class="input_text" type="text" name="nationality" id="nationality" data-test="string require">
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Contact -->
+        <div class="state_module">
+          <div class="state_moduleTitleContainer">
+            <h2 class="state_moduleTitle">Contact</h2>
+          </div>
+          <div class="state_moduleContainer">
+
+            <div class="input_container">
+              <label class="input_label" for="phone">Téléphone :</label>
+              <input class="input_text" type="number" name="phone" id="phone" data-test="number require">
+            </div>
+
+            <div class="input_container">
+              <label class="input_label" for="email">Email :</label>
+              <input class="input_text" type="email" name="email" id="email" data-test="email require">
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Adresse -->
+        <div class="state_module">
+          <div class="state_moduleTitleContainer">
+            <h2 class="state_moduleTitle">Adresse</h2>
+          </div>
+          <div class="state_moduleContainer">
+
+            <div class="input_container">
+              <label class="input_label" for="adress">Adresse :</label>
+              <input class="input_text" type="text" name="adress" id="adress" data-test="require">
+            </div>
+
+            <div class="input_container">
+              <label class="input_label" for="city">Ville :</label>
+              <input class="input_text" type="text" name="city" id="city" data-test="require">
+            </div>
+
+            <div class="input_container">
+              <label class="input_label" for="zipcode">Code postal :</label>
+              <input class="input_text" type="number" name="zipcode" id="zipcode" data-test="number require">
+            </div>
+
+            <div class="input_container">
+              <label class="input_label" for="country">Pays :</label>
+              <input class="input_text" type="text" name="country" id="country" data-test="require">
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Situation -->
+        <div class="state_module">
+          <div class="state_moduleTitleContainer">
+            <h2 class="state_moduleTitle">Situation</h2>
+          </div>
+          <div class="state_moduleContainer">
+
+            <div class="input_container">
+              <label class="input_label" for="situation">Situation actuelle :</label>
+              <select class="input_select" name="situation" id="situation">
+                <option value="student">Étudiant/Lycéen</option>
+                <option value="worker">Salarié</option>
+                <option value="other">Autre</option>
+              </select>
+            </div>
+
+            <div class="input_container">
+              <label class="input_label" for="level">Niveau d'intégration souhaité :</label>
+              <select class="input_select" name="level" id="level">
+                <option value="1">1er année</option>
+                <option value="2">2ème année</option>
+                <option value="3">3ème année</option>
+                <option value="4">4ème année</option>
+                <option value="5">5ème année</option>
+              </select>
+            </div>
+
+            <div class="input_container">
+              <label class="input_label" for="date">Date de la Réunion d'information :</label>
+              <select class="input_select" name="date" id="date">
+                <option value="20171010">10/10/2017</option>
+                <option value="20170915">15/09/2017</option>
+              </select>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="state_buttonContainer">
+          <button class="state_button" type="submit">
+            Étape suivante
+            <span class="state_buttonArrow"></span>
+          </button>
+        </div>
+      </div>
+    </form>
+  </section>
+  <script src="<?php echo $this->basePath('dist/js/main.js') ?>" charset="utf-8"></script>
+</body>
+</html>

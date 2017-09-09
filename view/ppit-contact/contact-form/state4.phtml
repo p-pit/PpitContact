@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="<?php echo $this->basePath('dist/css/main.css') ?>">
+  <script src="<?php echo $this->basePath('dist/lib/jquery-3.2.1.min.js') ?>" charset="utf-8"></script>
+  <title>Inscription au admission</title>
+  <link rel="<?php echo $this->basePath('shortcut icon') ?>" href="<?php echo $this->basePath('favicon.ico') ?>" type="image/x-icon">
+  <link rel="icon" href="<?php echo $this->basePath('favicon.ico') ?>" type="image/x-icon">
+</head>
+<body>
+  <header class="header">
+    <div class="header_container">
+      <img src="<?php echo $this->basePath('dist/img/logo.png') ?>" alt="ESI Environment Social Impact Business School" class="header_logo">
+      <div class="header_state">
+        <div class="header_number header_number-full">1</div>
+        <div class="header_line"></div>
+        <div class="header_number header_number-full">2</div>
+        <div class="header_line"></div>
+        <div class="header_number header_number-full">3</div>
+        <div class="header_line"></div>
+        <div class="header_number header_number-full">4</div>
+      </div>
+    </div>
+  </header>
+  <section class="state state4">
+    <form action="">
+      <h1 class="state_title">Etapes 4 : Pièces à fournir</h1>
+      <div class="state_container">
+
+        <!-- Fichier -->
+        <div class="info_container">
+          <div class="info_inputContainer">
+            <div class="input_container input_container-large">
+              <label class="input_label" for="identity">Photocopie de votre carte d'identité :</label>
+              <input class="input_fileHidden" type="file" id="identity" name="identity" multiple data-test="require">
+              <label class="input_file" for="identity">
+                <div class="input_fileLogo"></div>
+                <div class="input_fileText">+ Ajouter un fichier</div>
+              </label>
+            </div>
+
+            <div class="input_container input_container-large">
+              <label class="input_label" for="diploma">Photocopie de vos diplômes et relevés de notes au examens :</label>
+              <input class="input_fileHidden" type="file" id="diploma" name="diploma" multiple data-test="require">
+              <label class="input_file" for="diploma">
+                <div class="input_fileLogo"></div>
+                <div class="input_fileText">+ Ajouter un fichier</div>
+              </label>
+            </div>
+
+            <div class="input_container input_container-large">
+              <label class="input_label" for="cv">Curriculum Vitae :</label>
+              <input class="input_fileHidden" type="file" id="cv" name="cv" multiple data-test="require">
+              <label class="input_file" for="cv">
+                <div class="input_fileLogo"></div>
+                <div class="input_fileText">+ Ajouter un fichier</div>
+              </label>
+            </div>
+
+            <div class="input_container input_container-large">
+              <label class="input_label" for="photo">Photo d'identité (les phototes scannées sont acceptées) :</label>
+              <input class="input_fileHidden" type="file" id="photo" name="photo" multiple data-test="require">
+              <label class="input_file" for="photo">
+                <div class="input_fileLogo"></div>
+                <div class="input_fileText">+ Ajouter un fichier</div>
+              </label>
+            </div>
+          </div>
+
+          <div class="info_infoContainer">
+            <img class="info_img" src="dist/img/info.png" alt="Information">
+            <p>Le jour de l'entretien, merci d'apporter les élements suivants :</p>
+            <ul class="info_list">
+              <li>1 grande enveloppe vierge</li>
+              <li>4 petites enveloppes vierges</li>
+              <li>5 timbres au tarif en vigueur</li>
+            </ul>
+          </div>
+
+        </div>
+
+        <div class="state_buttonContainer">
+          <button class="state_button state_button-large" type="submit">
+            Valider et acceder au paiement
+            <span class="state_buttonArrow"></span>
+          </button>
+        </div>
+      </div>
+    </form>
+  </section>
+  <script src="<?php echo $this->basePath('dist/js/main.js') ?>" charset="utf-8"></script>
+</body>
+</html>

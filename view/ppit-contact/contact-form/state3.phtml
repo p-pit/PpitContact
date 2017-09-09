@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="<?php echo $this->basePath('dist/css/main.css') ?>">
+  <script src="<?php echo $this->basePath('dist/lib/jquery-3.2.1.min.js') ?>" charset="utf-8"></script>
+  <title>Inscription au admission</title>
+  <link rel="shortcut icon" href="<?php echo $this->basePath('favicon.ico') ?>" type="image/x-icon">
+  <link rel="icon" href="<?php echo $this->basePath('favicon.ico') ?>" type="image/x-icon">
+</head>
+<body>
+  <header class="header">
+    <div class="header_container">
+      <img src="<?php echo $this->basePath('dist/img/logo.png') ?>" alt="ESI Environment Social Impact Business School" class="header_logo">
+      <div class="header_state">
+        <div class="header_number header_number-full">1</div>
+        <div class="header_line"></div>
+        <div class="header_number header_number-full">2</div>
+        <div class="header_line"></div>
+        <div class="header_number header_number-full">3</div>
+        <div class="header_line"></div>
+        <div class="header_number">4</div>
+      </div>
+    </div>
+  </header>
+  <section class="state state3">
+    <form action="state4.html">
+      <h1 class="state_title">Etapes 3 : Expériences professionnelles</h1>
+      <div class="state_container">
+
+        <!-- Diplome -->
+        <div class="state_module">
+          <div class="state_moduleTitleContainer">
+            <h2 class="state_moduleTitle">Stage(s) et/ou emploi(s)</h2>
+          </div>
+          <div class="state_moduleContainer state_moduleContainer-large">
+
+            <div class="input_repeater">
+              <div class="input_container input_container-grid4">
+                <label class="input_label" for="company">Entreprise :</label>
+                <input class="input_text" type="text" name="company" id="company">
+              </div>
+
+              <div class="input_container input_container-grid4">
+                <label class="input_label" for="duration">Durée :</label>
+                <input class="input_text" type="text" name="duration" id="duration">
+              </div>
+
+              <div class="input_container input_container-grid4">
+                <label class="input_label" for="activity">Secteur d'activité :</label>
+                <input class="input_text" type="text" name="activity" id="activity">
+              </div>
+
+              <div class="input_container input_container-grid4">
+                <label class="input_label" for="job">Poste occupé :</label>
+                <input class="input_text" type="text" name="job" id="job">
+              </div>
+            </div>
+
+            <div class="input_more">
+              <div class="input_moreButton">+ Ajouter une autre expériences</div>
+            </div>
+
+            <div class="input_container input_container-solo">
+              <label class="input_label" for="total">Durée totale de vos expériences professionnelles :</label>
+              <input class="input_text" type="text" name="total" id="total" data-test="require">
+            </div>
+          </div>
+        </div>
+
+        <!-- Langue -->
+        <div class="state_module">
+          <div class="state_moduleTitleContainer">
+            <h2 class="state_moduleTitle">Motivation personnelles</h2>
+          </div>
+          <div class="state_moduleContainer state_moduleContainer-large">
+
+            <div class="input_container input_container-large">
+              <label class="input_label" for="motivation">Quelles sont les motivations de votre candidature :</label>
+              <textarea class="input_textarea" name="motivation" rows="8" cols="80" data-test="require"></textarea>
+            </div>
+
+            <div class="input_container input_container-large">
+              <label class="input_label" for="skill">Quels sont vos compétences et vos centres d'intérêts ? :</label>
+              <textarea class="input_textarea" name="skill" rows="8" cols="80" data-test="require"></textarea>
+            </div>
+
+            <div class="input_container input_container-large">
+              <label class="input_label" for="quality">Quels sont vos qualités et vos défauts :</label>
+              <textarea class="input_textarea" name="quality" rows="8" cols="80" data-test="require"></textarea>
+            </div>
+
+            <div class="input_container input_container-large">
+              <label class="input_label" for="other">Avez-vous des commentaires supplémentaires à spécifier ? :</label>
+              <textarea class="input_textarea" name="other" rows="8" cols="80" data-test="require"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="state_buttonContainer">
+          <button class="state_button" type="submit">
+            Étape suivante
+            <span class="state_buttonArrow"></span>
+          </button>
+        </div>
+      </div>
+    </form>
+  </section>
+  <script src="<?php echo $this->basePath('dist/js/main.js') ?>" charset="utf-8"></script>
+</body>
+</html>

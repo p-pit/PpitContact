@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="<?php echo $this->basePath('dist/css/main.css') ?>">
+  <script src="<?php echo $this->basePath('dist/lib/jquery-3.2.1.min.js') ?>" charset="utf-8"></script>
+  <title>Inscription au admission</title>
+  <link rel="shortcut icon" href="<?php echo $this->basePath('favicon.ico') ?>" type="image/x-icon">
+  <link rel="icon" href="<?php echo $this->basePath('favicon.ico') ?>" type="image/x-icon">
+</head>
+<body>
+  <header class="header">
+    <div class="header_container">
+      <img src="<?php echo $this->basePath('dist/img/logo.png') ?>" alt="ESI Environment Social Impact Business School" class="header_logo">
+    </div>
+  </header>
+  <section class="banner">
+    <h1 class="banner_title">Inscription au admission</h1>
+  </section>
+  <div class="question">
+    <form action="<?php echo $this->basePath('state1.html') ?>">
+      <h2 class="question_title">Formation choisie</h2>
+      <div class="question_container">
+        <input class="question_button" type="submit" value="Bachelor in Green, Social & Digital Business">
+        <input class="question_button" type="submit" value="Mastère in Green, Social & Digital Management">
+      </div>
+    </form>
+  </div>
+  <footer class="footer">
+    Retourner sur <a class="footer_link" href="https://www.esi-business-school.com/">www.esi-business-school.com</a>
+  </footer>
+<script src="<?php echo $this->basePath('dist/js/main.js') ?>" charset="utf-8"></script>
+</body>
+</html>

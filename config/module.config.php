@@ -3,7 +3,7 @@
 return array(
     'controllers' => array(
         'invokables' => array(
-            'PpitContact\Controller\Contract' => 'PpitContact\Controller\ContractController',
+        	'PpitContact\Controller\ContactForm' => 'PpitContact\Controller\ContactFormController',
         	'PpitContact\Controller\ContactMessage' => 'PpitContact\Controller\ContactMessageController',
         ),
     ),
@@ -48,6 +48,64 @@ return array(
 	                ),
 	       		),
             ),
+        	'contactForm' => array(
+                'type'    => 'literal',
+                'options' => array(
+                    'route'    => '/contact-form',
+                    'defaults' => array(
+                        'controller' => 'PpitContact\Controller\ContactForm',
+                        'action'     => 'index',
+                    ),
+                ),
+           		'may_terminate' => true,
+	       		'child_routes' => array(
+        						'index' => array(
+        								'type' => 'segment',
+        								'options' => array(
+        										'route' => '/index',
+        										'defaults' => array(
+        												'action' => 'index',
+        										),
+        								),
+        						),
+        						'state1' => array(
+        								'type' => 'segment',
+        								'options' => array(
+        										'route' => '/state1',
+        										'defaults' => array(
+        												'action' => 'state1',
+        										),
+        								),
+        						),
+        						'state2' => array(
+        								'type' => 'segment',
+        								'options' => array(
+        										'route' => '/state2',
+        										'defaults' => array(
+        												'action' => 'state2',
+        										),
+        								),
+        						),
+        						'state3' => array(
+        								'type' => 'segment',
+        								'options' => array(
+        										'route' => '/state3',
+        										'defaults' => array(
+        												'action' => 'state3',
+        										),
+        								),
+        						),
+        						'state4' => array(
+        								'type' => 'segment',
+        								'options' => array(
+        										'route' => '/state4',
+        										'defaults' => array(
+        												'action' => 'state4',
+        										),
+        								),
+        						),
+	       		),
+        	),
         	'contactMessage' => array(
                 'type'    => 'literal',
                 'options' => array(
@@ -256,6 +314,12 @@ return array(
 		'guards' => array(
 			'BjyAuthorize\Guard\Route' => array(
 
+				array('route' => 'contactForm/index', 'roles' => array('admin')),
+				array('route' => 'contactForm/state1', 'roles' => array('admin')),
+				array('route' => 'contactForm/state2', 'roles' => array('admin')),
+				array('route' => 'contactForm/state3', 'roles' => array('admin')),
+				array('route' => 'contactForm/state4', 'roles' => array('admin')),
+						
 				array('route' => 'contactMessage', 'roles' => array('admin')),
 				array('route' => 'contactMessage/index', 'roles' => array('admin')),
 				array('route' => 'contactMessage/search', 'roles' => array('admin')),
@@ -263,18 +327,6 @@ return array(
 				array('route' => 'contactMessage/list', 'roles' => array('admin')),
 				array('route' => 'contactMessage/detail', 'roles' => array('admin')),
 				array('route' => 'contactMessage/update', 'roles' => array('admin')),
-/*						
-				array('route' => 'contract', 'roles' => array('admin')),
-				array('route' => 'contract/add', 'roles' => array('admin')),
-				array('route' => 'contract/datalist', 'roles' => array('admin')),
-				array('route' => 'contract/delete', 'roles' => array('admin')),
-				array('route' => 'contract/list', 'roles' => array('admin')),*/
-
-				array('route' => 'message', 'roles' => array('admin')),
-				array('route' => 'message/delete', 'roles' => array('admin')),
-				array('route' => 'message/index', 'roles' => array('admin')),
-				array('route' => 'message/simulate', 'roles' => array('admin')),
-				array('route' => 'message/update', 'roles' => array('admin')),
 			)
 		)
 	),
@@ -328,8 +380,7 @@ return array(
 	'ppitCoreDependencies' => array(
 	),
 
-	'menus' => array(
-			'p-pit-contact' => array(
+	'menus/p-pit-contact' => array(
 					'contact-message' => array(
 							'route' => 'contactMessage/index',
 							'params' => array(),
@@ -339,7 +390,6 @@ return array(
 									'fr_FR' => 'Messages',
 							),
 					),
-			),
 	),
 		
 	'vcard/properties' => array(
