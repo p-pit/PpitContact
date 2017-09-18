@@ -68,7 +68,16 @@ return array(
         										),
         								),
         						),
-        						'state1' => array(
+        						'state' => array(
+        								'type' => 'segment',
+        								'options' => array(
+        										'route' => '/state[/:state_id][/:id]',
+        										'defaults' => array(
+        												'action' => 'state',
+        										),
+        								),
+        						),
+	       						'state1' => array(
         								'type' => 'segment',
         								'options' => array(
         										'route' => '/state1',
@@ -315,6 +324,7 @@ return array(
 			'BjyAuthorize\Guard\Route' => array(
 
 				array('route' => 'contactForm/index', 'roles' => array('admin')),
+				array('route' => 'contactForm/state', 'roles' => array('admin')),
 				array('route' => 'contactForm/state1', 'roles' => array('admin')),
 				array('route' => 'contactForm/state2', 'roles' => array('admin')),
 				array('route' => 'contactForm/state3', 'roles' => array('admin')),

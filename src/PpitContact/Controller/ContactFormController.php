@@ -5,6 +5,8 @@ use PpitCore\Form\CsrfForm;
 use PpitCore\Model\Context;
 use PpitCore\Model\Csrf;
 use PpitCore\Model\Place;
+use PpitCore\Model\Vcard;
+use PpitCommitment\Model\Account;
 use PpitContact\Model\ContactMessage;
 use PpitContact\ViewHelper\SsmlContactMessageViewHelper;
 use PpitContact\Model\smsenvoi;
@@ -37,7 +39,7 @@ class ContactFormController extends AbstractActionController
 		$view->setTerminal(true);
 		return $view;
 	}
-
+	
 	public function state1Action()
 	{
 		$context = Context::getCurrent();
