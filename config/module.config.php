@@ -26,28 +26,6 @@ return array(
 
     'router' => array(
         'routes' => array(
-            'index' => array(
-                'type' => 'literal',
-                'options' => array(
-                    'route'    => '/',
-                    'defaults' => array(
-                        'controller' => 'PpitContact\Controller\Vcard',
-                        'action'     => 'index',
-                    ),
-                ),
-           		'may_terminate' => true,
-	       		'child_routes' => array(
-	                'index' => array(
-	                    'type' => 'segment',
-	                    'options' => array(
-	                        'route' => '/index',
-	                    	'defaults' => array(
-	                    		'action' => 'index',
-	                        ),
-	                    ),
-	                ),
-	       		),
-            ),
         	'contactForm' => array(
                 'type'    => 'literal',
                 'options' => array(
