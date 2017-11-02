@@ -13,6 +13,7 @@ use Zend\Log\Writer;
 use Zend\Mail;
 use Zend\Mail\Message;
 use Zend\Mime\Message as MimeMessage;
+use Zend\Mime\Mime;
 use Zend\Mime\Part as MimePart;
 
 class ContactMessage implements InputFilterAwareInterface
@@ -230,7 +231,7 @@ class ContactMessage implements InputFilterAwareInterface
     		}
     	}
     }
-
+/*
     function sendHtmlMail()
     {
     	$context = Context::getCurrent();
@@ -270,6 +271,68 @@ class ContactMessage implements InputFilterAwareInterface
     			$logger->addWriter($writer);
     			$logger->info('to: '.implode(', ', $this->to).' - subject: '.$this->subject.' - body: '.$this->body);
     		}
+    	}
+    }*/
+
+    function sendHtmlMail()
+    {
+    	$context = Context::getCurrent();
+    	$settings = $context->getConfig();
+    	
+    	if ($settings['isDemoAccountUpdatable'] || $context->getInstanceId() != 0) { // instance 0 is for demo
+	 
+			// HTML part
+			$htmlPart = new MimePart($this->body);
+			$htmlPart->encoding = Mime::ENCODING_QUOTEDPRINTABLE;
+			$htmlPart->type = "text/html; charset=UTF-8";
+	 
+			// Plain text part
+/*			$textPart = new MimePart($text);
+			$textPart->encoding = Mime::ENCODING_QUOTEDPRINTABLE;
+			$textPart->type = "text/plain; charset=UTF-8";*/
+	 
+			$body = new MimeMessage();
+			// With attachments, we need a multipart/related email. First part
+			// is itself a multipart/alternative message        
+			$content = new MimeMessage();
+//			$content->addPart($textPart);
+			$content->addPart($htmlPart);
+ 
+			$contentPart = new MimePart($content->generateMessage());
+			$contentPart->type = "multipart/alternative;\n boundary=\"" .
+			$content->getMime()->boundary() . '"';
+
+			$body->addPart($contentPart);
+			$messageType = 'multipart/related';
+
+			// Add each attachment
+			$img = new MimePart($context->getConfig('customisation/esi/send-message/logo')['content']);
+			$img->type        = Mime::TYPE_OCTETSTREAM;
+			$img->encoding    = Mime::ENCODING_BASE64;
+//			$img->disposition = Mime::DISPOSITION_ATTACHMENT;
+
+			$body->addPart($img);
+
+    		$mail = new Mail\Message();
+			$mail->getHeaders()->get('content-type')->setType($messageType);
+    		$mail->setEncoding("UTF-8");
+    		$mail->setBody($body);
+    		$mail->setFrom($this->from_mail, $this->from_name);
+    		$mail->setSubject($this->subject);
+
+    		foreach ($this->to as $toMail => $toName) $mail->addTo($toMail, $toName);
+    		foreach ($this->cc as $ccEmail => $ccName) $mail->addCc($ccEmail, $ccName);
+    		foreach ($this->cci as $cciEmail => $cciName) $mail->addBcc($cciEmail, $cciName);
+    		if ($settings['mailProtocol'] == 'Smtp') {
+    			$transport = new Mail\Transport\Smtp();
+    		}
+    		elseif ($settings['mailProtocol'] == 'Sendmail') {
+    			$transport = new Mail\Transport\SendMail();
+    		}
+
+    		if ($settings['mailProtocol']) $transport->send($mail);
+    		$this->emission_time = date('Y-m-d H:i:s');
+    		ContactMessage::getTable()->transSave($this);
     	}
     }
     

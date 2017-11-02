@@ -355,8 +355,7 @@ return array(
 	'ppitApplications' => array(
     		'p-pit-contact' => array(
     				'labels' => array('fr_FR' => 'P-Pit Contacts', 'en_US' => 'Contacts by 2Pit'),
-    				'route' => 'contactMessage/index',
-    				'params' => array(),
+    				'default' => 'contact-message',
 					'roles' => array(
 					),
 			),
@@ -629,24 +628,6 @@ Texte du message
 Bien cordialement,
 			
 L\'équipe P-Pit
-',
-			),
-	),
-	'community/sendMessage' => array(
-			'cci' => 'support@p-pit.fr',
-			'from_mail' => 'support@p-pit.fr',
-			'from_name' => 'noreply@p-pit.fr',
-			'subject' => array('en_US' => 'Important message from P-Pit', 'fr_FR' => 'Message important de P-Pit'),
-			'body' => array(
-					'en_US' => '<p>Hello,</p>
-<p>We hope that our services are giving you satisfaction. Please send your requests or questions to the P-Pit support: support@p-pit.fr.</p>
-<p>Best regards,</p>
-<p>The P-Pit staff</p>
-', 
-					'fr_FR' => '<p>Bonjour,</p>
-<p>Nous espérons que nos services vous donnent entière satisfaction. Veuillez adresser toute requête ou question au support P-Pit : support@p-pit.fr.</p>
-<p>Bien cordialement,</p>
-<p>L\'équipe P-Pit</p>
 ',
 			),
 	),
