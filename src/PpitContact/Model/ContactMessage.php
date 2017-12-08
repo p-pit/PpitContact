@@ -150,7 +150,7 @@ class ContactMessage implements InputFilterAwareInterface
     	return $contactMessage;
     }
     
-    public static function instanciate()
+    public static function instanciate($type = 'email')
     {
     	$message = new ContactMessage;
     	$message->status = 'new';
@@ -231,7 +231,7 @@ class ContactMessage implements InputFilterAwareInterface
     		}
     	}
     }
-/*
+
     function sendHtmlMail()
     {
     	$context = Context::getCurrent();
@@ -240,8 +240,14 @@ class ContactMessage implements InputFilterAwareInterface
     	if ($settings['isDemoAccountUpdatable'] || $context->getInstanceId() != 0) { // instance 0 is for demo
     		$text = new MimePart($this->body);
     		$text->type = "text/html";
+
+/*    		$img = new MimePart($context->getConfig('customisation/esi/send-message/logo')['content']);
+    		$img->type = "image/gif";
+    		$img->encoding = Mime::ENCODING_BASE64;
+    		$img->disposition = Mime::DISPOSITION_INLINE;*/
+    		
     		$body = new MimeMessage();
-    		$body->setParts(array($text));
+    		$body->setParts(array($text/*, $img*/));
     		 
     		$mail = new Mail\Message();
     		$mail->setEncoding("UTF-8");
@@ -249,9 +255,9 @@ class ContactMessage implements InputFilterAwareInterface
     		$mail->setFrom($this->from_mail, $this->from_name);
     		$mail->setSubject($this->subject);
 
-    		foreach ($this->to as $toMail => $toName) $mail->addTo($toMail, $toName);
-    		foreach ($this->cc as $ccEmail => $ccName) $mail->addCc($ccEmail, $ccName);
-    		foreach ($this->cci as $cciEmail => $cciName) $mail->addBcc($cciEmail, $cciName);
+    		foreach ($this->to as $toMail => $toName) $mail->addTo($toMail, (($toName) ? $toName : $toMail));
+    		foreach ($this->cc as $ccEmail => $ccName) $mail->addCc($ccEmail, (($ccName) ? $ccName : $ccEmail));
+    		foreach ($this->cci as $cciEmail => $cciName) $mail->addBcc($cciEmail, (($cciName) ? $cciName : $cciEmail));
     		if ($settings['mailProtocol'] == 'Smtp') {
     			$transport = new Mail\Transport\Smtp();
     		}
@@ -272,9 +278,9 @@ class ContactMessage implements InputFilterAwareInterface
     			$logger->info('to: '.implode(', ', $this->to).' - subject: '.$this->subject.' - body: '.$this->body);
     		}
     	}
-    }*/
+    }
 
-    function sendHtmlMail()
+    function sendHtmlMailBis()
     {
     	$context = Context::getCurrent();
     	$settings = $context->getConfig();
@@ -296,26 +302,27 @@ class ContactMessage implements InputFilterAwareInterface
 			// is itself a multipart/alternative message        
 			$content = new MimeMessage();
 //			$content->addPart($textPart);
-			$content->addPart($htmlPart);
+//			$content->addPart($htmlPart);
  
 			$contentPart = new MimePart($content->generateMessage());
-			$contentPart->type = "multipart/alternative;\n boundary=\"" .
-			$content->getMime()->boundary() . '"';
+			$contentPart->type = "multipart/alternative;\n boundary=\"" . $content->getMime()->boundary() . '"';
 
 			$body->addPart($contentPart);
-			$messageType = 'multipart/related';
 
 			// Add each attachment
 			$img = new MimePart($context->getConfig('customisation/esi/send-message/logo')['content']);
 			$img->type        = Mime::TYPE_OCTETSTREAM;
 			$img->encoding    = Mime::ENCODING_BASE64;
-//			$img->disposition = Mime::DISPOSITION_ATTACHMENT;
+			$img->disposition = Mime::DISPOSITION_INLINE;
 
 			$body->addPart($img);
 
     		$mail = new Mail\Message();
-			$mail->getHeaders()->get('content-type')->setType($messageType);
-    		$mail->setEncoding("UTF-8");
+			$headers = $mail->getHeaders();
+			$headers->removeHeader('Content-Type');
+			$headers->addHeaderLine('Content-Type', 'multipart/related');
+//			$mail->getHeaders()->get('Content-Type')->setType('multipart/related');
+			$mail->setEncoding("UTF-8");
     		$mail->setBody($body);
     		$mail->setFrom($this->from_mail, $this->from_name);
     		$mail->setSubject($this->subject);
