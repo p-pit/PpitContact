@@ -10,7 +10,6 @@
 namespace PpitContact\ViewHelper;
 
 use PpitCore\Model\Context;
-use PpitCommitment\Model\Account;
 
 class SsmlContactMessageViewHelper
 {
