@@ -185,7 +185,7 @@ class ContactMessage implements InputFilterAwareInterface
     	 
     	if (array_key_exists('body', $data)) {
 	    	$this->body = $data['body'];
-    		if (!$this->body || strlen($this->body) > 65535) return 'Integrity';
+    		if (!$this->body) return 'Integrity';
     	}
 
     	if (array_key_exists('emission_time', $data)) $this->emission_time = $data['emission_time'];
@@ -232,22 +232,41 @@ class ContactMessage implements InputFilterAwareInterface
     	}
     }
 
+    function sendHtmlMail2()
+    {
+    	$context = Context::getCurrent();
+    	$settings = $context->getConfig();
+    	$headers  = 'From: "'.$this->from_name.'"<'.$this->from_mail.'>\n';
+    	$headers .= "MIME-Version: 1.0\n";
+    	$headers .= 'Content-Type: multipart/related; boundary="----=_Alternative_690_4213_09061981.062980923"';
+    	if ($settings['isDemoAccountUpdatable'] || $context->getInstanceId() != 0) { // instance 0 is for demo
+    		foreach ($this->to as $toMail => $toName) mail($toMail, $this->subject, $this->body, $headers);
+    	}
+    }
+    
     function sendHtmlMail()
     {
     	$context = Context::getCurrent();
     	$settings = $context->getConfig();
     	
     	if ($settings['isDemoAccountUpdatable'] || $context->getInstanceId() != 0) { // instance 0 is for demo
-    		$text = new MimePart($this->body);
-    		$text->type = "text/html";
+			
+    		$body = '------=_Alternative_690_4213_09061981.062980923
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-/*    		$img = new MimePart($context->getConfig('customisation/esi/send-message/logo')['content']);
-    		$img->type = "image/gif";
-    		$img->encoding = Mime::ENCODING_BASE64;
-    		$img->disposition = Mime::DISPOSITION_INLINE;*/
+This is an HTML message.
+------=_Alternative_690_4213_09061981.062980923
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+    				
+';
+    		$body .= $this->body;			
+    		$text = new MimePart($body);
+			$text->type = 'multipart/alternative; boundary="----=_Alternative_690_4213_09061981.062980923"';
     		
     		$body = new MimeMessage();
-    		$body->setParts(array($text/*, $img*/));
+    		$body->setParts(array($text));
     		 
     		$mail = new Mail\Message();
     		$mail->setEncoding("UTF-8");
@@ -279,70 +298,7 @@ class ContactMessage implements InputFilterAwareInterface
     		}
     	}
     }
-
-    function sendHtmlMailBis()
-    {
-    	$context = Context::getCurrent();
-    	$settings = $context->getConfig();
-    	
-    	if ($settings['isDemoAccountUpdatable'] || $context->getInstanceId() != 0) { // instance 0 is for demo
-	 
-			// HTML part
-			$htmlPart = new MimePart($this->body);
-			$htmlPart->encoding = Mime::ENCODING_QUOTEDPRINTABLE;
-			$htmlPart->type = "text/html; charset=UTF-8";
-	 
-			// Plain text part
-/*			$textPart = new MimePart($text);
-			$textPart->encoding = Mime::ENCODING_QUOTEDPRINTABLE;
-			$textPart->type = "text/plain; charset=UTF-8";*/
-	 
-			$body = new MimeMessage();
-			// With attachments, we need a multipart/related email. First part
-			// is itself a multipart/alternative message        
-			$content = new MimeMessage();
-//			$content->addPart($textPart);
-//			$content->addPart($htmlPart);
- 
-			$contentPart = new MimePart($content->generateMessage());
-			$contentPart->type = "multipart/alternative;\n boundary=\"" . $content->getMime()->boundary() . '"';
-
-			$body->addPart($contentPart);
-
-			// Add each attachment
-			$img = new MimePart($context->getConfig('customisation/esi/send-message/logo')['content']);
-			$img->type        = Mime::TYPE_OCTETSTREAM;
-			$img->encoding    = Mime::ENCODING_BASE64;
-			$img->disposition = Mime::DISPOSITION_INLINE;
-
-			$body->addPart($img);
-
-    		$mail = new Mail\Message();
-			$headers = $mail->getHeaders();
-			$headers->removeHeader('Content-Type');
-			$headers->addHeaderLine('Content-Type', 'multipart/related');
-//			$mail->getHeaders()->get('Content-Type')->setType('multipart/related');
-			$mail->setEncoding("UTF-8");
-    		$mail->setBody($body);
-    		$mail->setFrom($this->from_mail, $this->from_name);
-    		$mail->setSubject($this->subject);
-
-    		foreach ($this->to as $toMail => $toName) $mail->addTo($toMail, $toName);
-    		foreach ($this->cc as $ccEmail => $ccName) $mail->addCc($ccEmail, $ccName);
-    		foreach ($this->cci as $cciEmail => $cciName) $mail->addBcc($cciEmail, $cciName);
-    		if ($settings['mailProtocol'] == 'Smtp') {
-    			$transport = new Mail\Transport\Smtp();
-    		}
-    		elseif ($settings['mailProtocol'] == 'Sendmail') {
-    			$transport = new Mail\Transport\SendMail();
-    		}
-
-    		if ($settings['mailProtocol']) $transport->send($mail);
-    		$this->emission_time = date('Y-m-d H:i:s');
-    		ContactMessage::getTable()->transSave($this);
-    	}
-    }
-    
+   
     public static function sendMail($email, $textContent, $subject, $cc = null)
     {
     	$context = Context::getCurrent();
@@ -386,6 +342,7 @@ class ContactMessage implements InputFilterAwareInterface
 
     public function add()
     {
+    	$this->id = null;
 		ContactMessage::getTable()->save($this);
 		return 'OK';
     }
