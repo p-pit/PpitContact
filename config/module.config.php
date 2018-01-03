@@ -381,6 +381,7 @@ return array(
 		
 	'vcard/properties' => array(
 			'n_title' => array(
+					'definition' => 'inline',
 					'type' => 'input',
 					'maxSize' => 255,
 					'labels' => array(
@@ -389,6 +390,7 @@ return array(
 					),
 			),
 			'n_first' => array(
+					'definition' => 'inline',
 					'type' => 'input',
 					'maxSize' => 255,
 					'labels' => array(
@@ -397,6 +399,7 @@ return array(
 					),
 			),
 			'n_last' => array(
+					'definition' => 'inline',
 					'type' => 'input',
 					'maxSize' => 255,
 					'labels' => array(
@@ -405,6 +408,7 @@ return array(
 					),
 			),
 			'n_fn' => array(
+					'definition' => 'inline',
 					'type' => 'input',
 					'maxSize' => 255,
 					'labels' => array(
@@ -413,6 +417,7 @@ return array(
 					),
 			),
 			'tel_work' => array(
+					'definition' => 'inline',
 					'type' => 'phone',
 					'labels' => array(
 							'en_US' => 'Phone',
@@ -420,6 +425,7 @@ return array(
 					),
 			),
 			'tel_cell' => array(
+					'definition' => 'inline',
 					'type' => 'phone',
 					'labels' => array(
 							'en_US' => 'Cellular',
@@ -427,6 +433,7 @@ return array(
 					),
 			),
 			'email' => array(
+					'definition' => 'inline',
 					'type' => 'email',
 					'labels' => array(
 							'en_US' => 'Email',
@@ -434,6 +441,7 @@ return array(
 					),
 			),
 			'adr_street' => array(
+					'definition' => 'inline',
 					'type' => 'input',
 					'maxSize' => 255,
 					'labels' => array(
@@ -442,6 +450,7 @@ return array(
 					),
 			),
 			'adr_extended' => array(
+					'definition' => 'inline',
 					'type' => 'input',
 					'maxSize' => 255,
 					'labels' => array(
@@ -450,6 +459,7 @@ return array(
 					),
 			),
 			'adr_post_office_box' => array(
+					'definition' => 'inline',
 					'type' => 'input',
 					'maxSize' => 255,
 					'labels' => array(
@@ -458,6 +468,7 @@ return array(
 					),
 			),
 			'adr_zip' => array(
+					'definition' => 'inline',
 					'type' => 'input',
 					'maxSize' => 255,
 					'labels' => array(
@@ -466,6 +477,7 @@ return array(
 					),
 			),
 			'adr_city' => array(
+					'definition' => 'inline',
 					'type' => 'input',
 					'maxSize' => 255,
 					'labels' => array(
@@ -474,6 +486,7 @@ return array(
 					),
 			),
 			'adr_state' => array(
+					'definition' => 'inline',
 					'type' => 'input',
 					'maxSize' => 255,
 					'labels' => array(
@@ -482,6 +495,7 @@ return array(
 					),
 			),
 			'adr_country' => array(
+					'definition' => 'inline',
 					'type' => 'input',
 					'maxSize' => 255,
 					'labels' => array(
@@ -490,6 +504,7 @@ return array(
 					),
 			),
 			'locale' => array(
+					'definition' => 'inline',
 					'type' => 'select',
 					'modalities' => array(
 							'en_US' => array('en_US' => 'en_US', 'fr_FR' => 'en_US'),

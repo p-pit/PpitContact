@@ -269,8 +269,9 @@ Content-Transfer-Encoding: quoted-printable
     		$body->setParts(array($text));
     		 
     		$mail = new Mail\Message();
-    		$mail->setEncoding("UTF-8");
-    		$mail->setBody($body);
+//    		$mail->setEncoding("UTF-8");
+			$mail->getHeaders()->addHeaderLine('Content-Transfer-Encoding', 'quoted-printable');
+			$mail->setBody($body);
     		$mail->setFrom($this->from_mail, $this->from_name);
     		$mail->setSubject($this->subject);
 
