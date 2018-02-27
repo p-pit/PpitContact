@@ -250,26 +250,15 @@ class ContactMessage implements InputFilterAwareInterface
     	$settings = $context->getConfig();
     	
     	if ($settings['isDemoAccountUpdatable'] || $context->getInstanceId() != 0) { // instance 0 is for demo
-			
-    		$body = '------=_Alternative_690_4213_09061981.062980923
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-
-This is an HTML message.
-------=_Alternative_690_4213_09061981.062980923
-Content-Type: text/html; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-    				
-';
-    		$body .= $this->body;			
+    		$body = $this->body;
     		$text = new MimePart($body);
-			$text->type = 'multipart/alternative; boundary="----=_Alternative_690_4213_09061981.062980923"';
-    		
+    		$text->type = \Zend\Mime\Mime::TYPE_HTML;
+    		$text->encoding = \Zend\Mime\Mime::ENCODING_QUOTEDPRINTABLE;
     		$body = new MimeMessage();
     		$body->setParts(array($text));
-    		 
+    		
     		$mail = new Mail\Message();
-//    		$mail->setEncoding("UTF-8");
+    		$mail->setEncoding("UTF-8");
 			$mail->getHeaders()->addHeaderLine('Content-Transfer-Encoding', 'quoted-printable');
 			$mail->setBody($body);
     		$mail->setFrom($this->from_mail, $this->from_name);

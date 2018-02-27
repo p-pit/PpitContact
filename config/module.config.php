@@ -368,6 +368,7 @@ return array(
 	),
 
 	'menus/p-pit-contact' => array(
+		'entries' => array(
 					'contact-message' => array(
 							'route' => 'contactMessage/index',
 							'params' => array(),
@@ -377,6 +378,11 @@ return array(
 									'fr_FR' => 'Messages',
 							),
 					),
+		),
+		'labels' => array(
+			'default' => '2pit Contacts',
+			'fr_FR' => 'P-Pit Contacts',
+		),
 	),
 		
 	'vcard/properties' => array(
