@@ -263,10 +263,10 @@ class ContactMessage implements InputFilterAwareInterface
 			$mail->setBody($body);
     		$mail->setFrom($this->from_mail, $this->from_name);
     		$mail->setSubject($this->subject);
-
-    		foreach ($this->to as $toMail => $toName) $mail->addTo($toMail, (($toName) ? $toName : $toMail));
-    		foreach ($this->cc as $ccEmail => $ccName) $mail->addCc($ccEmail, (($ccName) ? $ccName : $ccEmail));
-    		foreach ($this->cci as $cciEmail => $cciName) $mail->addBcc($cciEmail, (($cciName) ? $cciName : $cciEmail));
+    		
+	    	foreach ($this->to as $toMail => $toName) $mail->addTo($toMail, (($toName) ? $toName : $toMail));
+	    	foreach ($this->cc as $ccEmail => $ccName) $mail->addCc($ccEmail, (($ccName) ? $ccName : $ccEmail));
+	    	foreach ($this->cci as $cciEmail => $cciName) $mail->addBcc($cciEmail, (($cciName) ? $cciName : $cciEmail));
     		if ($settings['mailProtocol'] == 'Smtp') {
     			$transport = new Mail\Transport\Smtp();
     		}
