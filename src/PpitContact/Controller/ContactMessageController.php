@@ -216,14 +216,16 @@ class ContactMessageController extends AbstractActionController
 		$context = Context::getCurrent();
 		$select = ContactMessage::getTable()->getSelect()->where(array('type' => 'email', 'status' => 'new'));
 		$cursor = ContactMessage::getTable()->transSelectWith($select);
-		
+		$emails = array();
+		foreach ($cursor as $email) $emails[$email->id] = $email;
+
 		// Atomically change the status to prevent next batch to select the same messages again
 		$connection = ContactMessage::getTable()->getAdapter()->getDriver()->getConnection();
 		$connection->beginTransaction();
 		try {
-			foreach ($cursor as $email) {
+			foreach ($emails as $email) {
 				$email->status = 'sending';
-				ContactMessage::getTable()->transSave($this);
+				ContactMessage::getTable()->transSave($email);
 			}
 			$connection->commit();
 			$message = 'OK';
@@ -234,15 +236,15 @@ class ContactMessageController extends AbstractActionController
     	}
 
     	// Send the messages
-		foreach ($cursor as $email) $email->sendHtmlMail();
+		foreach ($emails as $email) $email->sendHtmlMail();
 			
 		// Atomically change the status to 'sent' and log the time of sending
 		$connection = ContactMessage::getTable()->getAdapter()->getDriver()->getConnection();
 		$connection->beginTransaction();
 		try {
-			foreach ($cursor as $email) {
+			foreach ($emails as $email) {
 				$email->status = 'sent';
-				ContactMessage::getTable()->transSave($this);
+				ContactMessage::getTable()->transSave($email);
 			}
 			$connection->commit();
 			$message = 'OK';
