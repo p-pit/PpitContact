@@ -231,18 +231,6 @@ class ContactMessage implements InputFilterAwareInterface
     		}
     	}
     }
-
-    function sendHtmlMail2()
-    {
-    	$context = Context::getCurrent();
-    	$settings = $context->getConfig();
-    	$headers  = 'From: "'.$this->from_name.'"<'.$this->from_mail.'>\n';
-    	$headers .= "MIME-Version: 1.0\n";
-    	$headers .= 'Content-Type: multipart/related; boundary="----=_Alternative_690_4213_09061981.062980923"';
-    	if ($settings['isDemoAccountUpdatable'] || $context->getInstanceId() != 0) { // instance 0 is for demo
-    		foreach ($this->to as $toMail => $toName) mail($toMail, $this->subject, $this->body, $headers);
-    	}
-    }
     
     function sendHtmlMail()
     {
@@ -275,17 +263,6 @@ class ContactMessage implements InputFilterAwareInterface
     		}
 
     		if ($settings['mailProtocol']) $transport->send($mail);
-    		$this->emission_time = date('Y-m-d H:i:s');
-    		ContactMessage::getTable()->transSave($this);
-    	    
-    		if ($settings['isTraceActive']) {
-    
-    			// Write to the log
-    			$writer = new Writer\Stream('data/log/mailing.txt');
-    			$logger = new Logger();
-    			$logger->addWriter($writer);
-    			$logger->info('to: '.implode(', ', $this->to).' - subject: '.$this->subject.' - body: '.$this->body);
-    		}
     	}
     }
    

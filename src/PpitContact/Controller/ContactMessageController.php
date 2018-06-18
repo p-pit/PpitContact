@@ -211,11 +211,45 @@ class ContactMessageController extends AbstractActionController
     	return $view;
     }
 
-    public function sendAction()
-    {
-    	$context = Context::getCurrent();
-    	$select = ContactMessage::getTable()->getSelect()->where(array('type' => 'email', 'emission_time' => null));
-    	$cursor = ContactMessage::getTable()->transSelectWith($select);
-    	foreach ($cursor as $email) $email->sendHtmlMail();
-    }
+	public function sendAction()
+	{
+		$context = Context::getCurrent();
+		$select = ContactMessage::getTable()->getSelect()->where(array('type' => 'email', 'status' => 'new'));
+		$cursor = ContactMessage::getTable()->transSelectWith($select);
+		
+		// Atomically change the status to prevent next batch to select the same messages again
+		$connection = ContactMessage::getTable()->getAdapter()->getDriver()->getConnection();
+		$connection->beginTransaction();
+		try {
+			foreach ($cursor as $email) {
+				$email->status = 'sending';
+				ContactMessage::getTable()->transSave($this);
+			}
+			$connection->commit();
+			$message = 'OK';
+		}
+		catch (\Exception $e) {
+			$connection->rollback();
+			throw $e;
+    	}
+
+    	// Send the messages
+		foreach ($cursor as $email) $email->sendHtmlMail();
+			
+		// Atomically change the status to 'sent' and log the time of sending
+		$connection = ContactMessage::getTable()->getAdapter()->getDriver()->getConnection();
+		$connection->beginTransaction();
+		try {
+			foreach ($cursor as $email) {
+				$email->status = 'sent';
+				ContactMessage::getTable()->transSave($this);
+			}
+			$connection->commit();
+			$message = 'OK';
+		}
+		catch (\Exception $e) {
+			$connection->rollback();
+			throw $e;
+    	}
+	}
 }
