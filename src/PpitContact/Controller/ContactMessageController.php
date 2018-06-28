@@ -215,6 +215,7 @@ class ContactMessageController extends AbstractActionController
 	{
 		$context = Context::getCurrent();
 		$select = ContactMessage::getTable()->getSelect()->where(array('type' => 'email', 'status' => 'new'));
+		$select->limit(10);
 		$cursor = ContactMessage::getTable()->transSelectWith($select);
 		$emails = array();
 		foreach ($cursor as $email) $emails[$email->id] = $email;
