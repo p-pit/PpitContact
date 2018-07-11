@@ -239,11 +239,17 @@ class ContactMessage implements InputFilterAwareInterface
     	
     	if ($settings['isDemoAccountUpdatable'] || $context->getInstanceId() != 0) { // instance 0 is for demo
     		$body = $this->body;
-    		$text = new MimePart($body);
-    		$text->type = \Zend\Mime\Mime::TYPE_HTML;
+
+    		$text = new MimePart('Le message ci-après s\'affichera correctement sur un navigateur qui supporte le format HTML.');
+    		$text->type = "text/plain";
     		$text->encoding = \Zend\Mime\Mime::ENCODING_QUOTEDPRINTABLE;
+    		
+    		$html = new MimePart($body);
+    		$html->type = \Zend\Mime\Mime::TYPE_HTML;
+    		$html->encoding = \Zend\Mime\Mime::ENCODING_QUOTEDPRINTABLE;
+
     		$body = new MimeMessage();
-    		$body->setParts(array($text));
+    		$body->setParts(array($text, $html));
     		
     		$mail = new Mail\Message();
     		$mail->setEncoding("UTF-8");
