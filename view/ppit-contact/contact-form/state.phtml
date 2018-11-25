@@ -77,7 +77,7 @@
 		$mandatory = (array_key_exists('mandatory', $field) && $field['mandatory']) ? 'require' : '';
 		?>
 
-		<?php if ($field['type'] == 'structured') : ?>
+		<?php if (false) : // ($field['type'] == 'structured') : ?>
 <!-- Structured field -->
 			<?php foreach ($field['properties'] as $itemId => $item) : ?>
 
