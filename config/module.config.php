@@ -8,22 +8,6 @@ return array(
         ),
     ),
 
-	'console' => array(
-			'router' => array(
-					'routes' => array(
-							'send' => array(
-									'options' => array(
-											'route'    => 'contact-message send',
-											'defaults' => array(
-													'controller' => 'PpitContact\Controller\ContactMessage',
-													'action'     => 'send'
-											)
-									)
-							),
-					),
-			),
-	),
-
     'router' => array(
         'routes' => array(
         	'contactForm' => array(
@@ -164,6 +148,18 @@ return array(
 		        								),
 		        						),
 		        				),
+	       						'send' => array(
+        								'type' => 'segment',
+        								'options' => array(
+        										'route' => '/send',
+        										'constraints' => array(
+        												'id' => '[0-9]*',
+        										),
+        										'defaults' => array(
+        												'action' => 'send',
+        										),
+        								),
+        						),
 	       		),
 			),
 /*        	'contract' => array(
@@ -315,6 +311,7 @@ return array(
 				array('route' => 'contactMessage/list', 'roles' => array('admin')),
 				array('route' => 'contactMessage/detail', 'roles' => array('admin')),
 				array('route' => 'contactMessage/update', 'roles' => array('admin')),
+				array('route' => 'contactMessage/send', 'roles' => array('admin')),
 			)
 		)
 	),
