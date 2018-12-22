@@ -185,7 +185,6 @@ class ContactMessage implements InputFilterAwareInterface
     	 
     	if (array_key_exists('body', $data)) {
 	    	$this->body = $data['body'];
-    		if (!$this->body) return 'Integrity';
     	}
 
     	if (array_key_exists('emission_time', $data)) $this->emission_time = $data['emission_time'];

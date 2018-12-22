@@ -214,6 +214,13 @@ class ContactMessageController extends AbstractActionController
 	public function sendAction()
 	{
 		$context = Context::getCurrent();
+	    	
+		// Authentication
+		if (!$context->isAuthenticated() && !$context->wsAuthenticate($this->getEvent())) {
+			$this->getResponse()->setStatusCode('401');
+			return $this->getResponse();
+		}
+		
 		$select = ContactMessage::getTable()->getSelect()->where(array('type' => 'email', 'status' => 'new'));
 		$select->limit(10);
 		$cursor = ContactMessage::getTable()->transSelectWith($select);
