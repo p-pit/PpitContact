@@ -311,7 +311,7 @@ return array(
 				array('route' => 'contactMessage/list', 'roles' => array('admin')),
 				array('route' => 'contactMessage/detail', 'roles' => array('admin')),
 				array('route' => 'contactMessage/update', 'roles' => array('admin')),
-				array('route' => 'contactMessage/send', 'roles' => array('admin')),
+				array('route' => 'contactMessage/send', 'roles' => array('guest')),
 			)
 		)
 	),
@@ -502,7 +502,7 @@ L\'équipe P-Pit
 ',
 			),
 	),
-	'community/consumeCredit' => array(
+/*	'community/consumeCredit' => array(
 			'messages' => array(
 					'availabilityAlertTitle' => array(
 							'en_US' => 'P-Pit Communities credits available',
@@ -575,5 +575,5 @@ L\'équipe P-Pit
 ',
 					),
 			),
-	),
+	),*/
 );

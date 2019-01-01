@@ -222,7 +222,7 @@ class ContactMessageController extends AbstractActionController
 		}
 		
 		$select = ContactMessage::getTable()->getSelect()->where(array('type' => 'email', 'status' => 'new'));
-		$select->limit(10);
+		$select->limit(50);
 		$cursor = ContactMessage::getTable()->transSelectWith($select);
 		$emails = array();
 		foreach ($cursor as $email) $emails[$email->id] = $email;
@@ -255,7 +255,7 @@ class ContactMessageController extends AbstractActionController
 				ContactMessage::getTable()->transSave($email);
 			}
 			$connection->commit();
-			$message = 'OK';
+			return $this->response;
 		}
 		catch (\Exception $e) {
 			$connection->rollback();
